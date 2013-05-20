@@ -1,0 +1,18 @@
+* Different areas to test
+** UI
+*** Do various interactions actually work as expected?
+- Can I create block programs in the expected way? 
+*** Can I serialize and restore block programs?
+Can I build up a fibonacci program? Will the typechecking work
+correctly?
+*** Can I connect two blocks of the wrong type
+Build Brown heaps? 
+** Semantics of generated code
+One obvious possibility is build up a library of programs for which we
+have the semantics pinned down. We can then test those with valid
+inputs, invalid inputs. We can also test all the primitives with
+valid inputs and invalid inputs. That should provide thurough testing
+for the semantics of all the primitives. System tests would be
+provided by testing the functions they define, in the same way that
+one would test using DrRacket. 
+

@@ -1,0 +1,15 @@
+body {
+  background-color: white;
+  font-family: sans-serif;
+}
+h1 {
+  font-weight: normal;
+  font-size: 140%;
+}
+#svgDiv {
+  height: 300px;
+  width: 100%;
+  border-style: solid;
+  border-color: #ddd;
+  border-width: 0 1px 1px 0;
+}

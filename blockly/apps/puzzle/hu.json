@@ -1,0 +1,42 @@
+{
+    "Puzzle.country1": "Ausztr\u00e1lia",
+    "Puzzle.country1Language": "Angol",
+    "Puzzle.country1City1": "Melbourne",
+    "Puzzle.country1City2": "Sydney",
+    "Puzzle.country1HelpUrl": "http://hu.wikipedia.org/wiki/Ausztr\u00e1lia",
+    "Puzzle.country2": "N\u00e9metorsz\u00e1g",
+    "Puzzle.country2Language": "N\u00e9met",
+    "Puzzle.country2City1": "Berlin",
+    "Puzzle.country2City2": "M\u00fcnchen",
+    "Puzzle.country2HelpUrl": "http://hu.wikipedia.org/wiki/N\u00e9metorsz\u00e1g",
+    "Puzzle.country3": "K\u00edna",
+    "Puzzle.country3Language": "K\u00ednai",
+    "Puzzle.country3City1": "Peking",
+    "Puzzle.country3City2": "Sanghaj",
+    "Puzzle.country3HelpUrl": "http://hu.wikipedia.org/wiki/K\u00edna",
+    "Puzzle.country4": "Braz\u00edlia",
+    "Puzzle.country4Language": "Portug\u00e1l",
+    "Puzzle.country4City1": "Rio de Janeiro",
+    "Puzzle.country4City2": "S\u00e3o Paulo",
+    "Puzzle.country4HelpUrl": "http://hu.wikipedia.org/wiki/Braz\u00edlia",
+    "Puzzle.flag": "z\u00e1szl\u00f3",
+    "Puzzle.language": "nyelv:",
+    "Puzzle.languageChoose": "v\u00e1lassz\u2026",
+    "Puzzle.cities": "v\u00e1rosok:",
+    "Puzzle.error0": "T\u00f6k\u00e9letes!\nMinden %1 blokk helyes.",
+    "Puzzle.error1": "Majdnem siker\u00fclt! Egy blokk helytelen.",
+    "Puzzle.error2": "%1 blok helytelen.",
+    "Puzzle.tryAgain": "A kiemelt blokk helytelen.\nPr\u00f3b\u00e1lkozz tov\u00e1bb!",
+    "Puzzle.fullTitle": "Blokkrejtv\u00e9ny",
+    "Puzzle.title": "Rejtv\u00e9ny",
+    "Puzzle.help": "Seg\u00edts\u00e9g",
+    "Puzzle.checkAnswers": "V\u00e1laszok ellen\u0151rz\u00e9se",
+    "Puzzle.helpText": "Minden orsz\u00e1ghoz (z\u00f6ld sz\u00edn\u0171ek) add hozz\u00e1 a z\u00e1szl\u00f3j\u00e1t, v\u00e1laszd ki a nyelvet amit besz\u00e9lnek \u00e9s k\u00e9sz\u00edts egy tornyot a v\u00e1rosaib\u00f3l.",
+    "Puzzle.helpImage": "help_en.png",
+    "Puzzle.helpOk": "Elolvastam",
+    "@metadata": {
+        "authors": [
+            "Grin"
+        ]
+    }
+}

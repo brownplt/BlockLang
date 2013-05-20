@@ -1,0 +1,45 @@
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Blockly Code</title>
+  <link href="style.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript" src="/storage.js"></script>
+  <script type="text/javascript" src="../_soy/soyutils.js"></script>
+  <script type="text/javascript" src="template.js"></script>
+  <script>
+    var MSG = {
+      // Tooltips.
+      trashTooltip: 'Discard all blocks.',
+      linkTooltip: 'Save and link to blocks.',
+      runTooltip: 'Run program.',
+      // Toolbox categories.
+      catControl: 'Control',
+      catLogic: 'Logic',
+      catMath: 'Math',
+      catText: 'Text',
+      catLists: 'Lists',
+      catColour: 'Colour',
+      catVariables: 'Variables',
+      catProcedures: 'Procedures',
+      // Misc text.
+      blocks: 'Blocks',
+      badXml: 'Error parsing XML:\n%1\n\nAbandon changes?',
+      badCode: 'Program error:\n%1',
+      timeout: 'Maximum execution iterations exceeded.',
+      discard: 'Delete all "%1" blocks?',
+      title: 'Code'
+    };
+    if ('BlocklyStorage' in window) {
+      BlocklyStorage.HTTPREQUEST_ERROR = 'There was a problem with the request.\n';
+      BlocklyStorage.LINK_ALERT = 'Share your blocks with this link:\n\n';
+      BlocklyStorage.HASH_ERROR = 'Sorry, "%1" doesn\'t correspond with any saved Blockly file.';
+      BlocklyStorage.XML_ERROR = 'Could not load your saved file.\n'+
+          'Perhaps it was created with a different version of Blockly?\nXML: ';
+    }
+    var frameSrc = ['en_compressed.js'];
+  </script>
+</head>
+<body>
+  <script type="text/javascript" src="code.js"></script>
+</body>
+</html>
