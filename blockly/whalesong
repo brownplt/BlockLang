@@ -1,8 +1,0 @@
-#!/bin/sh
-# This script was created by make-mzscheme-launcher
-
-# {{{ bindir
-bindir="/local/projects/racket/recent/i686/bin"
-# }}} bindir
-
-exec "${bindir}/racket" -N "$0" '/home/slg1/.racket/planet/300/5.3.3/cache/dyoo/whalesong.plt/1/21/whalesong.rkt'  ${1+"$@"}
