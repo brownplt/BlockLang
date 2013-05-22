@@ -163,6 +163,7 @@ Blockly.Whalesong.quote_ = function(string) {
   string = string.replace(/\\/g, '\\\\')
                  .replace(/\n/g, '\\\n')
                  .replace(/'/g, '\\\'');
+
   return '\'' + string + '\'';
 };
 
