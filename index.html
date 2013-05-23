@@ -2,6 +2,40 @@
 <html lang="en">
 <head>
   <title>Index</title>
+  <style media="screen" type="text/css">
+    textarea { min-width: 85%; min-height: 400px; padding: 0; }
+  </style>
   <script type="text/javascript" src="./runtime.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() { 
+        $("button").click(function(e) { 
+            console.log("About to eval!");
+            var text = $("textarea").val();
+            console.log("Result is: " + eval(text));
+        });
+    });
+    
+    var _temp;
+    var success = function(v) { _temp = v; };
+    var failure = function(v) {
+        throw { message: "Failure!!!", value: v }; 
+    };
+    var prim_to_js_prim = function(name) { 
+        return plt.baselib.functions.asJavaScriptFunction(plt.baselib.primitives.Primitives[name]);
+    };
+
+    var call_js_prim = function(prim) { 
+        var args = Array.prototype.slice.call(arguments, 1);
+        var continuations = [success, failure];
+        prim.apply(null, continuations.concat(args));
+        return _temp;
+    }
+  </script>
 </head>
+<div>
+  <textarea></textarea>
+</div>
+<div>
+  <button type="button">Evaluate in PLT context</button>
+</div>
 <body>

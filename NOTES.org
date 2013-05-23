@@ -1,0 +1,138 @@
+* Dependencies
+
+  As checked out originally, the blockly core is provided in compiled
+  form ('blockly_compressed.js') so that users who don't want to
+  change the core functionality of Blockly don't have to get a local
+  copy of the Google Closure library (upon which Blockly depends)
+  and can just can add languages and blocks using the high-level
+  functions provided by the Blockly core. 
+
+  If you do want to recompile the core, you then need the Closure
+  Library dependency, located at '/closure-library-read-only'. This
+  contains all the UI shared by all of Google's web applications, as
+  well as some dependency management for organizing the codebase and
+  Google's events library. 
+
+  By default, even if you have the local copy of the Closure Library,
+  compilation is still done through the Closure Compiler web API,
+  since the Closure Library and the Closure Compiler have to be
+  installed separately. I've modified the provided build script
+  ('build.py') to do everything locally since online compilation
+  wouldn't work without an internet connection and is quite
+  slow, as the entire contents of files to be compiled are sent over
+  as parameters to the POST request.  
+
+* Interfacing with Whalesong runtime
+
+  The Whalesong runtime provides Javascript versions of (essentially)
+  all of the core of Racket, and acts as a virtual machine on top of
+  the Javascript runtime, allowing programs it runs to interrupt and
+  resume computations, both of which are needed to implement
+  continuations and other forms of exceptional control flow. 
+
+  It normally operates by compiling Racket code to Racket bytecode,
+  then compiling that bytecode to an intermediate language, and then
+  finally to Javascript bytecode which then runs on the Whalesong VM. 
+
+  We want to be able to evaluate arbitrary block programs (corresponding
+  to Racket programs) every time a user hits run, without having
+  to generate Racket, send that to a server which returns compiled
+  Whalesong VM JS, and then finally that. 
+
+  The Whalesong runtime provides the function 'asJavaScriptFunction'
+  (located in 'plt.baselib.functions') which takes in a Whalesong
+  function, and returns a function that can be called directly from
+  ordinary Javascript code, though in a less-than-straightforward
+  way. 
+
+  The collection of Racket primitives provided by the Whalesong
+  runtime is located at 'plt.baselib.primitives.Primitives'. 
+
+  Here's an example: We have the following expression that we want to
+  evaluate: (sin (+ 1 2))
+
+  We can get the javascript functions corresponding to each of the
+  primitives as follows: 
+
+  #+BEGIN_SRC js
+    
+    var sin_prim = plt.baselib.primitives.Primitives['sin'];
+    var plus_prim = plt.baselib.primitives.Primitives['+'];
+    
+    var sinF = plt.baselib.functions.asJavaScriptFunction(sin_prim);
+    var plusF = plt.baselib.functions.asJavaScriptFunction(plus_prim);
+    
+  #+END_SRC
+
+  The calling convention for functions created in this way has them
+  taking 2 or more arguments, 
+    success: a function of one argument that is executed upon
+             successful evaluation of the underlying Racket function
+             application. When evaluated, the success function is
+             passed the result of the Racket function
+             call. (Basically the successful continuation.)
+    failure: a function of one argument that is executed upon an
+             error or exeception during the evaluation of the
+             underlying Racket function application. When evaluated,
+             the failure function is passed the error produced by the
+             Racket function application. (Basically the failure
+             continuation.) 
+    args...: Any arguments to the Racket function that is being
+             wrapped here. These should be objects of the right type
+             that are passed directly to the called function. 
+
+  Furthermore, when the success and failure continuations are called,
+  any values they return are not passed back directly to the top
+  level that invoked the Racket primitive in the first place. In
+  order to get the value resulting from the function invocation and to
+  make the generated code more manageable, I define the following
+  functions globally, immediately after the Whalesong runtime
+  finished loading:
+
+  #+BEGIN_SRC js
+    
+    var _temp;
+    var success = function(v) { _temp = v; };
+    var failure = function(e) { 
+        throw { message: "Failure!!!", value: v }; 
+    };
+    var prim_to_js_prim = function(name) { 
+        return plt.baselib.functions.asJavaScriptFunction(plt.baselib.primitives.Primitives[name]);
+    };
+    var call_js_prim = function(prim) { 
+        var args = Array.prototype.slice.call(arguments, 1);
+        var continuations = [success, failure];
+        prim.apply(null, continuations.concat(args));
+        return _temp;
+    };
+
+  #+END_SRC
+
+  With this in place, The generated code can be relatively
+  straightforward. Continuing with the example above, the final
+  generated code is:
+
+  #+BEGIN_SRC js
+
+    call_js_prim(prim_to_js_prim('sin'), call_js_prim(prim_to_js_prim('+'), 1, 2));
+
+  #+END_SRC
+
+  This evaluates to 0.1411, which matches exactly the result obtained
+  by (sin (+ 1 2)) in WeScheme. 
+
+  I believe this pattern will suffice most (if not all) of the blocks
+  that don't extend the namespace (that aren't definitions). Those will
+  require deeper integration with the Whalesong VM than here since I
+  will have to deal with scope and variable binding and have to be
+  very careful about when exactly definitions are introduced into the
+  environment.   
+  
+  That being said, using this pattern (potentially) loses a lot of the
+  functionality of the Whalesong VM, since we are working in plain
+  Javascript and not bytecode compiled JS. I'm not sure whether this
+  approach allows for computations to be interrupted, and I suppose
+  that depends at least in part on how the 'asJavaScriptFunction'
+  function wraps up the function it is converting to JS.
+
+
