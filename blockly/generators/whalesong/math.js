@@ -87,14 +87,12 @@ Blockly.Whalesong.math_single = function() {
     case 'SIN':
     case 'COS':
     case 'TAN':
-      var arg_in_radians = Blockly.Whalesong.call_primitive("degrees->radians", arg);
-      code = Blockly.Whalesong.call_primitive(Blockly.Whalesong.TRIGONOMETRIC_OPERATORS[operator], arg_in_radians);
+      code = Blockly.Whalesong.call_primitive(Blockly.Whalesong.TRIGONOMETRIC_OPERATORS[operator], arg);
       break;
     case 'ASIN':
     case 'ACOS':
     case 'ATAN':
-      var result_in_radians = Blockly.Whalesong.call_primitive(Blockly.Whalesong.TRIGONOMETRIC_OPERATORS[operate], arg);
-      code = Blockly.Whalesong.call_primitive("radians->degrees", result_in_radians);
+      code = Blockly.Whalesong.call_primitive(Blockly.Whalesong.TRIGONOMETRIC_OPERATORS[operator], arg);
       break;
     case 'POW10':
     case 'LOG10':

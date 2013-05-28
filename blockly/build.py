@@ -36,11 +36,13 @@ def needs_compile(target_filename, filenames):
     last_changed = max([os.stat(f).st_mtime for f in filenames])
     if last_changed > last_compiled:
       print "%s needs to be re-compiled" % target_filename
+      return True
     else: 
       print "Skipping %s (no dependencies have been updated since last compilation)" % target_filename
-      return last_changed > last_compiled
+      return False
   else: 
     return True
+
 
 def import_path(fullpath):
   """Import a file with full path specification.

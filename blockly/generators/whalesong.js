@@ -115,7 +115,7 @@ Blockly.Whalesong.call_primitive = function (primitive /*, arguments to function
 	var prim_func = 'prim_to_js_prim(' + Blockly.Whalesong.quote_(primitive) + ')';
 	var call = 'call_js_prim(' + prim_func;
 
-	var call = call + 'success, failure';
+	var call = call + ', success, failure';
 	for(var i = 1; i < arguments.length; i++) { 
 	    call += ', ' + arguments[i];
 	}
