@@ -135,4 +135,8 @@
   that depends at least in part on how the 'asJavaScriptFunction'
   function wraps up the function it is converting to JS.
 
+* Send messages to Blockly mailing list
+- Can we define our own shapes, (rounded rectangle)
+- Why is there a gap between sub-expression and containing expression, since it can be full
 
+* Make a prototype of some programs that have definitions so that we can see what we are expecting
