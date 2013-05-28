@@ -27,7 +27,7 @@ Blockly.Whalesong.math = {};
 
 Blockly.Whalesong.math_number = function() {
   // Numeric value.
-  var code = window.parseFloat(this.getTitleValue('NUM'));    
+  var code = window.parseFloat(this.getTitleValue('NUM'));
   return [code, Blockly.Whalesong.ORDER_ATOMIC];
 };
 
@@ -37,7 +37,7 @@ Blockly.Whalesong.math_arithmetic = function() {
   var primitive_name = Blockly.Whalesong.math_arithmetic.BASIC_OPERATIONS[mode];
   var argument0 = Blockly.Whalesong.valueToCode(this, 'A', Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
   var argument1 = Blockly.Whalesong.valueToCode(this, 'B', Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
-  var code = Blockly.Whalesong.call_primitive(primitive_name, argument0, argument1);
+  var code = Blockly.Whalesong.ws_apply(primitive_name, argument0, argument1);
   return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
 
@@ -82,17 +82,17 @@ Blockly.Whalesong.math_single = function() {
     case 'ROUND':
     case 'ROUNDUP':
     case 'ROUNDDOWN':
-      code = Blockly.Whalesong.call_primitive(Blockly.Whalesong.UNARY_OPERATORS[operator], arg);
+      code = Blockly.Whalesong.ws_apply(Blockly.Whalesong.UNARY_OPERATORS[operator], arg);
       break;
     case 'SIN':
     case 'COS':
     case 'TAN':
-      code = Blockly.Whalesong.call_primitive(Blockly.Whalesong.TRIGONOMETRIC_OPERATORS[operator], arg);
+      code = Blockly.Whalesong.ws_apply(Blockly.Whalesong.TRIGONOMETRIC_OPERATORS[operator], arg);
       break;
     case 'ASIN':
     case 'ACOS':
     case 'ATAN':
-      code = Blockly.Whalesong.call_primitive(Blockly.Whalesong.TRIGONOMETRIC_OPERATORS[operator], arg);
+      code = Blockly.Whalesong.ws_apply(Blockly.Whalesong.TRIGONOMETRIC_OPERATORS[operator], arg);
       break;
     case 'POW10':
     case 'LOG10':
@@ -102,7 +102,7 @@ Blockly.Whalesong.math_single = function() {
   return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
 
-Blockly.Whalesong.UNARY_OPERATORS = { 
+Blockly.Whalesong.UNARY_OPERATORS = {
     ABS: "abs",
     ROOT: "sqrt",
     LN: "log",
@@ -112,7 +112,7 @@ Blockly.Whalesong.UNARY_OPERATORS = {
     ROUNDDOWN: "floor"
 };
 
-Blockly.Whalesong.TRIGONOMETRIC_OPERATORS = { 
+Blockly.Whalesong.TRIGONOMETRIC_OPERATORS = {
     SIN: "sin",
     COS: "cos",
     TAN: "tan",
@@ -124,79 +124,64 @@ Blockly.Whalesong.TRIGONOMETRIC_OPERATORS = {
 Blockly.Whalesong.math_constant = function() {
   // Constants: PI, E, the Golden Ratio, sqrt(2), 1/sqrt(2), INFINITY.
   var constant = this.getTitleValue('CONSTANT');
-  return Blockly.Whalesong.math_constant.CONSTANTS[constant];
+  if(constant === "GOLDEN_RATIO") {
+    var code = Blockly.Whalesong.ws_apply('/', Blockly.Whalesong.ws_apply('+', 1, Blockly.Whalesong.ws_apply('sqrt', 5)), 2);
+    return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
+  } else {
+    return Blockly.Whalesong.math_constant.CONSTANTS[constant];
+  }
+
 };
 
 Blockly.Whalesong.math_constant.CONSTANTS = {
   PI: ['Math.PI', Blockly.Whalesong.ORDER_MEMBER],
   E: ['Math.E', Blockly.Whalesong.ORDER_MEMBER],
-  GOLDEN_RATIO: ['(1 + Math.sqrt(5)) / 2', Blockly.Whalesong.ORDER_DIVISION],
   SQRT2: ['Math.SQRT2', Blockly.Whalesong.ORDER_MEMBER],
   SQRT1_2: ['Math.SQRT1_2', Blockly.Whalesong.ORDER_MEMBER],
   INFINITY: ['Infinity', Blockly.Whalesong.ORDER_ATOMIC]
 };
 
+
+/**
+ * I think that it's a bad idea to special-case prime and generate more complicated code for it.
+ * I'm just going to add it as a function to the Whalesong runtime
+ */
 Blockly.Whalesong.math_number_property = function() {
   // Check if a number is even, odd, prime, whole, positive, or negative
   // or if it is divisible by certain number. Returns true or false.
   var number_to_check = Blockly.Whalesong.valueToCode(this, 'NUMBER_TO_CHECK',
-      Blockly.Whalesong.ORDER_MODULUS) || 'NaN';
+      Blockly.Whalesong.ORDER_FUNCTION_CALL) || 'NaN';
   var dropdown_property = this.getTitleValue('PROPERTY');
   var code;
   if (dropdown_property == 'PRIME') {
     // Prime is a special case as it is not a one-liner test.
-    if (!Blockly.Whalesong.definitions_['isPrime']) {
-      var functionName = Blockly.Whalesong.variableDB_.getDistinctName(
-          'isPrime', Blockly.Generator.NAME_TYPE);
-      Blockly.Whalesong.logic_prime= functionName;
-      var func = [];
-      func.push('function ' + functionName + '(n) {');
-      func.push('  // http://en.wikipedia.org/wiki/Primality_test#Naive_methods');
-      func.push('  if (n == 2 || n == 3) {');
-      func.push('    return true;');
-      func.push('  }');
-      func.push('  // False if n is NaN, negative, is 1, or not whole.');
-      func.push('  // And false if n is divisible by 2 or 3.');
-      func.push('  if (isNaN(n) || n <= 1 || n % 1 != 0 || n % 2 == 0 ||' +
-                ' n % 3 == 0) {');
-      func.push('    return false;');
-      func.push('  }');
-      func.push('  // Check all the numbers of form 6k +/- 1, up to sqrt(n).');
-      func.push('  for (var x = 6; x <= Math.sqrt(n) + 1; x += 6) {');
-      func.push('    if (n % (x - 1) == 0 || n % (x + 1) == 0) {');
-      func.push('      return false;');
-      func.push('    }');
-      func.push('  }');
-      func.push('  return true;');
-      func.push('}');
-      Blockly.Whalesong.definitions_['isPrime'] = func.join('\n');
-    }
-    code = Blockly.Whalesong.logic_prime + '(' + number_to_check + ')';
-    return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
+    return Blockly.Whalesong.not_implemented();
   }
   switch (dropdown_property) {
     case 'EVEN':
-      code = number_to_check + ' % 2 == 0';
+      code = Blockly.Whalesong.ws_apply("even?", number_to_check);
       break;
     case 'ODD':
-      code = number_to_check + ' % 2 == 1';
+      code = Blockly.Whalesong.ws_apply("odd?", number_to_check);
       break;
     case 'WHOLE':
-      code = number_to_check + ' % 1 == 0';
+      code = Blockly.Whalesong.ws_apply("equal?",
+                                        Blockly.Whalesong.ws_apply("floor", number_to_check),
+                                        Blockly.Whalesong.ws_apply("ceiling", number_to_check));
       break;
     case 'POSITIVE':
-      code = number_to_check + ' > 0';
+      code = Blockly.Whalesong.ws_apply(">", number_to_check, 0);
       break;
     case 'NEGATIVE':
-      code = number_to_check + ' < 0';
+      code = Blockly.Whalesong.ws_apply("<", number_to_check, 0);
       break;
     case 'DIVISIBLE_BY':
       var divisor = Blockly.Whalesong.valueToCode(this, 'DIVISOR',
-          Blockly.Whalesong.ORDER_MODULUS) || 'NaN';
-      code = number_to_check + ' % ' + divisor + ' == 0';
+          Blockly.Whalesong.ORDER_FUNCTION_CALL) || 'NaN';
+      code = Blockly.Whalesong.ws_apply("equal?", Blockly.Whalesong.ws_apply("remainder", number_to_check, divisor), 0);
       break;
   }
-  return [code, Blockly.Whalesong.ORDER_EQUALITY];
+  return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Whalesong.math_change = function() {
@@ -371,23 +356,22 @@ Blockly.Whalesong.math_on_list = function() {
 Blockly.Whalesong.math_modulo = function() {
   // Remainder computation.
   var argument0 = Blockly.Whalesong.valueToCode(this, 'DIVIDEND',
-      Blockly.Whalesong.ORDER_MODULUS) || '0';
+      Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
   var argument1 = Blockly.Whalesong.valueToCode(this, 'DIVISOR',
-      Blockly.Whalesong.ORDER_MODULUS) || '0';
-  var code = argument0 + ' % ' + argument1;
-  return [code, Blockly.Whalesong.ORDER_MODULUS];
+      Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
+  var code = Blockly.Whalesong.ws_apply("modulo", argument0, argument1);
+  return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Whalesong.math_constrain = function() {
   // Constrain a number between two limits.
   var argument0 = Blockly.Whalesong.valueToCode(this, 'VALUE',
-      Blockly.Whalesong.ORDER_COMMA) || '0';
+      Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
   var argument1 = Blockly.Whalesong.valueToCode(this, 'LOW',
-      Blockly.Whalesong.ORDER_COMMA) || '0';
+      Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
   var argument2 = Blockly.Whalesong.valueToCode(this, 'HIGH',
-      Blockly.Whalesong.ORDER_COMMA) || 'Infinity';
-  var code = 'Math.min(Math.max(' + argument0 + ', ' + argument1 + '), ' +
-      argument2 + ')';
+      Blockly.Whalesong.ORDER_FUNCTION_CALL) || 'Infinity';
+  var code = Blockly.Whalesong.ws_apply("min", Blockly.Whalesong.ws_apply(argument0,argument1), argument2);
   return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
 
@@ -397,10 +381,10 @@ Blockly.Whalesong.math_random_int = function() {
       Blockly.Whalesong.ORDER_COMMA) || '0';
   var argument1 = Blockly.Whalesong.valueToCode(this, 'TO',
       Blockly.Whalesong.ORDER_COMMA) || '0';
-  return [Blockly.Whalesong.call_primitive("random", argument0, argument1), Blockly.Whalesong.ORDER_FUNCTION_CALL];
+  return [Blockly.Whalesong.ws_apply("random", argument0, argument1), Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
 
 Blockly.Whalesong.math_random_float = function() {
   // Random fraction between 0 and 1.
-  return [Blockly.Whalesong.call_primitive("random"), Blockly.Whalesong.ORDER_FUNCTION_CALL];
+  return [Blockly.Whalesong.ws_apply("random"), Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
