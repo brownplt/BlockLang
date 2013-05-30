@@ -5361,7 +5361,7 @@ if (!(this.plt)) { this.plt = {}; }
 
 
 
-    var reverse = function (lst) {
+   var reverse = function (lst) {
         var rev = EMPTY;
         while (lst !== EMPTY) {
             rev = makePair(lst.first, rev);
@@ -11779,7 +11779,7 @@ var LLRBTree = {};
             var next;
             var currentMax = checkReal(M, 'min', 0);
             for (i = 1; i < M.a; i++) {
-                next = checkReal(M, 'min', i);
+                next = checkReal(M, 'max', i);
                 if (baselib.numbers.greaterThan(next, currentMax)) {
                     currentMax = next;
                 }

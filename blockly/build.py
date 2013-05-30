@@ -28,10 +28,15 @@
 # been renamed.  The uncompressed file also allows for a faster developement
 # cycle since there is no need to rebuild or recompile, just reload.
 
-import glob, os, re, sys, subprocess
+import glob, os, re, sys, subprocess, fileinput
 
 def needs_compile(target_filename, filenames):
-  if os.path.isfile(target_filename):
+  try:
+    with open(target_filename): pass
+    exists = True
+  except IOError: 
+    exists = False
+  if exists:
     last_compiled = os.stat(target_filename).st_mtime
     last_changed = max([os.stat(f).st_mtime for f in filenames])
     if last_changed > last_compiled:
@@ -168,13 +173,20 @@ class Gen_compressed():
       self.do_compile_local(target_filename, filenames)
 
   def gen_generator(self, language):
-    target_filename = language + '_compressed.js'
+    target_filename_compressed = language + '_compressed.js'
+    target_filename_uncompressed = language + '_uncompressed.js'
     # Read in all the source files.
     filenames = glob.glob('./generators/%s/*.js' % language)
     filenames.insert(0, './generators/%s.js' % language)
 
-    if needs_compile(target_filename, filenames):
-      self.do_compile_local(target_filename, filenames)
+    if needs_compile(target_filename_uncompressed, filenames):
+      with open(target_filename_uncompressed, 'wt') as fout:
+        for line in fileinput.input(filenames, mode='r'):
+          fout.write(line)
+      print "SUCCESSFULLY COMPILED: %s" % target_filename_uncompressed
+
+    if needs_compile(target_filename_compressed, filenames):
+      self.do_compile_local(target_filename_compressed, filenames)
 
   def gen_language(self, language):
     target_filename = language + '_compressed.js'

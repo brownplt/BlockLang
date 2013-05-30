@@ -35,8 +35,8 @@ Blockly.Whalesong.math_arithmetic = function() {
   // Basic arithmetic operators, and power.
   var mode = this.getTitleValue('OP');
   var primitive_name = Blockly.Whalesong.math_arithmetic.BASIC_OPERATIONS[mode];
-  var argument0 = Blockly.Whalesong.valueToCode(this, 'A', Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
-  var argument1 = Blockly.Whalesong.valueToCode(this, 'B', Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
+  var argument0 = Blockly.Whalesong.valueToCode(this, 'A', Blockly.Whalesong.ORDER_COMMA) || '0';
+  var argument1 = Blockly.Whalesong.valueToCode(this, 'B', Blockly.Whalesong.ORDER_COMMA) || '0';
   var code = Blockly.Whalesong.ws_apply(primitive_name, argument0, argument1);
   return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
@@ -207,20 +207,22 @@ Blockly.Whalesong.math_on_list = function() {
     case 'SUM':
       list = Blockly.Whalesong.valueToCode(this, 'LIST',
           Blockly.Whalesong.ORDER_MEMBER) || '[]';
-      code = list + '.reduce(function(x, y) {return x + y;})';
+      return Blockly.Whalesong.not_implemented()
       break;
     case 'MIN':
       list = Blockly.Whalesong.valueToCode(this, 'LIST',
           Blockly.Whalesong.ORDER_COMMA) || '[]';
-      code = 'Math.min.apply(null, ' + list + ')';
+      code = Blockly.Whalesong.ws_apply('apply', Blockly.Whalesong.ws_prim('min'), list);
       break;
     case 'MAX':
       list = Blockly.Whalesong.valueToCode(this, 'LIST',
           Blockly.Whalesong.ORDER_COMMA) || '[]';
-      code = 'Math.max.apply(null, ' + list + ')';
+      code = Blockly.Whalesong.ws_apply('apply', Blockly.Whalesong.ws_prim('max'), list);
       break;
     case 'AVERAGE':
       // math_median([null,null,1,3]) == 2.0.
+      return Blockly.Whalesong.not_implemented();
+      /*
       if (!Blockly.Whalesong.definitions_['math_mean']) {
         var functionName = Blockly.Whalesong.variableDB_.getDistinctName(
             'math_mean', Blockly.Generator.NAME_TYPE);
@@ -235,9 +237,12 @@ Blockly.Whalesong.math_on_list = function() {
       list = Blockly.Whalesong.valueToCode(this, 'LIST',
           Blockly.Whalesong.ORDER_NONE) || '[]';
       code = Blockly.Whalesong.math_on_list.math_mean + '(' + list + ')';
+      */
       break;
-    case 'MEDIAN':
+    case 'MEDIAN':      
       // math_median([null,null,1,3]) == 2.0.
+      return Blockly.Whalesong.not_implemented();
+      /* 
       if (!Blockly.Whalesong.definitions_['math_median']) {
         var functionName = Blockly.Whalesong.variableDB_.getDistinctName(
             'math_median', Blockly.Generator.NAME_TYPE);
@@ -260,8 +265,11 @@ Blockly.Whalesong.math_on_list = function() {
       list = Blockly.Whalesong.valueToCode(this, 'LIST',
           Blockly.Whalesong.ORDER_NONE) || '[]';
       code = Blockly.Whalesong.math_on_list.math_median + '(' + list + ')';
+      */
       break;
     case 'MODE':
+      return Blockly.Whalesong.not_implemented();
+      /* 
       if (!Blockly.Whalesong.definitions_['math_modes']) {
         var functionName = Blockly.Whalesong.variableDB_.getDistinctName(
             'math_modes', Blockly.Generator.NAME_TYPE);
@@ -303,8 +311,11 @@ Blockly.Whalesong.math_on_list = function() {
       list = Blockly.Whalesong.valueToCode(this, 'LIST',
           Blockly.Whalesong.ORDER_NONE) || '[]';
       code = Blockly.Whalesong.math_on_list.math_modes + '(' + list + ')';
+      */
       break;
     case 'STD_DEV':
+      return Blockly.Whalesong.not_implemented();
+      /* 
       if (!Blockly.Whalesong.definitions_['math_standard_deviation']) {
         var functionName = Blockly.Whalesong.variableDB_.getDistinctName(
             'math_standard_deviation', Blockly.Generator.NAME_TYPE);
@@ -329,26 +340,17 @@ Blockly.Whalesong.math_on_list = function() {
           Blockly.Whalesong.ORDER_NONE) || '[]';
       code = Blockly.Whalesong.math_on_list.math_standard_deviation +
           '(' + list + ')';
+      */
       break;
     case 'RANDOM':
-      if (!Blockly.Whalesong.definitions_['math_random_item']) {
-        var functionName = Blockly.Whalesong.variableDB_.getDistinctName(
-            'math_random_item', Blockly.Generator.NAME_TYPE);
-        Blockly.Whalesong.math_on_list.math_random_item = functionName;
-        var func = [];
-        func.push('function ' + functionName + '(list) {');
-        func.push('  var x = Math.floor(Math.random() * list.length);');
-        func.push('  return list[x];');
-        func.push('}');
-        Blockly.Whalesong.definitions_['math_random_item'] = func.join('\n');
-      }
       list = Blockly.Whalesong.valueToCode(this, 'LIST',
           Blockly.Whalesong.ORDER_NONE) || '[]';
-      code = Blockly.Whalesong.math_on_list.math_random_item +
-          '(' + list + ')';
+      code = Blockly.Whalesong.ws_apply('list-ref', list, 
+					Blockly.Whalesong.ws_apply('random', 
+								   Blockly.Whalesong.ws_apply('length', list)));
       break;
     default:
-      throw 'Unknown operator: ' + func;
+      return Blockly.Whalesong.not_implemented;
   }
   return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
@@ -371,7 +373,7 @@ Blockly.Whalesong.math_constrain = function() {
       Blockly.Whalesong.ORDER_FUNCTION_CALL) || '0';
   var argument2 = Blockly.Whalesong.valueToCode(this, 'HIGH',
       Blockly.Whalesong.ORDER_FUNCTION_CALL) || 'Infinity';
-  var code = Blockly.Whalesong.ws_apply("min", Blockly.Whalesong.ws_apply(argument0,argument1), argument2);
+  var code = Blockly.Whalesong.ws_apply('min', Blockly.Whalesong.ws_apply('max', argument0, argument1), argument2);
   return [code, Blockly.Whalesong.ORDER_FUNCTION_CALL];
 };
 

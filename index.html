@@ -3,39 +3,67 @@
 <head>
   <title>Index</title>
   <style media="screen" type="text/css">
-    textarea { min-width: 85%; min-height: 400px; padding: 0; }
+    body { font-family: "sans-serif"; padding: 0px; background-color: black; }
+    #editor { overflow: auto; }
+    #i > textarea { 
+      border-style: solid;
+      border-width: 3px;
+      border-color: blue;
+      width: 90%;
+      rows: 1
+      height: 400px;
+      padding: 3px;
+      float: left;
+    }
+    #o > textarea { 
+      border-style: solid;
+      border-width: 3px;
+      border-color: maroon;
+      background-color: white; 
+      float: left;
+      width: 90%;
+      height: 800px;
+      padding: 3px;
+    }
+    #controller { height: auto; overflow: auto; }
   </style>
+  <script type="text/javascript" src="underscore.js"></script>
+  <script type="text/javascript" src="jsDump.js"></script>
   <script type="text/javascript" src="./runtime.js"></script>
   <script type="text/javascript">
     $(document).ready(function() { 
         $("button").click(function(e) { 
-            console.log("About to eval!");
-            var text = $("textarea").val();
-            console.log("Result is: " + eval(text));
+            $("#o > textarea").text("About to eval!");
+            var code = $("#i > textarea").val();
+            try { 
+                var eval_result = eval('(' + code + ')');
+                $("#o > textarea").text(jsDump.parse(eval_result));
+            } catch(e) { 
+                $("#o > textarea").text(jsDump.parse(e));
+            }
         });
     });
-    
-    var _temp;
-    var success = function(v) { _temp = v; };
-    var failure = function(v) {
-        throw { message: "Failure!!!", value: v }; 
-    };
-    var prim_to_js_prim = function(name) { 
-        return plt.baselib.functions.asJavaScriptFunction(plt.baselib.primitives.Primitives[name]);
-    };
 
-    var call_js_prim = function(prim) { 
-        var args = Array.prototype.slice.call(arguments, 1);
-        var continuations = [success, failure];
-        prim.apply(null, continuations.concat(args));
-        return _temp;
-    }
+    var ws = {};
+    ws.addReservedWords = function() { return void(0); };
+    var Blockly = {};
+    Blockly.Generator = {};
+    Blockly.Generator.get = function(lang) { return ws; };
+    
+  </script>
+  <script type="text/javascript" src="blockly/generators/whalesong.js"></script>
+  <script type="text/javascript">
+    var lib = {};
+    _.each(Blockly.Whalesong.lib_, function(value, key) { 
+       this[key] = eval('(' + value + ')');
+    });
   </script>
 </head>
-<div>
-  <textarea></textarea>
+<div id="editor">
+  <div id="i"><textarea></textarea></div>
+  <div id="o"><textarea disabled></textarea></div>
 </div>
-<div>
+<div id="controller">
   <button type="button">Evaluate in PLT context</button>
 </div>
 <body>
