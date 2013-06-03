@@ -1,0 +1,25 @@
+<html>
+<head>
+<!-- <link rel="stylesheet" type="text/css"> -->
+<style>
+  #tests > #passed {
+    color: green;
+  }
+
+  #tests > #failed {
+    color: red;
+  }
+</style>
+<!-- </link> -->
+
+<script type="text/javascript" src="require.js"></script>
+<script type="text/javascript">
+  require(['test'], function(test) { 
+    return test();
+  });
+</script>
+</head>
+<body>
+<p>Open up the console!</p>
+</body>
+</html>

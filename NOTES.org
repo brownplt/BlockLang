@@ -142,5 +142,13 @@
 - Why is there a gap between sub-expression and containing expression, since it can be full
 
 * Make a prototype of some programs that have definitions so that we can see what we are expecting
-* Reply to Emmanuel, Kathi, and Shriram
-* Figure out the deal with makeList, what is it?
+
+* So I've now defined a lot of the builtins in Math, Lists, Text. 
+- I can do Colour and Logic pretty easily, but then I get stuck when it comes to 
+** The following: 
+- Variables
+- Procedures
+- Control
+
+* How can I get 'if' working without being able to compile the expression into Racket bytecode and then to Javascript bytecode. 
+** Perhaps I can define the library version of 'if', and similarly for other primitive forms, and then just use those. But maybe that won't work.
