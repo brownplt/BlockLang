@@ -4,7 +4,7 @@
 // > http://underscorejs.org
 // > (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
 // > Underscore may be freely distributed under the MIT license.
-
+define(function() { 
 // Baseline setup
 // --------------
 (function() {
@@ -1225,3 +1225,9 @@
   });
 
 }).call(this);
+
+var underscore = _.noConflict();
+
+return underscore;
+
+});
