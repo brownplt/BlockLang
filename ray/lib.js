@@ -27,6 +27,9 @@ define(["jquery", "../underscore", "ray"], function($, _, R) {
     r.bind("cdr", r.prim(r.p_spec('x'), function(x) { 
       return x.cdr;
     }));
+    r.bind("cons", r.prim(r.p_spec('car', 'cdr'), function(car, cdr) { 
+      return r.Value.Pair(car, cdr);
+    }));
     r.bind("null?", lib.make_predicate(r, 'null'));
     r.bind("list?", r.fn(r.p_spec('x'),
       r.or(r.app(r.name('null?'), r.p_args(r.name('x'))),
@@ -34,9 +37,18 @@ define(["jquery", "../underscore", "ray"], function($, _, R) {
                        r.p_args(r.name('x'))),
                  r.app(r.name('list?'), 
                        r.p_args(r.app(r.name('cdr'), 
-                                      r.p_args(r.name('x')))))
-                )
-          )));
+                                      r.p_args(r.name('x')))))))));
+    r.bind("map", r.fn(r.p_spec('f','ls'),
+      r._if(r.app(r.name('null?'), r.p_args(r.name('ls'))),
+	    r.name('ls'),
+	    r.app(r.name('cons'), r.p_args(r.app(r.name('f'), 
+						 r.p_args(r.app(r.name('car'), 
+								r.p_args(r.name('ls'))))),
+					   r.app(r.name('map'),
+						 r.p_args(r.name('f'),
+							  r.app(r.name('cdr'),
+								r.p_args(r.name('ls'))))))))));
+	    
 
     r.bind(">", r.prim(r.p_spec('x','y'), function(x,y) { return r.bool(r.numbers.greaterThan(x.get(),y.get())); }));
     return r;
