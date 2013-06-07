@@ -1,15 +1,19 @@
 // Functions to help define the language AST nodes
-define([], function() {
-  function construct(constructor, args) {
+define(["../underscore"], function(_) {
+
+  var util = {};
+
+  util.construct = function(constructor, args) {
     function Builder() {
       return constructor.apply(this, args);
     }
-    Builder.prototype = constructor.prototype;
+    Builder.prototype = constructor.proto;
     var b = new Builder();
     b.constructor = constructor; // So we can figure out the constructor later to clone it
+    return b;
   };
 
-  function product(/* args */) {
+  util.product = function(/* args */) {
     var props = Array.prototype.slice.call(arguments, 0);
     var __constructor__ = function(/* args */) {
       this.__props__ = props;
@@ -21,14 +25,21 @@ define([], function() {
     return __constructor__;
   };
 
-  function clone_constructor() {
+  util.clone_constructor = function() {
     var props = this.__props__;
-    function cloner(prop) {
-      return typeof prop === 'object' ? this.R.clone(prop) : prop;
+    var self = this;
+    function cloner(prop_name) {
+      var prop = self[prop_name];
+      if (typeof prop === 'object') {
+          return self.R.clone(prop);
+      } else {
+          return prop;
+      }
     };
     var cloned_props = _.map(props, cloner);
-    return construct(this.constructor, cloned_props);
-  }
+    return construct(this.__node_constructor__, cloned_props);
+  };
 
-  return this;
+  return util;
+
 });

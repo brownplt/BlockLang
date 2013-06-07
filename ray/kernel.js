@@ -13,15 +13,13 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
 
   var make_expr = function(r,type,obj) {
     var proto = {};
-    _.extent(proto, obj);
+    _.extend(proto, obj);
     proto.toString = function() { return type + 'E'; };
     proto.type = type.toLocaleLowerCase() + 'E';
     proto.R = r;
     proto.expr = true;
     return proto;
   };
-
-
 
   var make_value = function(r,type,obj) {
     var proto = {};
@@ -31,6 +29,9 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
     };
     proto.type = type.toLocaleLowerCase();
     proto.R = r;
+    proto.eval = function() { 
+      throw new Error(type + " has no eval method!!!");
+    };
     proto.value = true;
     return proto;
   };
@@ -40,11 +41,14 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
       return Node.apply(this, args);
     }
     Builder.prototype = make_value(r,type,obj);
-    r.Value[type] = function() {
+    var NodeConstructor = function() {
       var node = new Builder(arguments);
-      node.constructor = Node;
+      //console.log('Making ' + Builder.prototype.type);
+      if(!node.__proto__.type) { throw new Error("No type set for this expr!!"); }
       return node;
     };
+    r.Value[type] = NodeConstructor;
+    Builder.prototype.__node_constructor__ = NodeConstructor;
   };
 
   var attach_expr_node = function(r,Node,type,obj) {
@@ -52,11 +56,14 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
       return Node.apply(this, args);
     }
     Builder.prototype = make_expr(r,type,obj);
-    r.Expr[type] = function() {
+    var NodeConstructor = function() {
       var node = new Builder(arguments);
-      node.constructor = Node;
+      //console.log('Making ' + Builder.prototype.type);
+      if(!node.__proto__.type) { throw new Error("No type set for this expr!!"); }
       return node;
     };
+    r.Expr[type] = NodeConstructor;
+    Builder.prototype.__node_constructor__ = NodeConstructor;
   };
 
   /**
@@ -64,12 +71,18 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
    */
   var Pair = product('car','cdr');
   Pair.proto = {
-    clone: clone_constructor
+    clone: clone_constructor,
+    display: function() { 
+      return '(' + this.R.display(this.car) + ' . ' + this.R.display(this.cdr) + ')';
+    }
   };
 
   var Null = product();
   Null.proto = {
-    clone: clone_constructor
+    clone: clone_constructor,
+    display: function() { 
+      return '()';
+    }
   };
 
   var Boolean = product('b');
@@ -77,25 +90,22 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
     clone: clone_constructor,
     display: function() {
       return this.b ? "#t" : "#f";
-    },
-    write: function() {
-      return this.display();
-    },
-    print: function() {
-      return this.display();
     }
   };
 
   var Num = product('n');
   Num.proto = {
-    clone: clone_constructor
+    clone: clone_constructor,
+    display: function() { 
+      return n.toString();
+    }
   };
 
   var Primitive = product('arg_spec', 'f');
   Primitive.proto = {
     clone: clone_constructor,
-    bind_arguments: function(args) {
-	    this.args = args;
+    bind_arguments: function(args) {      
+	    this.args = this.R.eval(args);
     },
     evaluate_body: function() {
 	    var args = [];
@@ -109,15 +119,18 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
     },
     unbind_arguments: function() {
 	    this.args = null;
+    },
+    display: function() { 
+      return '(primitive ' + this.R.display(this.arg_spec) + ' ...)';
     }
   };
 
   var Closure = product('arg_spec', 'body', 'envs');
   Closure.proto = {
     clone: function() {
-      return new Closure(this.R.clone(this.arg_spec), 
-                         this.R.clone(this.body),
-                         this.R.clone_envs(this.envs));
+      return new this.R.Value.Closure(this.R.clone(this.arg_spec), 
+                                      this.R.clone(this.body),
+                                      this.R.clone_envs(this.envs));
     },
     bind_arguments: function(args) {
       this.saved_envs = this.R.swap_envs(this.envs);
@@ -129,169 +142,18 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
     unbind_arguments: function() {
       this.arg_spec.unbind_arguments();
       this.R.swap_envs(this.saved_envs);
-    }
-  };
-
-  /////////////////////////////////////////////////////// Expressions
-
-  var PairExpr = product('car','cdr');
-  PairExpr.proto = {
-    clone: clone_constructor,
-    eval: function() { 
-      return new this.R.Value.Pair(this.R.eval(this.car), 
-                                   this.R.eval(this.cdr));
-    }
-  };
-  var NullExpr = product();
-  NullExpr.proto = {
-    clone: clone_constructor,
-    eval: function() { 
-      return new this.R.Value.Null();
-    }
-  };
-
-  var BooleanExpr = product('b');
-  BooleanExpr.proto = {
-    clone: clone_constructor,
-    eval: function() { 
-      return new this.R.Value.Boolean(this.b);
-    }
-  };
-
-  var NumExpr = product('n');
-  NumExpr.proto = {
-    clone: clone_constructor,
-    eval: function() { 
-      return new this.R.Value.Num(this.n);
-    }
-  };
-
-  var PrimitiveExpr = product('arg_spec', 'f');
-  PrimitiveExpr.proto = {
-    clone: clone_constructor,
-    eval: function() {
-      return new this.R.Value.Primitive(this.arg_spec, this.f);
-    }
-  };
-
-  var If = product('pred', 't_expr', 'f_expr');
-  If.proto = {
-    clone: clone_constructor,
-    eval: function() {
-      var pred_value = this.R.eval(this.pred);
-      return this.R.eval(pred_value.get() ? this.t_expr : this.f_expr);
-    }
-  };
-
-  var And = product('args');
-  And.proto = {
-    clone: function() {
-      return new And(_.map(this.args, this.R.clone));
     },
-    eval: function() {
-      var arg_val = new this.R.Boolean(true);
-      for(var i = 0; i < this.args.length; i++) {
-        arg_val = this.R.eval(this.args[i]);
-        if((this.R.type(arg_val) === 'boolean') && (arg_val.get() === false)) {
-            return new this.R.Boolean(false);
-        }
-      }
-      return arg_val;
+    display: function() { 
+      return '(closure ' + this.R.display(this.arg_spec) + ' ' + this.R.quote(this.R.display(this.body)) + ')'; 
     }
   };
 
-  var Or = product('args');
-  Or.proto = {
-    clone: function() {
-      return new Or(_.map(this.args, this.R.clone));
-    },
-    eval: function() {
-      var arg_val;
-      for(var i = 0; i < this.args.length; i++) {
-        arg_val = this.R.eval(this.args[i]);
-        if((this.R.type(arg_val) === 'boolean') && (arg_val.get() === true)) {
-            return arg_val;
-        }
-      }
-      return new this.R.Boolean(false);
-    }
-  };
-
-  /**
-   * @desc Names/Identifiers
-   */
-  var Name = product('name');
-  Name.proto = {
-    clone: clone_constructor,
-    eval: function() {
-	    return this.R.eval(this.R.lookup(this.name));
-    }
-  };
-
-  /**
-   * @desc Arguments objects
-   */
-  var Arguments = function(p_args, kw_args) {
-    this.p_args = p_args || [];
-    this.kw_args = kw_args || {};
-  };
-
-  Arguments.proto = {
-    clone: function() {
-      return new Arguments(_.map(this.p_args, function(s) { return s; }), _.clone(this.kw_args));
-    },
-    eval: function() {
-	    var self = this;
-	    var p_arg_values = _.map(this.p_args, self.R.eval);
-	    self.p_args = p_arg_values;
-	    var k_arg_values = {};
-	    _.each(this.kw_args, function(k_arg_expr, kw) {
-	      k_arg_values[kw] = self.R.eval(k_arg_expr);
-	    });
-	    return self;
-    }
-  };
-
-  /**
-   * @desc Function Applications
-   */
-  var App = product('f', 'args');
-  App.proto = {
-    clone: clone_constructor,
-    eval: function() {
-	    var f_value = this.R.eval(this.f);
-	    if(!(this.R.type(f_value) === 'closure' ||
-	         this.R.type(f_value) === 'primitive')) {
-	      throw new Error("Tried to apply a non-function");
-	    }
-	    if(!f_value.arg_spec.accepts(this.args)) {
-	      throw new Error("Arity mismatch in function application");
-	    }
-
-	    var arg_values = this.R.eval(this.args);
-
-	    f_value.bind_arguments(arg_values);
-	    var body_val = f_value.evaluate_body();
-	    f_value.unbind_arguments();
-
-	    return body_val;
-    }
-  };
-
-  /**
-   * @desc Argument specification for a function
-   */
-  var ArgumentSpec = function(dict) {
-    this.p_args = dict.p_args || [];
-    this.kw_args = dict.kw_args || {};
-    this.rest_arg = dict.rest_arg || null;
-  };
-
-  ArgumentSpec.proto = {
-    clone: function() {
-      return new ArgumentSpec({'p_args': _.map(this.p_args, function(s) { return s; }),
-                               'kw_args': _.clone(this.kw_args),
-                               'rest_arg': this.rest_arg});
+  var ArgumentSpec = product('p_args', 'kw_args', 'rest_arg');
+  ArgumentSpec.proto = { 
+    clone: function() { 
+      return new this.R.Value.ArgumentSpec(_.map(this.p_args, _.identity),
+                                           _.clone(this.kw_args),
+                                           this.rest_arg);
     },
     /**
      * @desc Does the provided arguments object match the argument specification,
@@ -328,6 +190,220 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
     },
     unbind_arguments: function() {
       return this.R.pop_env();
+    },
+    display: function() { 
+      return '(' + this.p_args.join(' ') + 
+        (_.map(this.kw_args, function(v,k) { return '#:' + k + ' ' + v; })).join(' ') + 
+        (this.rest_arg ? ' . ' + this.rest_arg : '') + ')';
+    }
+  };
+
+  var Arguments = product('p_args','kw_args');
+  Arguments.proto = {
+    clone: function() {
+      return new this.R.Value.Arguments(_.map(this.p_args, _.identity), _.clone(this.kw_args));
+    }
+  };
+
+
+
+  /////////////////////////////////////////////////////// Expressions
+
+  var PairExpr = product('car','cdr');
+  PairExpr.proto = {
+    clone: clone_constructor,
+    eval: function() { 
+      return new this.R.Value.Pair(this.R.eval(this.car), 
+                                   this.R.eval(this.cdr));
+    },
+    display: function() { 
+      return '(' + this.R.display(this.car) + ' . ' + this.R.display(this.cdr) + ')';
+    }
+  };
+
+  var NullExpr = product();
+  NullExpr.proto = {
+    clone: clone_constructor,
+    eval: function() { 
+      return new this.R.Value.Null();      
+    },
+    display: function() { 
+      return '()';
+    }
+  };
+
+  var BooleanExpr = product('b');
+  BooleanExpr.proto = {
+    clone: clone_constructor,
+    eval: function() { 
+      return new this.R.Value.Boolean(this.b);     
+    },
+    display: function() { 
+      return this.b ? "#t" : "#f";
+    }
+  };
+
+  var NumExpr = product('n');
+  NumExpr.proto = {
+    clone: clone_constructor,
+    eval: function() { 
+      return new this.R.Value.Num(this.n);
+    },
+    display: function() { 
+      return this.n.toString();
+    }
+  };
+
+  var PrimitiveExpr = product('arg_spec', 'f');
+  PrimitiveExpr.proto = {
+    clone: clone_constructor,
+    eval: function() {
+      return new this.R.Value.Primitive(this.R.eval(this.arg_spec), this.f);
+    },
+    display: function() { 
+      return '(primitive ' + this.R.display(this.arg_spec) + ' ...)';
+    }
+  };
+
+  var If = product('pred', 't_expr', 'f_expr');
+  If.proto = {
+    clone: clone_constructor,
+    eval: function() {
+      var pred_value = this.R.eval(this.pred);
+      return this.R.eval(pred_value.get() ? this.t_expr : this.f_expr);
+    },
+    display: function() { 
+      return '(if' + this.R.display(this.pred) + ' ' + this.R.display(this.t_expr) + ' ' + this.R.display(this.f_expr) + ')';
+    }
+  };
+
+  var And = product('args');
+  And.proto = {
+    clone: function() {
+      var self = this;
+      return new this.R.Expr.And(_.map(this.args, function(arg) { 
+        return self.R.clone(arg);
+      }));
+    },
+    eval: function() {
+      var arg_val = new this.R.Value.Boolean(true);
+      for(var i = 0; i < this.args.length; i++) {
+        arg_val = this.R.eval(this.args[i]);
+        if((this.R.type(arg_val) === 'boolean') && (arg_val.b === false)) {
+            return new this.R.Value.Boolean(false);
+        }
+      }
+      return arg_val;
+    },
+    display: function() { 
+      var self = this;
+      return '(and ' + (_.map(this.args, self.R.display)).join(' ') + ')';
+    }
+  };
+
+  var Or = product('args');
+  Or.proto = {
+    clone: function() {
+      var self = this;
+      return new this.R.Expr.Or(_.map(this.args, function(arg) { 
+        return self.R.clone(arg); 
+      }));
+    },
+    eval: function() {
+      var arg_val;
+      for(var i = 0; i < this.args.length; i++) {
+        arg_val = this.R.eval(this.args[i]);
+        if((this.R.type(arg_val) !== 'boolean') || (arg_val.b === true)) {
+            return arg_val;
+        }
+      }
+      return new this.R.Value.Boolean(false);
+    },
+    display: function() { 
+      var self = this;
+      return '(or ' + (_.map(this.args, self.R.display)).join(' ') + ')';
+    }
+  };
+
+  /**
+   * @desc Names/Identifiers
+   */
+  var Name = product('name');
+  Name.proto = {
+    clone: clone_constructor,
+    eval: function() {
+	    return this.R.lookup(this.name);
+    }, 
+    display: function() { 
+      return this.name;
+    }
+  };
+
+  /**
+   * @desc Arguments objects
+   */
+  var ArgumentsExpr = product('p_args','kw_args');
+  ArgumentsExpr.proto = {
+    clone: function() {
+      return new this.R.Expr.Arguments(_.map(this.p_args, _.identity), _.clone(this.kw_args));
+    },
+    eval: function() {
+	    var self = this;
+	    var p_arg_values = _.map(this.p_args, self.R.eval);
+	    var kw_arg_values = {};
+	    _.each(this.kw_args, function(kw_arg_expr, kw) {
+	      kw_arg_values[kw] = self.R.eval(kw_arg_expr);
+	    });
+      return new this.R.Value.Arguments(p_arg_values, kw_arg_values);
+    },
+    display: function() { 
+      return this.p_args.join(' ') + 
+        (_.map(this.kw_args, function(v,k) { return '#:' + k + ' ' + v; })).join(' ') +
+        (this.rest_arg ? ' . ' + this.rest_arg : '');
+    }
+  };
+
+  /**
+   * @desc Function Applications
+   */
+  var App = product('f', 'args');
+  App.proto = {
+    clone: clone_constructor,
+    eval: function() {
+	    var f_value = this.R.eval(this.f);
+	    if(!(this.R.type(f_value) === 'closure' ||
+	         this.R.type(f_value) === 'primitive')) {
+	      throw new Error("Tried to apply a non-function");
+	    }
+	    if(!f_value.arg_spec.accepts(this.args)) {
+	      throw new Error("Arity mismatch in function application");
+	    }
+
+	    f_value.bind_arguments(this.args);
+	    var body_val = f_value.evaluate_body();
+	    f_value.unbind_arguments();
+
+	    return body_val;
+    },
+    display: function() { 
+      return '(' + this.R.display(this.f) + ' ' + this.R.display(this.args) + ')';
+    }
+  };
+
+  /**
+   * @desc Argument specification for a function
+   */
+  var ArgumentSpecExpr = product('p_args', 'kw_args', 'rest_arg');
+  ArgumentSpecExpr.proto = {
+    clone: function() { 
+      return new this.R.Expr.ArgumentSpec(_.map(this.p_args, _.identity),
+                                          _.clone(this.kw_args),
+                                          this.rest_arg);
+    },
+    eval: function() {
+      return new this.R.Value.ArgumentSpec(_.map(this.p_args, _.identity),
+                                          _.clone(this.kw_args),
+                                          this.rest_arg);
     }
   };
 
@@ -338,7 +414,7 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
   Lambda.proto = {
     clone: clone_constructor,
     eval: function() {
-	    return new this.R.Closure(this.R.clone(this.arg_spec), this.R.clone(this.body), this.R.clone_envs());
+	    return new this.R.Value.Closure(this.R.eval(this.arg_spec), this.R.clone(this.body), this.R.clone_envs());
     }
   };
 
@@ -353,13 +429,17 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
     this.envs = [dict || {}];
     var self = this;
 
+    this.Value = {};
     attach_value_node(self,Pair,'Pair',Pair.proto);
     attach_value_node(self,Null,'Null',Null.proto);
     attach_value_node(self,Num,'Num',Num.proto);
     attach_value_node(self,Boolean,'Boolean',Boolean.proto);
     attach_value_node(self,Primitive,'Primitive',Primitive.proto);
     attach_value_node(self,Closure,'Closure',Closure.proto);
+    attach_value_node(self,ArgumentSpec,'ArgumentSpec',ArgumentSpec.proto);
+    attach_value_node(self,Arguments,'Arguments',Arguments.proto);
 
+    this.Expr = {};
     attach_expr_node(self,PairExpr,'Pair',PairExpr.proto);
     attach_expr_node(self,NullExpr,'Null',NullExpr.proto);
     attach_expr_node(self,NumExpr,'Num',NumExpr.proto);
@@ -367,13 +447,13 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
     attach_expr_node(self,PrimitiveExpr,'Primitive',PrimitiveExpr.proto);
     attach_expr_node(self,Lambda,'Lambda',Lambda.proto);
 
+    attach_expr_node(self,Name,'Name',Name.proto);
     attach_expr_node(self,If,'If',If.proto);
     attach_expr_node(self,And,'And',And.proto);
     attach_expr_node(self,Or,'Or',Or.proto);
-    attach_expr_node(self,Arguments,'Arguments',Arguments.proto);
-    attach_expr_node(self,ArgumentSpec,'ArgumentSpec',ArgumentSpec.proto);
     attach_expr_node(self,App,'App',App.proto);
-
+    attach_expr_node(self,ArgumentsExpr,'Arguments',ArgumentsExpr.proto);
+    attach_expr_node(self,ArgumentSpecExpr,'ArgumentSpec',ArgumentSpecExpr.proto);                      
   };
 
   R.prototype = {
@@ -417,18 +497,10 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
       return obj.type;
     },
     clone: function(expr) {
-      if(typeof expr === 'number') {
-        return expr;
-      } else {
-        return expr.clone();
-      }
+      return expr.clone();
     },
     eval: function(expr) {
-      if(typeof expr === 'number') {
-        return expr;
-      } else {
-        return expr.eval();
-      }
+      return expr.eval();
     },
     swap_envs: function(envs) {
       var tmp_envs = this.envs;
@@ -452,6 +524,12 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
         return new_env;
       });
       return new_envs;
+    },
+    display: function(expr) { 
+      return expr.display();
+    },
+    quote: function(str) { 
+      return "'" + str;
     }
   };
 
@@ -471,22 +549,22 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
 	      return new r.Expr.Arguments(p_args, kw_args);
       },
       p_args: function(/* args */) { 
-        return new r.Expr.Arguments(Array.prototype.slice.call(arguments,0));
+        return new r.Expr.Arguments(Array.prototype.slice.call(arguments,0), {});
       },
       name: function(name_arg) {
 	      return new r.Expr.Name(name_arg);
       },
-      spec: function(dict) {
-	      return new r.Expr.ArgumentSpec(dict);
+      spec: function(p_args, kw_args, rest_arg) {
+	      return new r.Expr.ArgumentSpec(p_args, kw_args, rest_arg);
       },
       p_spec: function(/* args */) {
-        return new r.Expr.ArgumentSpec({'p_args': Array.prototype.slice.call(arguments,0)});
+        return new r.Expr.ArgumentSpec(Array.prototype.slice.call(arguments,0), {}, null);
       },
       kw_spec: function(args) {
-        return new r.Expr.ArgumentSpec({'kw_args': args});
+        return new r.Expr.ArgumentSpec([], args, null);
       },
       rest_spec: function(name) {
-        return new r.Expr.ArgumentSpec({'rest_arg': name});
+        return new r.Expr.ArgumentSpec([], {}, name);
       },
       fn: function(arg_spec, body) {
 	      return new r.Expr.Lambda(arg_spec, body);
