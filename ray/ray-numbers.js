@@ -1,8 +1,16 @@
 /*jslint vars: true, maxerr: 50, indent: 4 */
-define(["js-numbers"], function(jsnums) {
+
+goog.provide('ray.ray_numbers');
+
+goog.require('ray.js_numbers');
+
+ray.ray_numbers = (function() {
     // Numbers.
     /*global jsnums*/
   return function(R) {
+
+    var jsnums = ray.js_numbers;
+
     'use strict';
     var exports = {};
     R.prototype.numbers = exports;
@@ -75,4 +83,4 @@ define(["js-numbers"], function(jsnums) {
     exports.sign = sign;
     return R;
   };
-});
+}());

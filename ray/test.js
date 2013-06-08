@@ -1,8 +1,11 @@
-define(["jquery", "../underscore", "ray", "lib"], function($, _, R, lib) {
+goog.provide('ray.test');
 
-  var global = this;
+goog.require('ray.ray');
+goog.require('ray.underscore');
+goog.require('ray.jquery');
+goog.require('ray.lib');
 
-  var assert = function(bool, message) {
+var assert = function(bool, message) {
     var tests = $("#tests");
     var test_message = (bool ? "Test passed" : "Test failed") + ": " + message;
     var test_li = $("<li>" + test_message + "</li>");
@@ -11,13 +14,20 @@ define(["jquery", "../underscore", "ray", "lib"], function($, _, R, lib) {
     tests.append(test_li);
   };
 
-  global.assert = assert;
+ray.test = function() {
 
-  _.each(R, function(v, k) {
-    global[k] = v;
-  });
+    var $ = ray.jquery;
+    var _ = ray.underscore;
+    var R = ray.ray();
+    var lib = ray.lib();
 
-  return function() {
+    var global = this;
+
+    _.each(R, function(v, k) {
+        global[k] = v;
+    });
+
+
     $("body").append("<ul id=\"tests\"></ul>");
     var tests = $("#tests");
     var r = lib.initialize(new R());
@@ -114,6 +124,5 @@ define(["jquery", "../underscore", "ray", "lib"], function($, _, R, lib) {
 
     global.r = r;
 
-  };
+};
 
-});

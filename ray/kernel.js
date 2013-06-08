@@ -3,11 +3,18 @@
  * @desc A Racket evaluator and namespace
  */
 
-define(["jquery", "../underscore", "util"], function($, _, util) {
+goog.provide('ray.kernel');
 
-  var global = this;
-  /* inject utility functions into the global namespace */
-  _.each(util, function(v,k) { 
+goog.require('ray.underscore');
+goog.require('ray.util');
+
+ray.kernel = function() {
+
+  var _ = ray.underscore;
+
+  var global = window;
+  // inject utility functions into the global namespace
+    _.each(ray.util(), function(v,k) {
     global[k] = v;
   });
 
@@ -599,4 +606,4 @@ define(["jquery", "../underscore", "util"], function($, _, util) {
 
   return R;
 
-});
+};

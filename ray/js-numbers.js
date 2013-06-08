@@ -1,5 +1,5 @@
 // Scheme numbers.
-define([], function() {
+goog.provide('ray.js_numbers');
 
 // The numeric tower has the following levels:
 //     integers
@@ -22,10 +22,11 @@ define([], function() {
 // An integer-scheme-number is either fixnum or BigInteger.
 
 
-  return (function() {
+(function(root) {
     'use strict';
     // Abbreviation
     var Numbers = {};
+    root.Numbers = Numbers;
     //var Numbers = jsnums;
 
 
@@ -4106,7 +4107,7 @@ define([], function() {
     Numbers['MIN_FIXNUM'] = MIN_FIXNUM;
     Numbers['MAX_FIXNUM'] = MAX_FIXNUM;
 
-    return Numbers;
+  })(this);
 
-  })();
-});
+ray.js_numbers = Numbers;
+Numbers = null;

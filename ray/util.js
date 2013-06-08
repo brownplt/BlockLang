@@ -1,5 +1,11 @@
 // Functions to help define the language AST nodes
-define(["../underscore"], function(_) {
+goog.provide('ray.util');
+
+goog.require('ray.underscore');
+
+ray.util = function() {
+
+  var _ = ray.underscore;
 
   var util = {};
 
@@ -42,4 +48,4 @@ define(["../underscore"], function(_) {
 
   return util;
 
-});
+};

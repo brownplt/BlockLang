@@ -9,14 +9,11 @@
     color: red;
   }
 </style>
-<script type="text/javascript" src="../require.js"></script>
-<script type="text/javascript">
-  require(['test'], function(test) {
-    return test();
-  });
-</script>
+    <script src="../closure-library-read-only/closure/goog/base.js"></script>
+    <script src="ray-deps.js"></script>
+    <script src="main.js"></script>
 </head>
-<body>
+<body onload=run_test()>
 <p>Open up the console!</p>
 </body>
 </html>

@@ -1,4 +1,11 @@
-define(["jquery", "../underscore", "ray"], function($, _, R) {
+goog.provide('ray.lib');
+
+goog.require('ray.underscore');
+goog.require('ray.ray');
+
+ray.lib = function() {
+
+  var _ = ray.underscore;
 
   var lib = {};
 
@@ -56,4 +63,4 @@ define(["jquery", "../underscore", "ray"], function($, _, R) {
 
   return lib;
 
-});
+};

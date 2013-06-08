@@ -4,7 +4,8 @@
 // > http://underscorejs.org
 // > (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
 // > Underscore may be freely distributed under the MIT license.
-define(function() { 
+goog.provide('ray.underscore');
+
 // Baseline setup
 // --------------
 (function() {
@@ -1226,8 +1227,4 @@ define(function() {
 
 }).call(this);
 
-var underscore = _.noConflict();
-
-return underscore;
-
-});
+ray.underscore = _.noConflict();
