@@ -9,10 +9,22 @@ var assert = function(bool, message) {
     var tests = $("#tests");
     var test_message = (bool ? "Test passed" : "Test failed") + ": " + message;
     var test_li = $("<li>" + test_message + "</li>");
-    test_li.attr("id", bool ? "passed" : "failed");
+    test_li.addClass(bool ? "passed" : "failed");
     console.log("Test " + (bool ? "passed" : "failed") + "!");
     tests.append(test_li);
-  };
+};
+
+var end_tests = function() {
+    var passed = $("#tests > li.passed").size();
+    var failed = $("#tests > li.failed").size();
+    var test_string = String(passed) + "/" + String(passed + failed);
+    $("body").append("<p>Tests passed: (" + test_string + ")</p>");
+    if(failed === 0) {
+        $("body").append("<H1 class=\"perfect\">All tests passed!</H1>");
+    } else {
+        $("body").append("<p>Almost there!</p>");
+    }
+};
 
 ray.test = function() {
 
@@ -27,15 +39,20 @@ ray.test = function() {
         global[k] = v;
     });
 
+    window.$ = $;
 
     $("body").append("<ul id=\"tests\"></ul>");
     var tests = $("#tests");
     var r = lib.initialize(new R());
 
-    /*
-    console.log(r.display(r.lookup('pair?')));
-    console.log(r.display(r.lookup('list?')));
-    */
+    var gt_1 = r.app(r.name('>'), r.p_args(r.num(3), r.num(0)));
+    assert(r.eval(gt_1).b === true, "gt_1");
+    var gt_2 = r.app(r.name('>'), r.p_args(r.num(3), r.num(3)));
+    assert(r.eval(gt_2).b === false, "gt_2");
+    var gt_3 = r.app(r.name('>'), r.p_args(r.num(3), r.num(5)));
+    assert(r.eval(gt_2).b === false, "gt_3");
+
+
 
     var or_1 = r.or(r.bool(true), r.bool(false));
     assert(r.eval(or_1).b === true, "or_1");
@@ -121,6 +138,8 @@ ray.test = function() {
 
     var if_test2 = r._if(r.app(r.name(">"), r.p_args(r.num(3),r.num(4))), r.num(8), r.num(9));
     assert(r.eval(if_test2).n === 9, "if_test2");
+
+    end_tests();
 
     global.r = r;
 

@@ -57,7 +57,7 @@ ray.lib = function() {
 								r.p_args(r.name('ls'))))))))));
 	    
 
-    r.bind(">", r.prim(r.p_spec('x','y'), function(x,y) { return r.bool(r.numbers.greaterThan(x.get(),y.get())); }));
+    r.bind(">", r.prim(r.p_spec('x','y'), function(x,y) { return r.bool(r.numbers.greaterThan(x.n,y.n))     ; }));
     return r;
   };
 

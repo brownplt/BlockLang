@@ -152,3 +152,5 @@
 
 * How can I get 'if' working without being able to compile the expression into Racket bytecode and then to Javascript bytecode. 
 ** Perhaps I can define the library version of 'if', and similarly for other primitive forms, and then just use those. But maybe that won't work.
+
+* Currently, when I save envs in a Closure, those saved envs, are not

@@ -140,15 +140,16 @@ ray.kernel = function() {
                                       this.R.clone_envs(this.envs));
     },
     bind_arguments: function(args) {
-      this.saved_envs = this.R.swap_envs(this.envs);
-	    this.arg_spec.bind_arguments(args);
+      if(!this.saved_envs) { this.saved_envs = []; }
+      this.saved_envs.unshift(this.R.swap_envs(this.envs));
+	  this.arg_spec.bind_arguments(args);
     },
     evaluate_body: function() {
 	    return this.R.eval(this.body);
     },
     unbind_arguments: function() {
       this.arg_spec.unbind_arguments();
-      this.R.swap_envs(this.saved_envs);
+      this.R.swap_envs(this.saved_envs.shift());
     },
     display: function() { 
       return '(closure ' + this.R.display(this.arg_spec) + ' ' + this.R.quote(this.R.display(this.body)) + ')'; 
@@ -211,8 +212,6 @@ ray.kernel = function() {
       return new this.R.Value.Arguments(_.map(this.p_args, _.identity), _.clone(this.kw_args));
     }
   };
-
-
 
   /////////////////////////////////////////////////////// Expressions
 
@@ -277,7 +276,7 @@ ray.kernel = function() {
     clone: clone_constructor,
     eval: function() {
       var pred_value = this.R.eval(this.pred);
-      return this.R.eval(pred_value.get() ? this.t_expr : this.f_expr);
+      return this.R.eval(pred_value.b ? this.t_expr : this.f_expr);
     },
     display: function() { 
       return '(if' + this.R.display(this.pred) + ' ' + this.R.display(this.t_expr) + ' ' + this.R.display(this.f_expr) + ')';
@@ -339,7 +338,12 @@ ray.kernel = function() {
   Name.proto = {
     clone: clone_constructor,
     eval: function() {
-	    return this.R.lookup(this.name);
+        var result = this.R.lookup(this.name);
+	    if(result) {
+            return result;
+        } else {
+            throw new Error('Unbound identifier: \'' + this.name + '\'');
+        }
     }, 
     display: function() { 
       return this.name;
@@ -469,33 +473,35 @@ ray.kernel = function() {
         return _.keys(env);
       });
     },
+    local_bind: function(name, val) {
+        var tmp = this.envs[0][name];
+        this.envs[0][name] = val;
+        return tmp || null;
+    },
     bind: function(name, val) {
       var value = this.eval(val);
       // Have to special-case closures to handle recursion
       if(this.type(value) === 'closure') {
         // Add the closure to its own environment to make recursion possible
         if(value.envs[0][name]) {
-          throw new Error("Name already bound in closure environment!");
-        } else {
-          value.envs[0][name] = [];
+          console.log('Overwriting existing binding for function: \'' + name + '\' in function environment');
         }
-        value.envs[0][name].unshift(value);
+        value.envs[0][name] = value;
       }
-      if(!this.envs[0][name]) {
-	      this.envs[0][name] = [];
+      var previously_bound = this.local_bind(name, value);
+      if(previously_bound) {
+        console.log("Overwriting previous binding in local environment!!!");
       }
-      this.envs[0][name].unshift(value);
     },
     unbind: function(name) {
       if(!this.envs[0][name]) {
 	      throw new Error("Can't unbind " + name + ": no bound values in local scope!");
       }
-      return this.envs[0][name].shift();
     },
     lookup: function(name) {
       for(var i = 0; i < this.envs.length; i++) {
         if(this.envs[i][name]) {
-          return this.envs[i][name][0];
+          return this.envs[i][name];
         }
       }
       return null;
@@ -525,8 +531,8 @@ ray.kernel = function() {
       var old_envs = envs || this.envs;
       var new_envs = _.map(old_envs, function(env) {
         var new_env = {};
-        _.each(env, function(v_array,k) {
-          new_env[k] = _.map(v_array, function(v) { return self.clone(v); });
+        _.each(env, function(v,k) {
+          new_env[k] = v;
         });
         return new_env;
       });
