@@ -186,11 +186,11 @@ ray.kernel = function() {
 	    var self = this;
 	    self.bound_args = self.bound_args || [];
 	    for(var i = 0; i < self.p_args.length; i++) {
-	      self.R.bind(self.p_args[i], args.p_args[i]);
+	      self.R.local_bind(self.p_args[i], args.p_args[i]);
 	    }
 
 	    if(self.rest_arg) {
-	      self.R.bind(self.rest_arg, args.p_args.slice(self.p_args.length));
+	      self.R.local_bind(self.rest_arg, args.p_args.slice(self.p_args.length));
 	    }
 	    _.each(self.kw_args, function(kw_name, kw) {
 	      self.R.bind(kw_name, args.kw_args[kw]);
@@ -438,6 +438,7 @@ ray.kernel = function() {
 
   var R = function(dict) {
     this.envs = [dict || {}];
+    this.top_level = {};
     var self = this;
 
     this.Value = {};
@@ -473,30 +474,22 @@ ray.kernel = function() {
         return _.keys(env);
       });
     },
+    top_level_bind: function(name, val) {
+      var value = this.eval(val);
+      if(this.top_level[name]) {
+        throw new Error("Trying to change a binding at the top level: " + name);
+      } else {
+        this.top_level[name] = value;
+      }
+    },
     local_bind: function(name, val) {
-        var tmp = this.envs[0][name];
-        this.envs[0][name] = val;
-        return tmp || null;
+      var value = this.eval(val);
+      var tmp = this.envs[0][name];
+      this.envs[0][name] = value;
+      return tmp || null;
     },
     bind: function(name, val) {
-      var value = this.eval(val);
-      // Have to special-case closures to handle recursion
-      if(this.type(value) === 'closure') {
-        // Add the closure to its own environment to make recursion possible
-        if(value.envs[0][name]) {
-          console.log('Overwriting existing binding for function: \'' + name + '\' in function environment');
-        }
-        value.envs[0][name] = value;
-      }
-      var previously_bound = this.local_bind(name, value);
-      if(previously_bound) {
-        console.log("Overwriting previous binding in local environment!!!");
-      }
-    },
-    unbind: function(name) {
-      if(!this.envs[0][name]) {
-	      throw new Error("Can't unbind " + name + ": no bound values in local scope!");
-      }
+      this.top_level_bind(name, val);
     },
     lookup: function(name) {
       for(var i = 0; i < this.envs.length; i++) {
@@ -504,7 +497,11 @@ ray.kernel = function() {
           return this.envs[i][name];
         }
       }
-      return null;
+      if(this.top_level[name]) {
+        return this.top_level[name];
+      } else {
+        return null;
+      }
     },
     type: function(obj) {
       return obj.type;
