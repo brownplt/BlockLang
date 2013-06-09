@@ -9,10 +9,20 @@ ray.lib = function() {
 
   var lib = {};
 
-  lib.make_predicate = function(r,type) {
-    return r.prim(r.p_spec('x'), function(x) {
-      return new r.Value.Boolean(r.type(x) === type);
-    });
+  lib.add_builtin = function(name, val) {
+    lib.r.builtins_bind(name, val);
+  };
+
+  lib.make_predicate = function(type) {
+    lib.add_builtin(type + '?', lib.r.prim(lib.r.p_spec('x'), function(x) {
+      return new lib.r.Value.Boolean(lib.r.type(x) === type);
+    }));
+  };
+
+  lib.make_numeric_binop = function(name,numbers_name, result_type) {
+    lib.add_builtin(name, lib.r.prim(lib.r.p_spec('x','y'), function(x,y) {
+      return result_type(lib.r.numbers[numbers_name](x.n, y.n))
+    }));
   };
 
   lib.initialize = function(r) {
@@ -21,33 +31,58 @@ ray.lib = function() {
     _.each(_r, function(v,k) {
       r[k] = v;
     });
+    lib.r = r;
 
-    r.bind("+", r.prim(r.rest_spec('ls'), function(ls) {
+    lib.add_builtin("+", r.prim(r.rest_spec('ls'), function(ls) {
 	    var sum = _.reduce(ls, function(a, b) { return r.numbers.add(a, b.n); }, 0);
       return r.num(sum);
 	  }));
-    r.bind("boolean?", lib.make_predicate(r, 'boolean'));
-    r.bind("pair?", lib.make_predicate(r, 'pair'));
-    r.bind("car", r.prim(r.p_spec('x'), function(x) { 
+    lib.add_builtin("*", r.prim(r.rest_spec('ls'), function(ls) {
+      var sum = _.reduce(ls, function(a, b) { return r.numbers.multiply(a, b.n); }, 1);
+      return r.num(sum);
+    }));
+    lib.add_builtin('-', r.prim(r.spec(['x'],{},'ls'), function(x,ls) {
+      if(ls.length === 0) {
+        return r.num(r.numbers.subtract(0, x.n));
+      } else {
+        var result = _.reduce(ls, function(a, b) { return r.numbers.subtract(a, b.n); }, x.n);
+        return r.num(result);
+      }
+    }));
+    lib.add_builtin('/', r.prim(r.spec(['x'],{},'ls'), function(x,ls) {
+      if(ls.length === 0) {
+        return r.num(r.numbers.divide(1, x.n));
+      } else {
+        var result = _.reduce(ls, function(a, b) { return r.numbers.divide(a, b.n); }, x.n);
+        return r.num(result);
+      }
+    }));
+    lib.make_predicate('boolean');
+    lib.make_predicate('pair');
+    lib.make_predicate('number');
+    lib.make_predicate('string');
+    lib.make_predicate('null');
+
+    lib.add_builtin("car", r.prim(r.p_spec('x'), function(x) {
       return x.car;
     }));
-    r.bind("cdr", r.prim(r.p_spec('x'), function(x) { 
+    lib.add_builtin("cdr", r.prim(r.p_spec('x'), function(x) {
       return x.cdr;
     }));
-    r.bind("cons", r.prim(r.p_spec('car', 'cdr'), function(car, cdr) { 
+    lib.add_builtin("cons", r.prim(r.p_spec('car', 'cdr'), function(car, cdr) {
       return r.Value.Pair(car, cdr);
     }));
-    r.bind("null?", lib.make_predicate(r, 'null'));
-    r.bind("list?", r.fn(r.p_spec('x'),
+
+    lib.add_builtin("list?", r.fn(r.p_spec('x'),
       r.or(r.app(r.name('null?'), r.p_args(r.name('x'))),
            r.and(r.app(r.name('pair?'), 
                        r.p_args(r.name('x'))),
                  r.app(r.name('list?'), 
                        r.p_args(r.app(r.name('cdr'), 
                                       r.p_args(r.name('x')))))))));
-    r.bind("map", r.fn(r.p_spec('f','ls'),
+    lib.add_builtin("map", r.fn(r.p_spec('f','ls'),
       r._if(r.app(r.name('null?'), r.p_args(r.name('ls'))),
-	    r.name('ls'),
+	    r._null(),
 	    r.app(r.name('cons'), r.p_args(r.app(r.name('f'), 
 						 r.p_args(r.app(r.name('car'), 
 								r.p_args(r.name('ls'))))),
@@ -56,8 +91,12 @@ ray.lib = function() {
 							  r.app(r.name('cdr'),
 								r.p_args(r.name('ls'))))))))));
 	    
+    lib.make_numeric_binop('>','greaterThan', r.bool);
+    lib.make_numeric_binop('<','lessThan', r.bool);
+    lib.make_numeric_binop('>=', 'greaterThanOrEqual', r.bool);
+    lib.make_numeric_binop('<=', 'lessThanOrEqual', r.bool);
+    lib.make_numeric_binop('=', 'equals', r.bool);
 
-    r.bind(">", r.prim(r.p_spec('x','y'), function(x,y) { return r.bool(r.numbers.greaterThan(x.n,y.n))     ; }));
     return r;
   };
 

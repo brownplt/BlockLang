@@ -1,17 +1,43 @@
 <html>
 <head>
 <style>
-  #tests > .passed {
+  #tests .passed {
     color: green;
   }
 
-  #tests > .failed {
+  #tests .failed {
     color: red;
   }
 
+  #tests dt {
+    font-family: sans-serif;
+  }
+
+  #tests pre {
+    font-family: monospace;
+    display: inline;
+  }
+
+  #tests {
+    float: left;
+    width: 40%;
+    margin: 2% 2%;
+  }
+
+  #lib {
+    float: left;
+    width: 40%;
+    margin: 2% 2%;
+  }
+
+  #lib pre {
+    font-family: monospace;
+    display: inline;
+  }
+
   .perfect {
-      color: darkgreen;
-      font-family: sans-serif;
+    color: darkgreen;
+    font-family: sans-serif;
   }
 
 </style>
@@ -20,6 +46,7 @@
     <script src="main.js"></script>
 </head>
 <body onload=run_test()>
-<p>Open up the console!</p>
+<div id="tests"></div>
+<div id="lib"></div>
 </body>
 </html>

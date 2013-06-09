@@ -31,13 +31,11 @@ ray.kernel = function() {
   var make_value = function(r,type,obj) {
     var proto = {};
     _.extend(proto, obj);
-    proto.toString = function() {
-      return type;
-    };
+    proto.toString = function() { return type; };
     proto.type = type.toLocaleLowerCase();
     proto.R = r;
-    proto.eval = function() { 
-      throw new Error(type + " has no eval method!!!");
+    proto.interp = function() {
+      throw new Error(type + " has no interp method!!!");
     };
     proto.value = true;
     return proto;
@@ -112,7 +110,7 @@ ray.kernel = function() {
   Primitive.proto = {
     clone: clone_constructor,
     bind_arguments: function(args) {      
-	    this.args = this.R.eval(args);
+	    this.args = this.R.interp(args);
     },
     evaluate_body: function() {
 	    var args = [];
@@ -121,6 +119,12 @@ ray.kernel = function() {
 	    for(var i = 0; i < num_p_args; i++) {
 	      args.push(p_args[i]);
 	    }
+      var kw_args = this.args.kw_args;
+      if(kw_args.length > 0) {
+        // I don't handle kw_args at the moment in primitives!!!
+        throw new Error("Keyword arguments not supported for primitives");
+      }
+
 	    args.push(p_args.slice(num_p_args)); // rest_arg
 	    return this.f.apply(this, args);
     },
@@ -145,14 +149,15 @@ ray.kernel = function() {
 	  this.arg_spec.bind_arguments(args);
     },
     evaluate_body: function() {
-	    return this.R.eval(this.body);
+      this.R.record_function_call(this, this.__name__);
+	    return this.R.interp(this.body);
     },
     unbind_arguments: function() {
       this.arg_spec.unbind_arguments();
       this.R.swap_envs(this.saved_envs.shift());
     },
     display: function() { 
-      return '(closure ' + this.R.display(this.arg_spec) + ' ' + this.R.quote(this.R.display(this.body)) + ')'; 
+      return '(lambda ' + this.R.display(this.arg_spec) + ' ' + this.R.display(this.body) + ')';
     }
   };
 
@@ -200,9 +205,9 @@ ray.kernel = function() {
       return this.R.pop_env();
     },
     display: function() { 
-      return '(' + this.p_args.join(' ') + 
-        (_.map(this.kw_args, function(v,k) { return '#:' + k + ' ' + v; })).join(' ') + 
-        (this.rest_arg ? ' . ' + this.rest_arg : '') + ')';
+      return '(' + this.p_args.concat(
+          _.map(this.kw_args, function(v,k) { return '#:' + k + ' ' + v; })).concat(
+          (this.rest_arg ? ['. ' + this.rest_arg] : [])).join(' ') + ')';
     }
   };
 
@@ -218,9 +223,9 @@ ray.kernel = function() {
   var PairExpr = product('car','cdr');
   PairExpr.proto = {
     clone: clone_constructor,
-    eval: function() { 
-      return new this.R.Value.Pair(this.R.eval(this.car), 
-                                   this.R.eval(this.cdr));
+    interp: function() {
+      return new this.R.Value.Pair(this.R.interp(this.car), 
+                                   this.R.interp(this.cdr));
     },
     display: function() { 
       return '(' + this.R.display(this.car) + ' . ' + this.R.display(this.cdr) + ')';
@@ -230,7 +235,7 @@ ray.kernel = function() {
   var NullExpr = product();
   NullExpr.proto = {
     clone: clone_constructor,
-    eval: function() { 
+    interp: function() {
       return new this.R.Value.Null();      
     },
     display: function() { 
@@ -241,7 +246,7 @@ ray.kernel = function() {
   var BooleanExpr = product('b');
   BooleanExpr.proto = {
     clone: clone_constructor,
-    eval: function() { 
+    interp: function() {
       return new this.R.Value.Boolean(this.b);     
     },
     display: function() { 
@@ -252,19 +257,19 @@ ray.kernel = function() {
   var NumExpr = product('n');
   NumExpr.proto = {
     clone: clone_constructor,
-    eval: function() { 
+    interp: function() {
       return new this.R.Value.Num(this.n);
     },
     display: function() { 
-      return this.n.toString();
+      return String(this.n);
     }
   };
 
   var PrimitiveExpr = product('arg_spec', 'f');
   PrimitiveExpr.proto = {
     clone: clone_constructor,
-    eval: function() {
-      return new this.R.Value.Primitive(this.R.eval(this.arg_spec), this.f);
+    interp: function() {
+      return new this.R.Value.Primitive(this.R.interp(this.arg_spec), this.f);
     },
     display: function() { 
       return '(primitive ' + this.R.display(this.arg_spec) + ' ...)';
@@ -274,12 +279,15 @@ ray.kernel = function() {
   var If = product('pred', 't_expr', 'f_expr');
   If.proto = {
     clone: clone_constructor,
-    eval: function() {
-      var pred_value = this.R.eval(this.pred);
-      return this.R.eval(pred_value.b ? this.t_expr : this.f_expr);
+    interp: function() {
+      var pred_value = this.R.interp(this.pred);
+      return this.R.interp(pred_value.b ? this.t_expr : this.f_expr);
     },
     display: function() { 
-      return '(if' + this.R.display(this.pred) + ' ' + this.R.display(this.t_expr) + ' ' + this.R.display(this.f_expr) + ')';
+      return ['(if',
+              this.R.display(this.pred),
+              this.R.display(this.t_expr),
+              this.R.display(this.f_expr) + ')'].join(' ');
     }
   };
 
@@ -291,19 +299,20 @@ ray.kernel = function() {
         return self.R.clone(arg);
       }));
     },
-    eval: function() {
+    interp: function() {
       var arg_val = new this.R.Value.Boolean(true);
       for(var i = 0; i < this.args.length; i++) {
-        arg_val = this.R.eval(this.args[i]);
+        arg_val = this.R.interp(this.args[i]);
         if((this.R.type(arg_val) === 'boolean') && (arg_val.b === false)) {
             return new this.R.Value.Boolean(false);
         }
       }
       return arg_val;
     },
-    display: function() { 
+    display: function() {
       var self = this;
-      return '(and ' + (_.map(this.args, self.R.display)).join(' ') + ')';
+      var displayed_args = _.map(this.args, self.R.display).join(' ');
+      return '(and'  + (displayed_args ? ' ' : '') + displayed_args + ')';
     }
   };
 
@@ -315,19 +324,20 @@ ray.kernel = function() {
         return self.R.clone(arg); 
       }));
     },
-    eval: function() {
+    interp: function() {
       var arg_val;
       for(var i = 0; i < this.args.length; i++) {
-        arg_val = this.R.eval(this.args[i]);
+        arg_val = this.R.interp(this.args[i]);
         if((this.R.type(arg_val) !== 'boolean') || (arg_val.b === true)) {
             return arg_val;
         }
       }
       return new this.R.Value.Boolean(false);
     },
-    display: function() { 
+    display: function() {
       var self = this;
-      return '(or ' + (_.map(this.args, self.R.display)).join(' ') + ')';
+      var displayed_args = _.map(this.args, self.R.display).join(' ');
+      return '(or'  + (displayed_args ? ' ' : '') + displayed_args + ')';
     }
   };
 
@@ -337,7 +347,7 @@ ray.kernel = function() {
   var Name = product('name');
   Name.proto = {
     clone: clone_constructor,
-    eval: function() {
+    interp: function() {
         var result = this.R.lookup(this.name);
 	    if(result) {
             return result;
@@ -358,19 +368,20 @@ ray.kernel = function() {
     clone: function() {
       return new this.R.Expr.Arguments(_.map(this.p_args, _.identity), _.clone(this.kw_args));
     },
-    eval: function() {
+    interp: function() {
 	    var self = this;
-	    var p_arg_values = _.map(this.p_args, self.R.eval);
+	    var p_arg_values = _.map(this.p_args, self.R.interp, self.R);
 	    var kw_arg_values = {};
 	    _.each(this.kw_args, function(kw_arg_expr, kw) {
-	      kw_arg_values[kw] = self.R.eval(kw_arg_expr);
+	      kw_arg_values[kw] = self.R.interp(kw_arg_expr);
 	    });
       return new this.R.Value.Arguments(p_arg_values, kw_arg_values);
     },
-    display: function() { 
-      return this.p_args.join(' ') + 
-        (_.map(this.kw_args, function(v,k) { return '#:' + k + ' ' + v; })).join(' ') +
-        (this.rest_arg ? ' . ' + this.rest_arg : '');
+    display: function() {
+      var self = this;
+      return _.map(this.p_args, self.R.display).join(' ') +
+        (_.map(this.kw_args, function(v,k) { return '#:' + k + ' ' + self.R.display(v); })).join(' ') +
+        (this.rest_arg ? ' . ' + self.R.display(this.rest_arg) : '');
     }
   };
 
@@ -380,8 +391,8 @@ ray.kernel = function() {
   var App = product('f', 'args');
   App.proto = {
     clone: clone_constructor,
-    eval: function() {
-	    var f_value = this.R.eval(this.f);
+    interp: function() {
+	    var f_value = this.R.interp(this.f);
 	    if(!(this.R.type(f_value) === 'closure' ||
 	         this.R.type(f_value) === 'primitive')) {
 	      throw new Error("Tried to apply a non-function");
@@ -396,8 +407,9 @@ ray.kernel = function() {
 
 	    return body_val;
     },
-    display: function() { 
-      return '(' + this.R.display(this.f) + ' ' + this.R.display(this.args) + ')';
+    display: function() {
+      var displayed_args = this.R.display(this.args);
+      return '(' + this.R.display(this.f) + (displayed_args ? ' ' : '') + displayed_args + ')';
     }
   };
 
@@ -411,10 +423,20 @@ ray.kernel = function() {
                                           _.clone(this.kw_args),
                                           this.rest_arg);
     },
-    eval: function() {
+    interp: function() {
       return new this.R.Value.ArgumentSpec(_.map(this.p_args, _.identity),
                                           _.clone(this.kw_args),
                                           this.rest_arg);
+    },
+    display: function() {
+      var args = _.map(this.p_args, _.identity);
+      _.each(this.kw_args, function(v,k) {
+        args = args.concat('#:' + k, v);
+      });
+      if(this.rest_arg) {
+        args = args.concat('.', this.rest_arg);
+      }
+      return '(' + args.join(' ') + ')';
     }
   };
 
@@ -424,8 +446,13 @@ ray.kernel = function() {
   var Lambda = product('arg_spec', 'body');
   Lambda.proto = {
     clone: clone_constructor,
-    eval: function() {
-	    return new this.R.Value.Closure(this.R.eval(this.arg_spec), this.R.clone(this.body), this.R.clone_envs());
+    interp: function() {
+	    return new this.R.Value.Closure(this.R.interp(this.arg_spec), this.R.clone(this.body), this.R.clone_envs());
+    },
+    display: function() {
+      return ['(lambda',
+              this.R.display(this.arg_spec),
+              this.R.display(this.body) + ')'].join(' ');
     }
   };
 
@@ -436,9 +463,11 @@ ray.kernel = function() {
   self.Error = Error;
   global.R = R;
 
-  var R = function(dict) {
-    this.envs = [dict || {}];
+  var R = function(dict, config) {
+    this.envs = [];
     this.top_level = {};
+    this.builtins = {};
+    this.function_call_limit = (config ? config.function_call_limit : 100) || 100;
     var self = this;
 
     this.Value = {};
@@ -469,21 +498,26 @@ ray.kernel = function() {
   };
 
   R.prototype = {
-    list_all: function () {
-      return _.map(this.envs, function(env) {
-        return _.keys(env);
-      });
+    builtins_bind: function(name, val) {
+      var value = this.interp(val);
+      if(this.builtins[name]) {
+        throw new Error("Trying to change a builtin binding: " + name);
+      } else {
+        this.builtins[name] = value;
+        value.__name__ = name;
+      }
     },
     top_level_bind: function(name, val) {
-      var value = this.eval(val);
+      var value = this.interp(val);
       if(this.top_level[name]) {
         throw new Error("Trying to change a binding at the top level: " + name);
       } else {
         this.top_level[name] = value;
+        value.__name__ = name;
       }
     },
     local_bind: function(name, val) {
-      var value = this.eval(val);
+      var value = this.interp(val);
       var tmp = this.envs[0][name];
       this.envs[0][name] = value;
       return tmp || null;
@@ -499,6 +533,8 @@ ray.kernel = function() {
       }
       if(this.top_level[name]) {
         return this.top_level[name];
+      } else if(this.builtins[name]) {
+        return this.builtins[name];
       } else {
         return null;
       }
@@ -509,8 +545,56 @@ ray.kernel = function() {
     clone: function(expr) {
       return expr.clone();
     },
+    set_stop: function(should_stop) {
+      if(arguments.length === 0) {
+        this.should_stop = true;
+      } else {
+        this.should_stop = should_stop;
+      }
+      return this.should_stop;
+    },
+    stop: function() {
+      this.envs = [];
+      var name = this.current_function_name;
+      this.current_function = null;
+      this.function_call_count = 0;
+      throw new Error("Stopping in:" + (name ? name : "**unknown**"));
+    },
+    record_function_call: function(f, name) {
+      if(name) { 
+        this.current_function_name = name;
+      }
+      
+      if(this.current_function === f) {
+        // Increment calls to this function
+        this.function_call_count++;
+        if(this.function_call_count > this.function_call_limit) {
+          this.should_stop = true;
+        }
+      } else {
+        // Reset current function name and start function call count at 1
+        this.current_function = f;
+        this.function_call_count = 1;
+      }
+    },
+    interp: function(expr) {
+      if(this.should_stop) {
+        return this.stop();
+      } else {
+        return expr.interp();
+      }
+    },
     eval: function(expr) {
-      return expr.eval();
+      if(!expr.expr) {
+        throw new Error("Can't evaluate a non-expression!!");
+      }
+
+      try {
+        return this.interp(expr);
+      } catch (e) {
+        console.log(e);
+        throw e;
+      }
     },
     swap_envs: function(envs) {
       var tmp_envs = this.envs;
