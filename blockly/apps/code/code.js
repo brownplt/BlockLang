@@ -29,7 +29,7 @@ document.write(codepage.start({}, null,
  * List of tab names.
  * @private
  */
-var TABS_ = ['blocks', 'whalesong', 'javascript', 'python', 'xml'];
+var TABS_ = ['blocks', 'whalesong', 'ray', 'javascript', 'python', 'xml'];
 
 var selected = 'blocks';
 
@@ -94,8 +94,10 @@ function renderContent() {
     content.innerHTML = Blockly.Generator.workspaceToCode('JavaScript');
   } else if (content.id == 'content_python') {
     content.innerHTML = Blockly.Generator.workspaceToCode('Python');
-  } else if (content.id == 'content_whalesong') { 
+  } else if (content.id == 'content_whalesong') {
     content.innerHTML = Blockly.Generator.workspaceToCode('Whalesong');
+  } else if (content.id == 'content_ray') {
+    content.innerHTML = Blockly.Generator.workspaceToCode('Ray');
   }
 }
 

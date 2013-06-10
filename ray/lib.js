@@ -26,6 +26,19 @@ ray.lib = function() {
     }));
   };
 
+  lib.make_numeric_comparison = function(name, numbers_name) {
+    var r = lib.r;
+    lib.add_builtin(name, r.prim(r.spec(['x'],{},'ls'), function(x, ls) {
+      var args = [x].concat(ls);
+      var lefts = args.slice(0, -1);
+      var rights = args.slice(1);
+      var result = _.reduce(_.range(lefts.length), function(result, i) {
+        return result && lib.r.numbers[numbers_name](lefts[i].n,rights[i].n);
+      }, true);
+      return new r.Value.Boolean(result);
+    }));
+  };
+
   lib.initialize = function(r) {
     var _r = r.make_helper();
     var self = this;
@@ -81,6 +94,7 @@ ray.lib = function() {
                  r.app(r.name('list?'),
                        r.p_args(r.app(r.name('cdr'),
                                       r.p_args(r.name('x')))))))));
+
     lib.add_builtin("map", r.fn(r.p_spec('f','ls'),
       r._if(r.app(r.name('null?'), r.p_args(r.name('ls'))),
 	    r._null(),
@@ -92,11 +106,15 @@ ray.lib = function() {
 							  r.app(r.name('cdr'),
 								r.p_args(r.name('ls'))))))))));
 
-    lib.make_numeric_binop('>', r.bool, 'greaterThan');
-    lib.make_numeric_binop('<', r.bool, 'lessThan');
-    lib.make_numeric_binop('>=', r.bool, 'greaterThanOrEqual');
-    lib.make_numeric_binop('<=', r.bool, 'lessThanOrEqual');
-    lib.make_numeric_binop('=', r.bool, 'equals');
+    lib.add_builtin('not', r.prim(r.p_spec('x'), function(x) {
+      return new r.Value.Boolean(!x.b);
+    }));
+
+    lib.make_numeric_comparison('>', 'greaterThan');
+    lib.make_numeric_comparison('<', 'lessThan');
+    lib.make_numeric_comparison('>=', 'greaterThanOrEqual');
+    lib.make_numeric_comparison('<=', 'lessThanOrEqual');
+    lib.make_numeric_comparison('=', 'equals');
     lib.make_numeric_binop('quotient', r.num)
     lib.make_numeric_binop('remainder', r.num);
     lib.make_numeric_binop('modulo', r.num);

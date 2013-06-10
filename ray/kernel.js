@@ -102,7 +102,7 @@ ray.kernel = function() {
   Num.proto = {
     clone: clone_constructor,
     display: function() { 
-      return n.toString();
+      return String(this.n);
     }
   };
 

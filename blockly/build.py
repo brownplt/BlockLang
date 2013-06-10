@@ -161,6 +161,7 @@ class Gen_compressed():
     self.gen_generator('javascript')
     self.gen_generator('python')
     self.gen_generator('whalesong')
+    self.gen_generator('ray')
     self.gen_language('en')
 
   def gen_core(self):
