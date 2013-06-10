@@ -3,3 +3,8 @@
 *.py~
 *.html~
 *.org~
+.idea
+whalesong
+whalesong-gui
+*.svg~
+*.rkt~

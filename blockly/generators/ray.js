@@ -111,9 +111,9 @@ goog.require("ray.ray");\n\
 goog.require("ray.lib");\n\
 ';
 //Blockly.Ray.lib_["r"] = 'ray.lib.initialize(new ray.ray())';
-Blockly.Ray.ray_apply = function(name /*, args */) { 
+Blockly.Ray.ray_apply = function(name /*, args */) {
   var args = Array.prototype.slice.call(arguments, 1);
-  var ray_name = 'r.name(' + Blockly.Ray.quote(name) + ')';
+  var ray_name = 'r.name(' + Blockly.Ray.quote_(name) + ')';
   var ray_args = 'r.p_args(' + args.join(', ') + ')';
   return 'r.app(' + [ray_name, ray_args].join(', ') + ')';
 };

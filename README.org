@@ -1,0 +1,42 @@
+* How to get started:
+
+** Ray
+The test suite for Ray can be run and viewed by opening up
+'ray/ray.html' in a web browser. If you add new modules (new js files
+in 'ray/') that have dependencies on anything else in ray, you can
+recompile with: 
+
+#+BEGIN_SRC sh
+  closure-library-read-only/closure/bin/build/depswriter.py --root_with_prefix="ray ../../../ray" > ray/ray-deps.js
+#+END_SRC
+
+This will generate 'ray/ray-deps.js' which is loaded in 'ray/ray.html'
+so that future calls to 'goog.require' will know where to find the
+various modules.  
+
+** Blockly
+To use Blockly, currently you must start up a server, since browsers
+won't allow Blockly to be run in an iframe off the local filesystem. I
+set up a command to do this, './start-server', which also recompiles
+Blockly, using 'blockly/build.py'. 'blockly/build.py' is a build
+script that came with blockly that invokes Google's Closure compiler
+on the Blockly core, and generators, and language files. (I've removed
+all the language files, except for english, just to pare everything
+down to the bare minimum actually required to run Blockly. We can
+regenerate them later if desired.)  
+
+I've modified 'blockly/build.py' to compile locally using
+'compiler.jar', and the local copy of Google's Closure Library (in
+'closure-library-read-only'), and to only compile if any of the
+dependencies of the compilation targets have been modified since the
+last time the target was compiled.  
+
+I've been testing my code generation using the demo in
+'blockly/apps/code', and adding Whalesong (and now Ray) backends to
+it, and inspecting the generated code. If you ever make changes to
+'blockly/apps/code/template.soy', you should make sure to recompile
+'template.html' from 'blockly/apps/code' using this command:
+
+#+BEGIN_SRC sh 
+  java -jar ../_soy/SoyToJsSrcCompiler.jar --outputPathFormat template.js --srcs template.soy 
+#+END_SRC

@@ -7,16 +7,17 @@ goog.provide('ray.kernel');
 
 goog.require('ray.underscore');
 goog.require('ray.util');
+goog.require('ray.env');
 
 ray.kernel = function() {
+
+  var env = ray.env();
 
   var _ = ray.underscore;
 
   var global = window;
   // inject utility functions into the global namespace
-    _.each(ray.util(), function(v,k) {
-    global[k] = v;
-  });
+  ray.util().install(global);
 
   var make_expr = function(r,type,obj) {
     var proto = {};
@@ -113,6 +114,14 @@ ray.kernel = function() {
       return "\"" + s + "\"";
     }
   };
+
+  var Char = product('c');
+  Char.proto = {
+    clone: clone_constructor,
+    display: function() {
+      return "#\\" + this.c;
+    }
+  }
 
   var Primitive = product('arg_spec', 'f');
   Primitive.proto = {
@@ -281,6 +290,17 @@ ray.kernel = function() {
     },
     display: function() {
       return "\"" + this.s + "\"";
+    }
+  };
+
+  var CharExpr = product('c');
+  CharExpr.proto = {
+    clone: clone_constructor,
+    interp: function() {
+      return new this.R.Char(this.c);
+    },
+    display: function() {
+      return "#\\" + this.c;
     }
   };
 
@@ -484,8 +504,8 @@ ray.kernel = function() {
 
   var R = function(dict, config) {
     this.envs = [];
-    this.top_level = {};
-    this.builtins = {};
+    this.top_level = env.empty_fast_env();
+    this.builtins = env.empty_fast_env();
     this.function_call_limit = (config ? config.function_call_limit : 100) || 100;
     var self = this;
 
@@ -519,44 +539,49 @@ ray.kernel = function() {
   R.prototype = {
     builtins_bind: function(name, val) {
       var value = this.interp(val);
-      if(this.builtins[name]) {
+      if(this.builtins.lookup(name)) {
         throw new Error("Trying to change a builtin binding: " + name);
       } else {
-        this.builtins[name] = value;
+        this.builtins = this.builtins.extend(name, value);
         value.__name__ = name;
       }
     },
     top_level_bind: function(name, val) {
       var value = this.interp(val);
-      if(this.top_level[name]) {
+      if(this.top_level.lookup(name)) {
         throw new Error("Trying to change a binding at the top level: " + name);
       } else {
-        this.top_level[name] = value;
+        this.top_level = this.top_level.extend(name, value);
         value.__name__ = name;
       }
     },
     local_bind: function(name, val) {
       var value = this.interp(val);
-      var tmp = this.envs[0][name];
-      this.envs[0][name] = value;
+      var tmp = this.envs[0].lookup(name);
+      this.envs[0] = this.envs[0].extend(name, value);
       return tmp || null;
     },
     bind: function(name, val) {
       this.top_level_bind(name, val);
     },
     lookup: function(name) {
+      var value;
       for(var i = 0; i < this.envs.length; i++) {
-        if(this.envs[i][name]) {
-          return this.envs[i][name];
+        value = this.envs[i].lookup(name);
+        if(value) {
+          return value;
         }
       }
-      if(this.top_level[name]) {
-        return this.top_level[name];
-      } else if(this.builtins[name]) {
-        return this.builtins[name];
-      } else {
-        return null;
+      value = this.top_level.lookup(name);
+      if(value) {
+        return value;
       }
+      value = this.builtins.lookup(name);
+      if(value) {
+        return value;
+      }
+
+      return null;
     },
     type: function(obj) {
       return obj.type;
@@ -621,22 +646,16 @@ ray.kernel = function() {
       return tmp_envs;
     },
     push_env: function() {
-      this.envs.unshift({});
+      this.envs.unshift(env.empty_env());
     },
     pop_env: function() {
       return this.envs.shift();
     },
     clone_envs: function(envs) {
-      var self = this;
       var old_envs = envs || this.envs;
-      var new_envs = _.map(old_envs, function(env) {
-        var new_env = {};
-        _.each(env, function(v,k) {
-          new_env[k] = v;
-        });
-        return new_env;
+      return _.map(old_envs, function(env) {
+        return env.clone();
       });
-      return new_envs;
     },
     display: function(expr) { 
       return expr.display();

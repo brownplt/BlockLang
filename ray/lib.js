@@ -22,7 +22,7 @@ ray.lib = function() {
   lib.make_numeric_binop = function(name, result_type, numbers_name) {
     var internal_name = numbers_name || name;
     lib.add_builtin(name, lib.r.prim(lib.r.p_spec('x','y'), function(x,y) {
-      return result_type(lib.r.numbers[internal_name](x.n, y.n));
+      return new result_type(lib.r.numbers[internal_name](x.n, y.n));
     }));
   };
 
@@ -47,36 +47,18 @@ ray.lib = function() {
     });
     lib.r = r;
 
-    lib.add_builtin("+", r.prim(r.rest_spec('ls'), function(ls) {
-	    var sum = _.reduce(ls, function(a, b) { return r.numbers.add(a, b.n); }, 0);
-      return r.num(sum);
-	  }));
-    lib.add_builtin("*", r.prim(r.rest_spec('ls'), function(ls) {
-      var sum = _.reduce(ls, function(a, b) { return r.numbers.multiply(a, b.n); }, 1);
-      return r.num(sum);
-    }));
-    lib.add_builtin('-', r.prim(r.spec(['x'],{},'ls'), function(x,ls) {
-      if(ls.length === 0) {
-        return r.num(r.numbers.subtract(0, x.n));
-      } else {
-        var result = _.reduce(ls, function(a, b) { return r.numbers.subtract(a, b.n); }, x.n);
-        return r.num(result);
-      }
-    }));
-    lib.add_builtin('/', r.prim(r.spec(['x'],{},'ls'), function(x,ls) {
-      if(ls.length === 0) {
-        return r.num(r.numbers.divide(1, x.n));
-      } else {
-        var result = _.reduce(ls, function(a, b) { return r.numbers.divide(a, b.n); }, x.n);
-        return r.num(result);
-      }
-    }));
+    /**
+     * Type tests
+     */
     lib.make_predicate('boolean');
     lib.make_predicate('pair');
     lib.make_predicate('number');
     lib.make_predicate('string');
     lib.make_predicate('null');
 
+    /**
+     * Pairs and Lists
+     */
     lib.add_builtin("car", r.prim(r.p_spec('x'), function(x) {
       return x.car;
     }));
@@ -84,7 +66,7 @@ ray.lib = function() {
       return x.cdr;
     }));
     lib.add_builtin("cons", r.prim(r.p_spec('car', 'cdr'), function(car, cdr) {
-      return r.Value.Pair(car, cdr);
+      return new r.Value.Pair(car, cdr);
     }));
 
     lib.add_builtin("list?", r.fn(r.p_spec('x'),
@@ -106,8 +88,39 @@ ray.lib = function() {
 							  r.app(r.name('cdr'),
 								r.p_args(r.name('ls'))))))))));
 
+    /**
+     * Booleans and Equality
+     */
     lib.add_builtin('not', r.prim(r.p_spec('x'), function(x) {
       return new r.Value.Boolean(!x.b);
+    }));
+
+    /**
+     * Generic Numerics
+     */
+    lib.add_builtin("+", r.prim(r.rest_spec('ls'), function(ls) {
+      var sum = _.reduce(ls, function(a, b) { return r.numbers.add(a, b.n); }, 0);
+      return new r.Value.Num(sum);
+    }));
+    lib.add_builtin("*", r.prim(r.rest_spec('ls'), function(ls) {
+      var sum = _.reduce(ls, function(a, b) { return r.numbers.multiply(a, b.n); }, 1);
+      return new r.Value.Num(sum);
+    }));
+    lib.add_builtin('-', r.prim(r.spec(['x'],{},'ls'), function(x,ls) {
+      if(ls.length === 0) {
+        return r.num(r.numbers.subtract(0, x.n));
+      } else {
+        var result = _.reduce(ls, function(a, b) { return r.numbers.subtract(a, b.n); }, x.n);
+        return new r.Value.Num(result);
+      }
+    }));
+    lib.add_builtin('/', r.prim(r.spec(['x'],{},'ls'), function(x,ls) {
+      if(ls.length === 0) {
+        return new r.Value.Num(r.numbers.divide(1, x.n));
+      } else {
+        var result = _.reduce(ls, function(a, b) { return r.numbers.divide(a, b.n); }, x.n);
+        return new r.Value.Num(result);
+      }
     }));
 
     lib.make_numeric_comparison('>', 'greaterThan');
@@ -115,9 +128,50 @@ ray.lib = function() {
     lib.make_numeric_comparison('>=', 'greaterThanOrEqual');
     lib.make_numeric_comparison('<=', 'lessThanOrEqual');
     lib.make_numeric_comparison('=', 'equals');
-    lib.make_numeric_binop('quotient', r.num)
-    lib.make_numeric_binop('remainder', r.num);
-    lib.make_numeric_binop('modulo', r.num);
+    lib.make_numeric_binop('quotient', r.Value.Num)
+    lib.make_numeric_binop('remainder', r.Value.Num);
+    lib.make_numeric_binop('modulo', r.Value.Num);
+
+    /**
+     * Strings
+     */
+    lib.add_builtin('make-string', r.prim(r.p_spec('k', 'c'), function(k, c) {
+      var str = "";
+      _.times(k.n, function() { str += c.c; });
+      return new r.Value.Str(str);
+    }));
+
+    lib.add_builtin('string', r.prim(r.rest_spec('ls'), function(ls) {
+      var str = "";
+      _.each(ls, function(c) { str += c.c; });
+      return new r.Value.Str(str);
+    }));
+
+    lib.add_builtin('string-length', r.prim(r.p_spec('x'), function(s) {
+      return new r.Value.Num(s.s.length);
+    }));
+
+    lib.add_builtin('string-ref', r.prim(r.p_spec('str', 'k'), function(str, k) {
+      var c = str.s.charAt(k.n);
+      if(!c) {
+        throw new r.Error("Invalid index passed to string-ref!");
+      }
+      return new r.Value.Char(c);
+    }));
+
+    lib.add_builtin('string-append', r.prim(r.rest_spec('ls'), function(ls) {
+      var str = _.reduce(ls, function(str, s) { return str + s.s; }, "");
+      return new r.Value.Str(str);
+    }));
+
+    lib.add_builtin('substring', r.prim(r.p_spec('str', 'start', 'end'), function(str, start, end) {
+      if(start.n >= 0 && start.n <= str.s.length &&
+         end.n >= start.n &&  end.n <= str.s.length) {
+        return new r.Value.Str(str.s.substring(start.n, end.n));
+      } else {
+        throw new r.Error("Invalid indices passed to substring");
+      }
+    }));
 
 
     return r;

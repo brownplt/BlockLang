@@ -1,0 +1,8 @@
+* DONE First, switch to my list implementation. 
+* TODO Add in test cases for user-defined functions. 
+* TODO Then spend a day on code generation, so that we can have a representative sample of blocks to play with  
+* TODO Figure out how I want to represent types. 
+
+Spend a day getting code generation working on a representative sample.
+Build my own immutable list data structures. 
+Feel free to have types be associated with arguments. 

@@ -29,7 +29,7 @@ document.write(codepage.start({}, null,
  * List of tab names.
  * @private
  */
-var TABS_ = ['blocks', 'whalesong', 'ray', 'javascript', 'python', 'xml'];
+var TABS_ = ['blocks', 'ray', 'whalesong', 'javascript', 'python', 'xml'];
 
 var selected = 'blocks';
 

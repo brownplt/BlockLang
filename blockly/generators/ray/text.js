@@ -104,7 +104,7 @@ Blockly.Ray.text_changeCase = function() {
   // Change capitalization.
   var mode = this.getTitleValue('CASE');
   var func = Blockly.Ray.text_changeCase.OPERATORS[mode];
-  var argument0 = Blockly.Ray.text_trim.(this, 'TEXT',
+  var argument0 = Blockly.Ray.text_trim(this, 'TEXT',
       Blockly.Ray.ORDER_COMMA) || '\'\'';
   if(!func) {
     return Blockly.Ray.not_implemented();

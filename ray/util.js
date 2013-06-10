@@ -9,6 +9,14 @@ ray.util = function() {
 
   var util = {};
 
+  util.install = function(obj) {
+    _.each(util, function(v,k) {
+      if(k !== 'install') {
+        obj[k] = v;
+      }
+    });
+  };
+
   util.construct = function(constructor, args) {
     function Builder() {
       return constructor.apply(this, args);
@@ -43,7 +51,7 @@ ray.util = function() {
       }
     };
     var cloned_props = _.map(props, cloner);
-    return construct(this.__node_constructor__, cloned_props);
+    return util.construct(this.__node_constructor__, cloned_props);
   };
 
   return util;

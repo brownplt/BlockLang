@@ -66,7 +66,7 @@ var end_tests = function() {
 var print_lib = function(r) {
   $("#lib").prepend("<p>Current builtins:</p>");
   var lib_list = $("#lib > dl");
-  _.each(r.builtins, function(value, name) {
+  _.each(r.builtins.dict({}), function(value, name) {
     var lib_dt = $("<dt><pre>" + name + "</pre></dt>");
     var lib_dd = $("<dd><pre>" + _.escape(r.display(value)) + "</pre></dd>");
     lib_list.append(lib_dt);
