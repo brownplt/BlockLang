@@ -106,6 +106,14 @@ ray.kernel = function() {
     }
   };
 
+  var Str = product('s');
+  Str.proto = {
+    clone: clone_constructor,
+    display: function() {
+      return "\"" + s + "\"";
+    }
+  };
+
   var Primitive = product('arg_spec', 'f');
   Primitive.proto = {
     clone: clone_constructor,
@@ -262,6 +270,17 @@ ray.kernel = function() {
     },
     display: function() { 
       return String(this.n);
+    }
+  };
+
+  var StrExpr = product('s');
+  StrExpr.proto = {
+    clone: clone_constructor,
+    interp: function() {
+      return new this.R.Value.Str(this.s);
+    },
+    display: function() {
+      return "\"" + this.s + "\"";
     }
   };
 
@@ -664,11 +683,10 @@ ray.kernel = function() {
 	      return new r.Expr.Lambda(arg_spec, body);
       },
       num: function(n) {
-        if(typeof n === 'number') {
-          return new r.Expr.Num(n);
-        } else {
-          return n;
-        }
+        return new r.Expr.Num(n);
+      },
+      str: function(s) {
+      return new r.Expr.Str(s);
       },
       pair: function(car, cdr) {
         return new r.Expr.Pair(car, cdr);

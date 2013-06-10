@@ -19,9 +19,10 @@ ray.lib = function() {
     }));
   };
 
-  lib.make_numeric_binop = function(name,numbers_name, result_type) {
+  lib.make_numeric_binop = function(name, result_type, numbers_name) {
+    var internal_name = numbers_name || name;
     lib.add_builtin(name, lib.r.prim(lib.r.p_spec('x','y'), function(x,y) {
-      return result_type(lib.r.numbers[numbers_name](x.n, y.n))
+      return result_type(lib.r.numbers[internal_name](x.n, y.n));
     }));
   };
 
@@ -75,27 +76,31 @@ ray.lib = function() {
 
     lib.add_builtin("list?", r.fn(r.p_spec('x'),
       r.or(r.app(r.name('null?'), r.p_args(r.name('x'))),
-           r.and(r.app(r.name('pair?'), 
+           r.and(r.app(r.name('pair?'),
                        r.p_args(r.name('x'))),
-                 r.app(r.name('list?'), 
-                       r.p_args(r.app(r.name('cdr'), 
+                 r.app(r.name('list?'),
+                       r.p_args(r.app(r.name('cdr'),
                                       r.p_args(r.name('x')))))))));
     lib.add_builtin("map", r.fn(r.p_spec('f','ls'),
       r._if(r.app(r.name('null?'), r.p_args(r.name('ls'))),
 	    r._null(),
-	    r.app(r.name('cons'), r.p_args(r.app(r.name('f'), 
-						 r.p_args(r.app(r.name('car'), 
+	    r.app(r.name('cons'), r.p_args(r.app(r.name('f'),
+						 r.p_args(r.app(r.name('car'),
 								r.p_args(r.name('ls'))))),
 					   r.app(r.name('map'),
 						 r.p_args(r.name('f'),
 							  r.app(r.name('cdr'),
 								r.p_args(r.name('ls'))))))))));
-	    
-    lib.make_numeric_binop('>','greaterThan', r.bool);
-    lib.make_numeric_binop('<','lessThan', r.bool);
-    lib.make_numeric_binop('>=', 'greaterThanOrEqual', r.bool);
-    lib.make_numeric_binop('<=', 'lessThanOrEqual', r.bool);
-    lib.make_numeric_binop('=', 'equals', r.bool);
+
+    lib.make_numeric_binop('>', r.bool, 'greaterThan');
+    lib.make_numeric_binop('<', r.bool, 'lessThan');
+    lib.make_numeric_binop('>=', r.bool, 'greaterThanOrEqual');
+    lib.make_numeric_binop('<=', r.bool, 'lessThanOrEqual');
+    lib.make_numeric_binop('=', r.bool, 'equals');
+    lib.make_numeric_binop('quotient', r.num)
+    lib.make_numeric_binop('remainder', r.num);
+    lib.make_numeric_binop('modulo', r.num);
+
 
     return r;
   };
