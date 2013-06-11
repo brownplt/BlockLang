@@ -1,6 +1,11 @@
 <html>
 <head>
 <style>
+  body {
+    background-color: lightblue;
+    font-family: sans-serif;
+  }
+
   #tests .passed {
     color: green;
   }
@@ -13,25 +18,39 @@
     font-family: sans-serif;
   }
 
-  #tests pre {
+  #tests code {
+    white-space: pre;
     font-family: monospace;
+    font-size: 14pt;
     display: inline;
+  }
+
+  #tests p.out {
+    color: midnightblue;
   }
 
   #tests {
     float: left;
     width: 40%;
-    margin: 2% 2%;
+    margin: 2% 0 2% 2%;
+    padding: .5em 1em;
+    background-color: antiquewhite;
+    overflow: scroll;
   }
 
   #lib {
     float: left;
     width: 40%;
-    margin: 2% 2%;
+    margin: 2% 0 2% 2%;
+    padding: .5em 1em;
+    background-color: antiquewhite;
+    overflow: scroll;
   }
 
-  #lib pre {
+  #lib code {
+    white-space: pre;
     font-family: monospace;
+    font-size: 14pt;
     display: inline;
   }
 

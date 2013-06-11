@@ -15,6 +15,30 @@ var assert = function(bool, message) {
   tests.append("<dd></dd>");
 };
 
+var describe = function(description) {
+  var tests = $("#tests > dl");
+  tests.append("<p>" + description + "</p>");
+};
+
+var display = function(expr, should_evaluate) {
+  var tests = $("#tests > dl");
+  var result = should_evaluate ? r.eval(expr) : expr;
+  tests.append("<p><code>" + _.escape(r.display(result)) + "</code></p>");
+}
+
+var display_evaluation = function(expr) {
+  var tests = $("#tests > dl");
+  var result = r.eval(expr);
+  tests.append("<p class=\"in\"><code>" +
+                   _.escape(r.display(expr)) +
+                   " </code>" +
+                   "&rArr; <br></p>" +
+                   "<p class=\"out\"><code>    " +
+                   _.escape(r.display(result)) +
+                   "</code></p>");
+};
+
+
 var assert_true = function(expr, name) {
   var result = r.eval(expr);
   var tests = $("#tests > dl");
@@ -22,7 +46,7 @@ var assert_true = function(expr, name) {
   test_dt.addClass(result.b ? "passed" : "failed");
   tests.append(test_dt);
   var test_dd = $("<dd></dd>");
-  test_dd.append("<pre>" + _.escape(r.display(expr)) + "</pre>")
+  test_dd.append("<code>" + _.escape(r.display(expr)) + "</code>")
   test_dd.append(" is true");
   tests.append(test_dd);
 };
@@ -34,7 +58,7 @@ var assert_false = function(expr, name) {
   test_dt.addClass((!result.b) ? "passed" : "failed");
   tests.append(test_dt);
   var test_dd = $("<dd></dd>");
-  test_dd.append("<pre>" + _.escape(r.display(expr)) + "</pre>")
+  test_dd.append("<code>" + _.escape(r.display(expr)) + "</code>")
   test_dd.append(" is false");
   tests.append(test_dd);
 };
@@ -46,7 +70,7 @@ var assert_equals = function(expr, n, name) {
   test_dt.addClass(result.n === n ? "passed" : "failed");
   tests.append(test_dt);
   var test_dd = $("<dd></dd>");
-  test_dd.append("<pre>" + _.escape(r.display(expr)) + "</pre>")
+  test_dd.append("<code>" + _.escape(r.display(expr)) + "</code>")
   test_dd.append(" is equal to " + String(n));
   tests.append(test_dd);
 }
@@ -64,11 +88,11 @@ var end_tests = function() {
 };
 
 var print_lib = function(r) {
-  $("#lib").prepend("<p>Current builtins:</p>");
+  $("#lib").prepend("<H2>Current builtins:</H2>");
   var lib_list = $("#lib > dl");
   _.each(r.builtins.dict({}), function(value, name) {
-    var lib_dt = $("<dt><pre>" + name + "</pre></dt>");
-    var lib_dd = $("<dd><pre>" + _.escape(r.display(value)) + "</pre></dd>");
+    var lib_dt = $("<dt><code>" + name + "</code></dt>");
+    var lib_dd = $("<dd><code>" + _.escape(r.display(value)) + "</code></dd>");
     lib_list.append(lib_dt);
     lib_list.append(lib_dd);
   });
@@ -76,7 +100,7 @@ var print_lib = function(r) {
 
 var create_testing_environment = function(R, lib) {
   $("#tests").append("<dl></dl>");
-  $("#tests").prepend("Test results:")
+  $("#tests").prepend("<H2>Test results:</H2>")
   $("#lib").append("<dl></dl>");
   return lib.initialize(new R());
 }
@@ -96,6 +120,29 @@ ray.test = function() {
   assert_false(gt_2, "gt_2");
   var gt_3 = r.app(r.name('>'), r.p_args(r.num(3), r.num(5)));
   assert_false(gt_2, "gt_3");
+  
+  var lt_1 = r.app(r.name('<'), r.p_args(r.num(1), r.num(2)));
+  assert_true(lt_1, "lt_1");
+  var lt_2 = r.app(r.name('<'), r.p_args(r.num(2), r.num(2)));
+  assert_false(lt_2, "lt_2");
+  var lt_3 = r.app(r.name('<'), r.p_args(r.num(3), r.num(2), r.num(3)));
+  assert_false(lt_3, "lt_3");
+  
+  var ge_1 = r.app(r.name('>='), r.p_args(r.num(3), r.num(0)));
+  assert_true(ge_1, "ge_1");
+  var ge_2 = r.app(r.name('>='), r.p_args(r.num(3), r.num(3), r.num(3), r.num(1)));
+  assert_true(ge_2, "ge_2");
+  var ge_3 = r.app(r.name('>='), r.p_args(r.num(3), r.num(5)));
+  assert_false(ge_3, "ge_3");
+  var ge_4 = r.app(r.name('>='), r.p_args(r.num(3), r.num(0), r.num(-5), r.num(8)));
+  assert_false(ge_4, "ge_4");
+  
+  var le_1 = r.app(r.name('<='), r.p_args(r.num(1), r.num(2), r.num(5), r.num(131234234)));
+  assert_true(le_1, "le_1");
+  var le_2 = r.app(r.name('<='), r.p_args(r.num(2), r.num(2)));
+  assert_true(le_2, "le_2");
+  var le_3 = r.app(r.name('<='), r.p_args(r.num(3), r.num(2), r.num(5)));
+  assert_false(le_3, "le_3");
 
   var or_1 = r.or(r.bool(true), r.bool(false));
   assert_true(or_1, "or_1");
@@ -106,6 +153,7 @@ ray.test = function() {
   var or_4 = r.or(r.num(4));
   assert_equals(or_4, 4, "or_4");
   var or_5 = r.or(r.bool(false), r.num(3));
+
   assert_equals(or_5, 3, "or_5");
   var and_1 = r.and(r.bool(true), r.bool(false));
   assert_false(and_1, "and_1");
@@ -117,6 +165,11 @@ ray.test = function() {
   assert_equals(and_4, 4, "and_4");
   var and_5 = r.and(r.bool(true), r.num(3));
   assert_equals(and_5, 3, "and_5");
+
+  var yes_bool = r.app(r.name('boolean?'), r.p_args(r.app(r.name('boolean?'), r.p_args(r.num(5)))));
+  assert_true(yes_bool, "yes_bool");
+  var no_bool = r.app(r.name('boolean?'), r.p_args(r.num(5)));
+  assert_false(no_bool, "no_bool");
 
   var yes_pair = r.app(r.name('pair?'),
                        r.p_args(r.pair(r.num(1),r.num(2))));
@@ -178,6 +231,48 @@ ray.test = function() {
 
   var if_test2 = r._if(r.app(r.name(">"), r.p_args(r.num(3),r.num(4))), r.num(8), r.num(9));
   assert_equals(if_test2, 9, "if_test2");
+
+  describe("First, I bind <code>double</code> at the top level to:");
+  var double = r.fn(r.p_spec('x'), r.app(r.name('*'), r.p_args(r.name('x'), r.num(2))));
+  display(double, false);
+  r.top_level_bind('double', double);
+  describe("The binding is available everywhere.");
+  display_evaluation(r.app(r.name('double'), r.p_args(r.num(5))));
+
+  describe("Since top level bindings are visible everywhere, we can make recursive bindings.");
+  describe("Here, I bind <code>last</code>:");
+  var last = r.fn(r.p_spec('x'), r._if(r.app(r.name('null?'),
+                                             r.p_args(r.app(r.name('cdr'),
+                                                            r.p_args(r.name('x'))))),
+                                       r.app(r.name('car'),
+                                             r.p_args(r.name('x'))),
+                                       r.app(r.name('last'),
+                                             r.p_args(r.app(r.name('cdr'),
+                                                            r.p_args(r.name('x')))))));
+  display(last, false);
+  r.top_level_bind('last', last);
+  describe('It works as expected.');
+  var last_of_5 = r.app(r.name('last'), r.p_args(r.app(r.name('list'), r.p_args(r.num(1), r.num(2), r.num(3), r.num(4), r.num(5)))));
+  display_evaluation(last_of_5);
+
+  describe("We can use any function defined at the top level in any other definition at the top level");
+  describe("Let's define <code>double-last</code> as");
+  var double_last = r.fn(r.p_spec('x'), r.app(r.name('double'), r.p_args(r.app(r.name('last'), r.p_args(r.name('x'))))));
+  r.top_level_bind('double-last', double_last);
+  display(double_last, false);
+  describe("No surprises here.");
+  var double_last_of_5 = r.app(r.name('double-last'), r.p_args(r.app(r.name('list'), r.p_args(r.num(1), r.num(2), r.num(3), r.num(4), r.num(5)))));
+  display_evaluation(double_last_of_5);
+  describe("If we now change a binding at the top level, this will be reflected in any other definitions that rely upon it");
+  describe("I will now change the definition of <code>double</code> to a function of one argument that always just returns the string <code>\"double\"</code>");
+  var double_str = r.fn(r.p_spec('x'), r.str("double"));
+  r.top_level_bind('double', double_str);
+  display_evaluation(r.app(r.name('double'), r.p_args(r.num(5))));
+  display_evaluation(double_last_of_5);
+
+
+
+
 
   end_tests();
 

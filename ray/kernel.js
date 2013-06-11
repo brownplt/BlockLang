@@ -111,7 +111,7 @@ ray.kernel = function() {
   Str.proto = {
     clone: clone_constructor,
     display: function() {
-      return "\"" + s + "\"";
+      return "\"" + this.s + "\"";
     }
   };
 
@@ -162,8 +162,10 @@ ray.kernel = function() {
     },
     bind_arguments: function(args) {
       if(!this.saved_envs) { this.saved_envs = []; }
+      var arg_env = this.arg_spec.bind_arguments(args);
       this.saved_envs.unshift(this.R.swap_envs(this.envs));
-	  this.arg_spec.bind_arguments(args);
+      this.R.push_env(arg_env);
+
     },
     evaluate_body: function() {
       this.R.record_function_call(this, this.__name__);
@@ -204,19 +206,21 @@ ray.kernel = function() {
      * @requires args must be accepted, (call ArgumentSpec.accepts(args) before this)
      */
     bind_arguments: function(args) {
-      this.R.push_env();
+      var env = this.R.get_env();
 	    var self = this;
 	    self.bound_args = self.bound_args || [];
 	    for(var i = 0; i < self.p_args.length; i++) {
-	      self.R.local_bind(self.p_args[i], args.p_args[i]);
+	      env = env.extend(self.p_args[i], self.R.interp(args.p_args[i]));
 	    }
 
 	    if(self.rest_arg) {
-	      self.R.local_bind(self.rest_arg, args.p_args.slice(self.p_args.length));
+	      env = env.extend(self.rest_arg, _.map(args.p_args.slice(self.p_args.length), self.R.interp));
 	    }
 	    _.each(self.kw_args, function(kw_name, kw) {
-	      self.R.bind(kw_name, args.kw_args[kw]);
+	      env = env.extend(kw_name, self.R.interp(args.kw_args[kw]));
 	    });
+
+      return env;
     },
     unbind_arguments: function() {
       return this.R.pop_env();
@@ -518,6 +522,7 @@ ray.kernel = function() {
     attach_value_node(self,Closure,'Closure',Closure.proto);
     attach_value_node(self,ArgumentSpec,'ArgumentSpec',ArgumentSpec.proto);
     attach_value_node(self,Arguments,'Arguments',Arguments.proto);
+    attach_value_node(self,Str,'Str',Str.proto)
 
     this.Expr = {};
     attach_expr_node(self,PairExpr,'Pair',PairExpr.proto);
@@ -525,6 +530,7 @@ ray.kernel = function() {
     attach_expr_node(self,NumExpr,'Num',NumExpr.proto);
     attach_expr_node(self,BooleanExpr,'Boolean',BooleanExpr.proto);
     attach_expr_node(self,PrimitiveExpr,'Primitive',PrimitiveExpr.proto);
+    attach_expr_node(self,StrExpr,'Str',StrExpr.proto);
     attach_expr_node(self,Lambda,'Lambda',Lambda.proto);
 
     attach_expr_node(self,Name,'Name',Name.proto);
@@ -548,12 +554,8 @@ ray.kernel = function() {
     },
     top_level_bind: function(name, val) {
       var value = this.interp(val);
-      if(this.top_level.lookup(name)) {
-        throw new Error("Trying to change a binding at the top level: " + name);
-      } else {
-        this.top_level = this.top_level.extend(name, value);
-        value.__name__ = name;
-      }
+      this.top_level = this.top_level.extend(name, value);
+      value.__name__ = name;
     },
     local_bind: function(name, val) {
       var value = this.interp(val);
@@ -633,20 +635,25 @@ ray.kernel = function() {
         throw new Error("Can't evaluate a non-expression!!");
       }
 
-      try {
+      /* try { */
         return this.interp(expr);
-      } catch (e) {
+      /* } catch (e) {
         console.log(e);
         throw e;
+
       }
+      */
     },
     swap_envs: function(envs) {
       var tmp_envs = this.envs;
       this.envs = envs;
       return tmp_envs;
     },
-    push_env: function() {
-      this.envs.unshift(env.empty_env());
+    get_env: function() {
+      return env.empty_env();
+    },
+    push_env: function(env) {
+      this.envs.unshift(env);
     },
     pop_env: function() {
       return this.envs.shift();

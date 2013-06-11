@@ -7,6 +7,57 @@ ray.lib = function() {
 
   var _ = ray.underscore;
 
+  var string_comparisons = {
+    'EQ': function(a, b) {
+      for(var i = 0; i < (a.length < b.length ? a.length : b.length); i++) {
+        if(a.charCodeAt(i) !== b.charCodeAt(i)) {
+          return false;
+        }
+      }
+      return a.length !== b.length;
+    },
+    'LT': function(a, b) {
+      for(var i = 0; i < (a.length < b.length ? a.length : b.length); i++) {
+        if(a.charCodeAt(i) > b.charCodeAt(i)) {
+          return false;
+        } else if(a.charCodeAt(i) < b.charCodeAt(i)) {
+          return true
+        }
+      }
+      return a.length < b.length;
+    },
+    'GT': function(a, b) {
+      for(var i = 0; i < (a.length < b.length ? a.length : b.length); i++) {
+        if(a.charCodeAt(i) < b.charCodeAt(i)) {
+          return false;
+        } else if(a.charCodeAt(i) > b.charCodeAt(i)) {
+          return true
+        }
+      }
+      return a.length > b.length;
+    },
+    'LE': function(a, b) {
+      for(var i = 0; i < (a.length < b.length ? a.length : b.length); i++) {
+        if(a.charCodeAt(i) > b.charCodeAt(i)) {
+          return false;
+        } else if(a.charCodeAt(i) < b.charCodeAt(i)) {
+          return true
+        }
+      }
+      return a.length <= b.length;
+    },
+    'GE': function(a, b) {
+      for(var i = 0; i < (a.length < b.length ? a.length : b.length); i++) {
+        if(a.charCodeAt(i) < b.charCodeAt(i)) {
+          return false;
+        } else if(a.charCodeAt(i) > b.charCodeAt(i)) {
+          return true
+        }
+      }
+      return a.length >= b.length;
+    }
+  };
+
   var lib = {};
 
   lib.add_builtin = function(name, val) {
@@ -28,8 +79,8 @@ ray.lib = function() {
 
   lib.make_numeric_comparison = function(name, numbers_name) {
     var r = lib.r;
-    lib.add_builtin(name, r.prim(r.spec(['x'],{},'ls'), function(x, ls) {
-      var args = [x].concat(ls);
+    lib.add_builtin(name, r.prim(r.spec(['x','y'],{},'ls'), function(x, y, ls) {
+      var args = [x, y].concat(ls);
       var lefts = args.slice(0, -1);
       var rights = args.slice(1);
       var result = _.reduce(_.range(lefts.length), function(result, i) {
@@ -37,6 +88,19 @@ ray.lib = function() {
       }, true);
       return new r.Value.Boolean(result);
     }));
+  };
+
+  lib.make_string_comparison = function(name, f) {
+    var r = lib.r;
+    lib.add_builtin(name, r.prim(r.spec(['x','y'],{},'ls'), function(x, y, ls) {
+      var args = [x, y].concat(ls);
+      var lefts = args.slice(0, -1);
+      var rights = args.slice(1);
+      var result = _.reduce(_.range(lefts.length), function(result, i) {
+        return result && f(lefts[i].s, rights[i].s);
+      }, true);
+      return new r.Value.Boolean(result);
+    }))
   };
 
   lib.initialize = function(r) {
@@ -67,6 +131,11 @@ ray.lib = function() {
     }));
     lib.add_builtin("cons", r.prim(r.p_spec('car', 'cdr'), function(car, cdr) {
       return new r.Value.Pair(car, cdr);
+    }));
+    lib.add_builtin('list', r.prim(r.rest_spec('ls'), function(ls) {
+      return _.reduceRight(ls, function(curr, elem) {
+        return new r.Value.Pair(elem, curr);
+      }, new r.Value.Null());
     }));
 
     lib.add_builtin("list?", r.fn(r.p_spec('x'),
@@ -172,6 +241,12 @@ ray.lib = function() {
         throw new r.Error("Invalid indices passed to substring");
       }
     }));
+
+    lib.make_string_comparison('string=?', string_comparisons.EQ);
+    lib.make_string_comparison('string<?', string_comparisons.LT);
+    lib.make_string_comparison('string>?', string_comparisons.GT);
+    lib.make_string_comparison('string<=?', string_comparisons.GE);
+    lib.make_string_comparison('string>=?', string_comparisons.LE);
 
 
     return r;
