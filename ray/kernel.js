@@ -712,7 +712,10 @@ Ray.Kernel = function() {
         return new r.Expr.Num(n);
       },
       str: function(s) {
-      return new r.Expr.Str(s);
+        return new r.Expr.Str(s);
+      },
+      char: function(c) {
+          return new r.Expr.Char(c);
       },
       pair: function(car, cdr) {
         return new r.Expr.Pair(car, cdr);

@@ -7,7 +7,9 @@ goog.require('Blockly');
 Ray.Blocks.BLOCK_COLOUR = 173;
 Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
 Ray.Blocks.BLOCK_PREFIX = "ray_";
+Ray.Blocks.PRIMITIVE_DATA_PREFIX = "ray_data_create_";
 Ray.Blocks.HELP_URL = "#";
+
 
 Ray.Blocks.block_name = function(name) {
   window._ = Ray._;
@@ -17,6 +19,11 @@ Ray.Blocks.block_name = function(name) {
 Ray.Blocks.rest_arg_block_name = function(name) {
   window._ = Ray._;
   return Ray.Blocks.REST_ARG_PREFIX + _.escape(name);
+};
+
+Ray.Blocks.primitive_data_block_name = function(name) {
+  window._ = Ray._;
+  return Ray.Blocks.PRIMITIVE_DATA_PREFIX + _.escape(name);
 };
 
 Ray.Blocks.rest_arg_arg_block_name = "ray_rest_arg_arg_";
@@ -29,6 +36,90 @@ Ray.Blocks.rest_arg_arg_block = {
     this.setNextStatement(true);
     this.contextMenu = false;
   }
+};
+
+/**
+ * Generates all the blocks for a given instance of Ray.
+ * Right now, this just sequentially generates all the primitive data blocks,
+ * and then all the blocks for builtin procedures.
+ * @param r
+ * @returns {{}}
+ */
+Ray.Blocks.generate_all_blocks = function(r) {
+  var obj = {};
+  Ray.Blocks.define_primitive_data_blocks(r, obj);
+  Ray.Blocks.define_builtin_blocks(r, obj);
+  return obj;
+};
+
+
+/**
+ * Defines the blocks that allow you to enter primitive data.
+ * Currently, this is limited to: booleans, numbers, characters, and strings.
+ * @param r
+ * @param obj
+ */
+Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
+  function PrimitiveDataBlock(type) {
+    this.helpUrl = Ray.Blocks.HELP_URL;
+    this.__value__ = null;
+    this.__datatype__ = type;
+  }
+
+  // Boolean
+  var boolean_block = new PrimitiveDataBlock('boolean');
+  boolean_block.init = function() {
+    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    var dropdown = new Blockly.FieldDropdown([['#t', 'TRUE'],['#f', 'FALSE']]);
+    this.appendDummyInput()
+        .appendTitle(dropdown, 'B');
+    this.setOutput(true);
+  };
+
+  obj[Ray.Blocks.primitive_data_block_name('boolean')] = boolean_block;
+
+  // Number
+  var number_block = new PrimitiveDataBlock('number');
+  number_block.init = function() {
+    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    var textfield = new Blockly.FieldTextInput('0', Blockly.FieldTextInput.numberValidator);
+    this.appendDummyInput()
+        .appendTitle(textfield, 'N');
+    this.setOutput(true);
+  };
+
+  obj[Ray.Blocks.primitive_data_block_name('number')] = number_block;
+
+  //String
+  var string_block = new PrimitiveDataBlock('string');
+  string_block.init = function() {
+    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    var textfield = new Blockly.FieldTextInput('Hello, World!');
+    this.appendDummyInput()
+        .appendTitle('"')
+        .appendTitle(textfield, 'S')
+        .appendTitle('"');
+    this.setOutput(true);
+  };
+
+  obj[Ray.Blocks.primitive_data_block_name('string')] = string_block;
+
+  //Chars
+  var char_block = new PrimitiveDataBlock('char');
+  char_block.init = function() {
+    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    var char_validator = function(text) {
+      return text.length === 1 ? text : null;
+    };
+    var textfield = new Blockly.FieldTextInput('a', char_validator);
+    this.appendDummyInput()
+        .appendTitle('\'')
+        .appendTitle(textfield, 'C')
+        .appendTitle('\'');
+    this.setOutput(true);
+  }
+
+  obj[Ray.Blocks.primitive_data_block_name('char')] = char_block;
 };
 
 
@@ -59,6 +150,7 @@ Ray.Blocks.define_builtin_blocks = function(r, obj) {
  * (Note, that this is function application, and not definition)
  * value is either:
  *   a Pair,
+ *   a Number,
  *   a Null,
  *   a Boolean,
  *   a Str,
@@ -75,12 +167,14 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
   var block = {};
   switch(value.R.type(value)) {
     case 'pair':
+    case 'number':
     case 'null':
     case 'boolean':
     case 'str':
     case 'char':
-      throw new r.Error("Not yet implemented!");
-      block = null;
+      return;
+      //throw new r.Error("Not yet implemented!");
+      //block = null;
       break;
     case 'primitive':
     case 'closure':
@@ -91,6 +185,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
 
       var block = {};
       block.__name__ = name;
+      block.__value__ = value;
       block.helpUrl = Ray.Blocks.HELP_URL;
       block.init = function() {
         this.setInputsInline(true);
@@ -209,7 +304,7 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
     var container = document.createElement('mutation');
     container.setAttribute('rest_args', String(this.rest_arg_count_));
     return container;
-  }
+  };
   block.domToMutation = function(container) {
     for(var x = 0; x < this.rest_arg_count_; x++) {
       this.removeInput('REST_ARG' + String(x));

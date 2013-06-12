@@ -32,7 +32,7 @@ goog.require('goog.cssom');
  * file since:
  * a) It loads synchronously and doesn't force a redraw later.
  * b) It speeds up loading by not blocking on a separate HTTP transfer.
- * c) The CSS cantent may be made dynamic depending on init options.
+ * c) The CSS content may be made dynamic depending on init options.
  */
 Blockly.Css.inject = function() {
   var text = Blockly.Css.CONTENT.join('\n');

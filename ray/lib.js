@@ -123,6 +123,8 @@ Ray.Lib = function() {
     /**
      * Pairs and Lists
      */
+    Lib.add_builtin("null", r._null());
+
     Lib.add_builtin("car", r.prim(r.p_spec('x'), function(x) {
       return x.car;
     }));
@@ -245,8 +247,8 @@ Ray.Lib = function() {
     Lib.make_string_comparison('string=?', string_comparisons.EQ);
     Lib.make_string_comparison('string<?', string_comparisons.LT);
     Lib.make_string_comparison('string>?', string_comparisons.GT);
-    Lib.make_string_comparison('string<=?', string_comparisons.GE);
-    Lib.make_string_comparison('string>=?', string_comparisons.LE);
+    Lib.make_string_comparison('string<=?', string_comparisons.LE);
+    Lib.make_string_comparison('string>=?', string_comparisons.GE);
 
 
     return r;
