@@ -31,10 +31,10 @@
     }
     #controller { height: auto; overflow: auto; }
   </style>
-    <script src="closure-library-read-only/closure/goog/base.js"></script>
-    <script src="ray/ray-deps.js"></script>
-    <script src="ray/main.js"></script>
-    <script src="jsDump.js"></script>
+    <script src="../closure-library-read-only/closure/goog/base.js"></script>
+    <script src="ray-deps.js"></script>
+    <script src="main.js"></script>
+    <script src="../jsDump.js"></script>
   <script type="text/javascript">
     var r = create_ray();
 
@@ -59,13 +59,7 @@
     Blockly.Generator.get = function(lang) { return ray_generator; };
     
   </script>
-  <script type="text/javascript" src="blockly/generators/ray.js"></script>
-  <!-- <script type="text/javascript"> -->
-  <!--   var lib = {}; -->
-  <!--   _.each(Blockly.Ray.lib_, function(value, key) {  -->
-  <!--      this[key] = eval('(' + value + ')'); -->
-  <!--   }); -->
-  <!-- </script> -->
+  <script type="text/javascript" src="../blockly/generators/ray.js"></script>
 </head>
 <div id="editor">
   <div id="i"><textarea></textarea></div>

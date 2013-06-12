@@ -1,9 +1,9 @@
-goog.provide('ray.test');
+goog.provide('Ray.Test');
 
-goog.require('ray.ray');
-goog.require('ray.underscore');
-goog.require('ray.jquery');
-goog.require('ray.lib');
+goog.require('Ray.Ray');
+goog.require('Ray._');
+goog.require('Ray.JQuery');
+goog.require('Ray.Lib');
 
 var assert = function(bool, message) {
   var tests = $("#tests > dl");
@@ -105,11 +105,11 @@ var create_testing_environment = function(R, lib) {
   return lib.initialize(new R());
 }
 
-ray.test = function() {
-  window.$ = ray.jquery;
-  window._ = ray.underscore;
-  var R = ray.ray();
-  var lib = ray.lib();
+Ray.Test = function() {
+  window.$ = Ray.JQuery;
+  window._ = Ray._
+  var R = Ray.Ray();
+  var lib = Ray.Lib();
   var r = create_testing_environment(R, lib);
   window.r = r;
   print_lib(r);
@@ -269,10 +269,6 @@ ray.test = function() {
   r.top_level_bind('double', double_str);
   display_evaluation(r.app(r.name('double'), r.p_args(r.num(5))));
   display_evaluation(double_last_of_5);
-
-
-
-
 
   end_tests();
 

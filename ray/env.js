@@ -1,7 +1,7 @@
-goog.provide('ray.env');
+goog.provide('Ray.Env');
 
-goog.require('ray.util');
-goog.require('ray.underscore');
+goog.require('Ray.Util');
+goog.require('Ray._');
 
 /**
  * Environments, CS173 Style.
@@ -12,10 +12,10 @@ goog.require('ray.underscore');
  * These are immutable, so when I create an ExtendEnv, I must recursively copy all of the sub-environments,
  * so that both the original environment and the extended environment persist.
  */
-ray.env = function() {
+Ray.Env = function() {
 
   var global = window;
-  var _ = ray.underscore;
+  var _ = Ray._;
 
   var EmptyEnv = function() {
   };
@@ -30,7 +30,7 @@ ray.env = function() {
       return null;
     },
     extend: function(name, value) {
-      return new ExtendEnv(name, value, this.clone());
+      return new ExtendEnv(name, value, this);
     },
     all_bound_names: function() {
       return [];
@@ -43,7 +43,7 @@ ray.env = function() {
   var ExtendEnv = function(name, value, env) {
     this.name = name;
     this.value = value;
-    this.env = env.clone();
+    this.env = env;
   };
   ExtendEnv.prototype = {
     clone: function() {
@@ -56,7 +56,7 @@ ray.env = function() {
       return this.name === name ? this.value : this.env.lookup(name);
     },
     extend: function(name, value) {
-      return new ExtendEnv(name, value, this.clone());
+      return new ExtendEnv(name, value, this);
     },
     all_bound_names: function() {
       return [this.name].concat(this.env.all_bound_names());

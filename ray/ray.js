@@ -3,11 +3,11 @@
  * @desc A Racket evaluator and namespace
  */
 
-goog.provide('ray.ray');
+goog.provide('Ray.Ray');
 
-goog.require('ray.kernel');
-goog.require('ray.ray_numbers');
+goog.require('Ray.Kernel');
+goog.require('Ray.RayNumbers');
 
-ray.ray = function() {
-  return ray.ray_numbers(ray.kernel());
+Ray.Ray = function() {
+  return Ray.RayNumbers(Ray.Kernel());
 };

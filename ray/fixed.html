@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="base.css">
+    <script type="text/javascript" src="../closure-library-read-only/closure/goog/base.js"></script>
+    <script type="text/javascript" src="ray-deps.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+    <style>
+        body {
+            background-color: white;
+            font-family: sans-serif;
+        }
+        div#blocklyDiv {
+            margin: 1em;
+            border-width: 2px;
+            border-style: solid;
+            border-color: #fff;
+        }
+    </style>
+    <script>
+        var r = create_ray();
+        var ray_blocks = Ray.Blocks.define_builtin_blocks(r, {});
+        Blockly.Language = ray_blocks;
+        var toolbox = Ray.Blocks.generate_toolbox(ray_blocks);
+
+        function resizeBlockly() {
+            var seperator = 100;
+            var height = window.innerHeight;
+            var width = window.innerWidth;
+            var blocklyDiv = $("#blocklyDiv");
+            blocklyDiv.height(height - seperator);
+            blocklyDiv.width(width - seperator)
+        }
+    </script>
+
+</head>
+<body>
+<div id="blocklyDiv"></div>
+<script>
+    resizeBlockly();
+    Blockly.inject(document.getElementById('blocklyDiv'),
+                   {path : '../blockly/', toolbox: toolbox});
+</script>
+</body>
+</html>

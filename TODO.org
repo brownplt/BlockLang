@@ -1,8 +1,10 @@
 * DONE First, switch to my list implementation. 
-* TODO Add in test cases for user-defined functions. 
+* DONE Add in test cases for user-defined functions. 
 * TODO Then spend a day on code generation, so that we can have a representative sample of blocks to play with  
+- I also have to put an instance of Ray in place on the page, so I can use that, and I have to get the code generation working!
+- First, figure out how to generate blocks from calls to builtins. Basically,
+  look at type. If Primitive or Closure, match argument spec to determine
+  inputs. Otherwise, make an inner field for props. This will work
+  nicely with typing. 
 * TODO Figure out how I want to represent types. 
-
-Spend a day getting code generation working on a representative sample.
-Build my own immutable list data structures. 
-Feel free to have types be associated with arguments. 
+- Feel free to have types be associated with arguments. 

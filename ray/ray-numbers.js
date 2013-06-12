@@ -1,15 +1,15 @@
 /*jslint vars: true, maxerr: 50, indent: 4 */
 
-goog.provide('ray.ray_numbers');
+goog.provide('Ray.RayNumbers');
 
-goog.require('ray.js_numbers');
+goog.require('Ray.JSNumbers');
 
-ray.ray_numbers = (function() {
+Ray.RayNumbers = (function() {
     // Numbers.
     /*global jsnums*/
   return function(R) {
 
-    var jsnums = ray.js_numbers;
+    var jsnums = Ray.JSNumbers;
 
     'use strict';
     var exports = {};

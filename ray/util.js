@@ -1,23 +1,23 @@
 // Functions to help define the language AST nodes
-goog.provide('ray.util');
+goog.provide('Ray.Util');
 
-goog.require('ray.underscore');
+goog.require('Ray._');
 
-ray.util = function() {
+Ray.Util = function() {
 
-  var _ = ray.underscore;
+  var _ = Ray._;
 
-  var util = {};
+  var Util = {};
 
-  util.install = function(obj) {
-    _.each(util, function(v,k) {
+  Util.install = function(obj) {
+    _.each(Util, function(v,k) {
       if(k !== 'install') {
         obj[k] = v;
       }
     });
   };
 
-  util.construct = function(constructor, args) {
+  Util.construct = function(constructor, args) {
     function Builder() {
       return constructor.apply(this, args);
     }
@@ -27,7 +27,7 @@ ray.util = function() {
     return b;
   };
 
-  util.product = function(/* args */) {
+  Util.product = function(/* args */) {
     var props = Array.prototype.slice.call(arguments, 0);
     var __constructor__ = function(/* args */) {
       this.__props__ = props;
@@ -39,7 +39,7 @@ ray.util = function() {
     return __constructor__;
   };
 
-  util.clone_constructor = function() {
+  Util.clone_constructor = function() {
     var props = this.__props__;
     var self = this;
     function cloner(prop_name) {
@@ -51,9 +51,9 @@ ray.util = function() {
       }
     };
     var cloned_props = _.map(props, cloner);
-    return util.construct(this.__node_constructor__, cloned_props);
+    return Util.construct(this.__node_constructor__, cloned_props);
   };
 
-  return util;
+  return Util;
 
 };

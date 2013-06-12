@@ -12,7 +12,7 @@
 * Date: 2013-05-30T21:49Z
 */
 
-goog.provide('ray.jquery');
+goog.provide('Ray.JQuery');
 
 (function( window, undefined ) {
 
@@ -9809,4 +9809,4 @@ goog.provide('ray.jquery');
 
 })( window );
 
-ray.jquery = $.noConflict();
+Ray.JQuery = $.noConflict();

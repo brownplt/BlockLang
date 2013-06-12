@@ -3,21 +3,21 @@
  * @desc A Racket evaluator and namespace
  */
 
-goog.provide('ray.kernel');
+goog.provide('Ray.Kernel');
 
-goog.require('ray.underscore');
-goog.require('ray.util');
-goog.require('ray.env');
+goog.require('Ray._');
+goog.require('Ray.Util');
+goog.require('Ray.Env');
 
-ray.kernel = function() {
+Ray.Kernel = function() {
 
-  var env = ray.env();
+  var env = Ray.Env();
 
-  var _ = ray.underscore;
+  var _ = Ray._;
 
   var global = window;
   // inject utility functions into the global namespace
-  ray.util().install(global);
+  Ray.Util().install(global);
 
   var make_expr = function(r,type,obj) {
     var proto = {};
@@ -508,8 +508,8 @@ ray.kernel = function() {
 
   var R = function(dict, config) {
     this.envs = [];
-    this.top_level = env.empty_fast_env();
-    this.builtins = env.empty_fast_env();
+    this.top_level = env.empty_env();
+    this.builtins = env.empty_env();
     this.function_call_limit = (config ? config.function_call_limit : 100) || 100;
     var self = this;
 

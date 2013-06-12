@@ -1,5 +1,5 @@
 // Scheme numbers.
-goog.provide('ray.js_numbers');
+goog.provide('Ray.JSNumbers');
 
 // The numeric tower has the following levels:
 //     integers
@@ -4109,5 +4109,5 @@ goog.provide('ray.js_numbers');
 
   })(this);
 
-ray.js_numbers = Numbers;
+Ray.JSNumbers = Numbers;
 Numbers = null;
