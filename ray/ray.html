@@ -31,20 +31,22 @@
 
   #tests {
     float: left;
-    width: 40%;
-    margin: 2% 0 2% 2%;
+    width: 48%;
+    margin: 1%;
     padding: .5em 1em;
     background-color: antiquewhite;
     overflow: scroll;
+    box-sizing: border-box;
   }
 
   #lib {
     float: left;
-    width: 40%;
-    margin: 2% 0 2% 2%;
+    width: 48%;
+    margin: 1%;
     padding: .5em 1em;
     background-color: antiquewhite;
     overflow: scroll;
+    box-sizing: border-box;
   }
 
   #lib code {
@@ -64,7 +66,7 @@
     <script src="ray-deps.js"></script>
     <script src="main.js"></script>
 </head>
-<body onload=run_test()>
+<body onload=Ray.Main.run_test()>
 <div id="tests"></div>
 <div id="lib"></div>
 </body>

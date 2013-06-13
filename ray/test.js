@@ -232,6 +232,37 @@ Ray.Test = function() {
   var if_test2 = r._if(r.app(r.name(">"), r.p_args(r.num(3),r.num(4))), r.num(8), r.num(9));
   assert_equals(if_test2, 9, "if_test2");
 
+  var cond_test1 = r.cond([[r.app(r.name('='), r.p_args(r.num(3), r.num(5))), r.num(6)],
+                           [r.app(r.name('='), r.p_args(r.num(3), r.num(4))), r.num(5)],
+                           [r.app(r.name('='), r.p_args(r.num(3), r.num(3))), r.num(3)]]);
+  assert_equals(cond_test1, 3, "cond_test1");
+
+  var cond_test2 = r.cond([[r.app(r.name('='), r.p_args(r.num(3), r.num(3))), r.num(6)],
+                           [r.app(r.name('='), r.p_args(r.num(3), r.num(4))), r.num(5)],
+                           [r.app(r.name('='), r.p_args(r.num(3), r.num(3))), r.num(3)]]);
+  assert_equals(cond_test2, 6, "cond_test2");
+
+  var cond_test3 = r.cond([[r.app(r.name('='), r.p_args(r.num(3), r.num(5))), r.num(6)],
+                           [r.app(r.name('='), r.p_args(r.num(3), r.num(4))), r.num(5)],
+                           [r.app(r.name('='), r.p_args(r.num(3), r.num(3))), r.num(3)]],
+                          r.bool(false));
+  assert_equals(cond_test3, 3, "cond_test3");
+
+  var cond_test4 = r.cond([[r.app(r.name('='), r.p_args(r.num(3), r.num(5))), r.num(6)],
+                           [r.app(r.name('='), r.p_args(r.num(3), r.num(4))), r.num(5)],
+                           [r.app(r.name('='), r.p_args(r.num(3), r.num(2))), r.num(3)]],
+                          r.bool(false));
+  assert_false(cond_test4, "cond_test4");
+
+  var cond_test5 = r.cond([], r.num(8));
+  assert_equals(cond_test5, 8, "cond_test5");
+  var cond_test6 = r.cond([], r.bool(true));
+  assert_true(cond_test6, "cond_test6");
+  var cond_test7 = r.cond([], r.bool(false));
+  assert_false(cond_test7, "cond_test7");
+
+
+
   describe("First, I bind <code>double</code> at the top level to:");
   var double = r.fn(r.p_spec('x'), r.app(r.name('*'), r.p_args(r.name('x'), r.num(2))));
   display(double, false);

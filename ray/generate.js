@@ -65,7 +65,7 @@ Ray.Generator.install_generators = function(blocks) {
 
         // Ignoring keyword arguments for the time being
         return generatedCode(Ray.Generator.ray_apply.call(null, block.__name__, args));
-      } else {
+      } else if(block.__datatype__) {
         switch(block.__datatype__) {
           case('boolean'):
             var b = this.getTitleValue('B');
@@ -84,8 +84,44 @@ Ray.Generator.install_generators = function(blocks) {
             return generatedCode('r.char(\'' + c + '\')');
             break;
           default:
-            throwError();
+            Ray.Generator.throwError();
         }
+      } else if(block.__form__) {
+        switch(block.__form__) {
+          case('and'):
+            var args = [];
+            for(var i = 0; i < this.rest_arg_count_; i++) {
+              args.push(getArgument(this, 'REST_ARG' + String(i)));
+            }
+            return generatedCode('r.and(' + args.join(', ') + ')');
+            break;
+          case('or'):
+              return generatedCode('r.or(' + args.join(', ') + ')');
+            break;
+          case('if'):
+              var pred = getArgument(this, 'PRED');
+              var t_expr = getArgument(this, 'T_EXPR');
+              var f_expr = getArgument(this, 'F_EXPR');
+              return generatedCode('r._if(' + [pred, t_expr, f_expr].join(', ') + ')');
+            break;
+          case('cond'):
+              var args = [];
+              for(var i = 0; i <= this.test_clause_count_; i++) {
+                var test = getArgument(this, 'CONDITION' + String(i));
+                var body = getArgument(this, 'BODY' + String(i));
+                args.push('[' + test + ', ' + body + ']');
+              }
+              var test_clauses = '[' + args.join(', ') + ']';
+              if(this.else_clause_) {
+                var else_clause = getArgument(this, 'ELSE');
+                return generatedCode('r.cond(' + test_clauses + ', ' + else_clause + ')');
+              } else {
+                return generatedCode('r.cond(' + test_clauses + ')');
+              }
+            break;
+          default:
+            Ray.Generator.throwError();
+          }
       }
     };
     generators[block_name] = generator;

@@ -8,6 +8,7 @@ Ray.Blocks.BLOCK_COLOUR = 173;
 Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
 Ray.Blocks.BLOCK_PREFIX = "ray_";
 Ray.Blocks.PRIMITIVE_DATA_PREFIX = "ray_data_create_";
+Ray.Blocks.CONDITIONAL_PREFIX = "ray_conditional_";
 Ray.Blocks.HELP_URL = "#";
 
 
@@ -26,6 +27,11 @@ Ray.Blocks.primitive_data_block_name = function(name) {
   return Ray.Blocks.PRIMITIVE_DATA_PREFIX + _.escape(name);
 };
 
+Ray.Blocks.conditional_block_name = function(name) {
+  window._ = Ray._;
+  return Ray.Blocks.CONDITIONAL_PREFIX + _.escape(name);
+};
+
 Ray.Blocks.rest_arg_arg_block_name = "ray_rest_arg_arg_";
 Ray.Blocks.rest_arg_arg_block = {
   init: function() {
@@ -37,6 +43,8 @@ Ray.Blocks.rest_arg_arg_block = {
     this.contextMenu = false;
   }
 };
+Ray.Blocks.cond_test_body_block_name = "ray_conditional_cond_test_body";
+Ray.Blocks.cond_else_block_name = "ray_conditional_cond_else";
 
 /**
  * Generates all the blocks for a given instance of Ray.
@@ -49,6 +57,225 @@ Ray.Blocks.generate_all_blocks = function(r) {
   var obj = {};
   Ray.Blocks.define_primitive_data_blocks(r, obj);
   Ray.Blocks.define_builtin_blocks(r, obj);
+  Ray.Blocks.define_conditional_blocks(r, obj);
+  return obj;
+};
+
+Ray.Blocks.define_conditional_blocks = function(r, obj) {
+  function ConditionalBlock(name) {
+    this.helpUrl = Ray.Blocks.HELP_URL;
+    this.__value__ = null;
+    this.__datatype__ = null;
+    this.__form__ = name;
+    this.__name__ = name;
+  };
+
+  // If
+  var if_block = new ConditionalBlock('if');
+    if_block.init = function() {
+    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.appendValueInput('PRED')
+        .appendTitle("if");
+    this.appendValueInput('T_EXPR')
+        .appendTitle('then');
+    this.appendValueInput('F_EXPR')
+        .appendTitle('else');
+    this.setOutput(true);
+    this.setInputsInline(true);
+  };
+
+  obj[Ray.Blocks.conditional_block_name('if')] = if_block;
+
+  // And
+  var and_block = new ConditionalBlock('and');
+  and_block.init = function() {
+    this.setInputsInline(true);
+    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setPreviousStatement(false);
+    this.setNextStatement(false);
+    this.setOutput(true);
+
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
+        .appendTitle('and');
+
+    this.appendDummyInput('NO_REST_ARGS')
+        .appendTitle('...');
+    this.setMutator(new Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
+    this.rest_arg_count_ = 0;
+  };
+
+  Ray.Blocks.add_rest_arg(and_block, obj, 'and');
+  obj[Ray.Blocks.conditional_block_name('and')] = and_block;
+
+  // Or
+  var or_block = new ConditionalBlock('or');
+  or_block.init = function() {
+    this.setInputsInline(true);
+    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setPreviousStatement(false);
+    this.setNextStatement(false);
+    this.setOutput(true);
+
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
+        .appendTitle('or');
+
+    this.appendDummyInput('NO_REST_ARGS')
+        .appendTitle('...');
+    this.setMutator(new Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
+    this.rest_arg_count_ = 0;
+  };
+
+  Ray.Blocks.add_rest_arg(or_block, obj, 'or');
+  obj[Ray.Blocks.conditional_block_name('or')] = or_block;
+
+  // Cond
+  var cond_block = new ConditionalBlock('cond');
+  cond_block.init = function() {
+    this.setInputsInline(true);
+    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setPreviousStatement(false);
+    this.setNextStatement(false);
+
+    this.appendDummyInput()
+        .setAlign(Blockly.ALIGN_CENTRE)
+        .appendTitle('cond');
+
+    this.appendValueInput('CONDITION0')
+        .appendTitle('when');
+    this.appendValueInput('BODY0');
+
+
+    this.setMutator(new Blockly.Mutator([Ray.Blocks.cond_test_body_block_name, Ray.Blocks.cond_else_block_name]));
+    this.test_clause_count_ = 0;
+    this.else_clause_ = false;
+
+    this.setOutput(true);
+  };
+  cond_block.mutationToDom = function(workspace) {
+    var container = document.createElement('mutation');
+    container.setAttribute('test_clauses', String(this.test_clause_count_));
+    container.setAttribute('else_clause', String(this.else_clause_ ? 1 : 0));
+    return container;
+  };
+  cond_block.domToMutation = function(container) {
+    for(var i = 1; i <= this.test_clause_count_; i++) {
+      this.removeInput('CONDITION' + String(i));
+      this.removeInput('BODY' + String(i));
+    }
+
+    if(this.else_clause_) {
+      this.removeInput('ELSE');
+    }
+    this.test_clause_count_ = window.parseInt(container.getAttribute('test_clauses'));
+    for(var i = 1; i <= this.test_clause_count_; i++) {
+      this.addValueInput('CONDITION' + String(i))
+          .addTitle('when');
+    }
+
+    this.else_clause_ = Boolean(window.parseInt(container.getAttribute('else_clause')));
+    if(this.else_clause_) {
+      this.addValueInput('ELSE')
+          .addTitle('otherwise');
+    }
+  };
+  cond_block.decompose = function(workspace) {
+    var container_block = new Blockly.Block(workspace, Ray.Blocks.conditional_block_name('cond_cond'));
+    container_block.initSvg();
+    var connection = container_block.getInput('STACK').connection;
+    for(var x = 1; x <= this.test_clause_count_; x++) {
+      var test_body_block = new Blockly.Block(workspace, Ray.Blocks.cond_test_body_block_name);
+      test_body_block.initSvg();
+      connection.connect(test_body_block.previousConnection);
+      connection = test_body_block.nextConnection;
+    }
+
+    if(this.else_clause_) {
+      var else_block = new Blockly.Block(workspace, Ray.Blocks.cond_else_block_name);
+      else_block.initSvg();
+      connection.connect(else_block.previousConnection);
+    }
+    return container_block;
+
+  };
+  cond_block.compose = function(container_block) {
+    if(this.else_clause_) {
+      this.removeInput('ELSE');
+    }
+    this.else_clause_ = false;
+
+    for(var x = this.test_clause_count_; x > 0; x--) {
+      this.removeInput('CONDITION' + String(x));
+      this.removeInput('BODY' + String(x));
+    }
+    this.test_clause_count_ = 0;
+
+    var clause_block = container_block.getInputTargetBlock('STACK');
+    while(clause_block) {
+      switch(clause_block.__type__) {
+        case Ray.Blocks.cond_test_body_block_name:
+          this.test_clause_count_++;
+          this.appendValueInput('CONDITION' + String(this.test_clause_count_))
+              .appendTitle('when');
+          this.appendValueInput('BODY' + String(this.test_clause_count_));
+          break;
+        case Ray.Blocks.cond_else_block_name:
+          this.else_clause_ = true;
+          this.appendValueInput('ELSE')
+              .appendTitle('otherwise');
+          break;
+        default:
+          throw "Unknown block type inside ray_conditional_cond_cond!";
+          break;
+      }
+      clause_block = clause_block.nextConnection &&
+          clause_block.nextConnection.targetBlock();
+    }
+  };
+
+  obj[Ray.Blocks.conditional_block_name('cond')] = cond_block;
+
+  var cond_cond_block = {
+    init: function() {
+      this.setColour(Ray.Blocks.BLOCK_COLOUR);
+      this.appendDummyInput()
+          .appendTitle('cond');
+      this.appendStatementInput('STACK');
+      this.contextMenu = false;
+    }
+  };
+
+  obj[Ray.Blocks.conditional_block_name('cond_cond')] = cond_cond_block;
+
+  var cond_test_body_block = {
+    __type__: Ray.Blocks.cond_test_body_block_name,
+    init: function() {
+      this.setColour(Ray.Blocks.BLOCK_COLOUR);
+      this.appendDummyInput()
+          .appendTitle('test/body');
+      this.setPreviousStatement(true);
+      this.setNextStatement(true);
+      this.contextMenu = false;
+    }
+  };
+
+  obj[Ray.Blocks.cond_test_body_block_name] = cond_test_body_block;
+
+  var cond_else_block = {
+    __type__: Ray.Blocks.cond_else_block_name,
+    init: function() {
+      this.setColour(Ray.Blocks.BLOCK_COLOUR);
+      this.appendDummyInput()
+          .appendTitle('otherwise');
+      this.setPreviousStatement(true);
+      this.setNextStatement(false);
+      this.contextMenu = false;
+    }
+  };
+
+  obj[Ray.Blocks.cond_else_block_name] = cond_else_block;
+
   return obj;
 };
 
@@ -195,7 +422,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
         this.setOutput(true);
 
         this.appendDummyInput()
-            .setAlign('Blockly.ALIGN_CENTRE')
+            .setAlign(Blockly.ALIGN_CENTRE)
             .appendTitle(name);
 
         for(var i = 0; i < arity; i++) {
@@ -232,7 +459,9 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
  */
 Ray.Blocks.generate_toolbox = function(obj) {
   var block_names = _.reject(_.keys(obj), function(name) {
-    return name.indexOf(Ray.Blocks.REST_ARG_PREFIX) === 0;
+    var is_cond_cond = name.indexOf(Ray.Blocks.CONDITIONAL_PREFIX + 'cond_') === 0;
+    var is_rest_arg = name.indexOf(Ray.Blocks.REST_ARG_PREFIX) === 0;
+    return is_cond_cond || is_rest_arg;
   });
   var toolbox = "<xml>";
   _.each(block_names, function(block_name) {

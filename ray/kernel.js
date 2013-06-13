@@ -334,6 +334,46 @@ Ray.Kernel = function() {
     }
   };
 
+  // Note that at least one clause must be present, but it can be an else clause!!
+  var Cond = product('test_clauses', 'else_clause');
+  Cond.proto = {
+    clone: function() {
+      var self = this;
+      var test_clause_clones = _.map(this.test_clauses, function(test_clause) {
+        return [self.R.clone(test_clause[0]), self.R.clone(test_clause[1])];
+      });
+
+      var else_clause_clone = self.R.clone(this.else_clause);
+      return new self.R.Expr.Cond(test_clause_clones, else_clause_clone);
+    },
+    interp: function() {
+      if(this.test_clauses.length === 0 && !this.else_clause) {
+        throw new Error("At least 1 clause required in cond form!");
+      }
+      for(var i = 0; i < this.test_clauses.length; i++) {
+        var test_value = this.R.interp(this.test_clauses[i][0]);
+        if(this.R.type(test_value) !== 'boolean' || test_value.b) {
+          return this.R.interp(this.test_clauses[i][1]);
+        }
+      }
+      if(this.else_clause) {
+        return this.R.interp(this.else_clause);
+      } else {
+        throw new Error("All test results were false, and no else clause provided!");
+      }
+    },
+    display: function() {
+      var self = this;
+      var displayed_clauses = _.map(this.test_clauses, function(clause) {
+        return '[' + self.R.display(clause[0]) + ' ' + self.R.display(clause[1]) + ']';
+      });
+      if(this.else_clause) {
+        displayed_clauses.push('[else ' + this.R.display(this.else_clause) + ']');
+      }
+      return ['(cond'].concat(displayed_clauses).join(' ') + ')';
+    }
+  };
+
   var And = product('args');
   And.proto = {
     clone: function() {
@@ -522,7 +562,7 @@ Ray.Kernel = function() {
     attach_value_node(self,Closure,'Closure',Closure.proto);
     attach_value_node(self,ArgumentSpec,'ArgumentSpec',ArgumentSpec.proto);
     attach_value_node(self,Arguments,'Arguments',Arguments.proto);
-    attach_value_node(self,Str,'Str',Str.proto)
+    attach_value_node(self,Str,'Str',Str.proto);
 
     this.Expr = {};
     attach_expr_node(self,PairExpr,'Pair',PairExpr.proto);
@@ -534,6 +574,7 @@ Ray.Kernel = function() {
     attach_expr_node(self,Lambda,'Lambda',Lambda.proto);
 
     attach_expr_node(self,Name,'Name',Name.proto);
+    attach_expr_node(self,Cond,'Cond',Cond.proto);
     attach_expr_node(self,If,'If',If.proto);
     attach_expr_node(self,And,'And',And.proto);
     attach_expr_node(self,Or,'Or',Or.proto);
@@ -725,6 +766,13 @@ Ray.Kernel = function() {
       },
       bool: function(b) {
         return new r.Expr.Boolean(b);
+      },
+      cond: function(test_clauses, else_clause) {
+        if(test_clauses.length === 0 && !else_clause) {
+          throw new Error("At least one clause needed in cond form!");
+        } else {
+          return new r.Expr.Cond(test_clauses, else_clause || null);
+        }
       },
       _if: function(p, t, f) {
         return new r.Expr.If(p, t, f);
