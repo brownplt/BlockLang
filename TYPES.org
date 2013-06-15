@@ -1,0 +1,42 @@
+* Language of types:
+
+type :=
+  Bool
+  Num
+  Str
+  Char
+  list type
+  function argument type
+
+argument :=
+  (listOf type * type * ...) * (n_arity type)
+
+
+* How I will use type information:
+
+When I write down an expression every part of it must be fully specified, in terms of types.
+This requires no extra work with simple expressions, since all the sub-expressions will be typed.
+
+The only place I have to have people put type information then is in the definition of procedures,
+since we don't know how to typecheck the arguments.
+
+
+
+* Function arguments and return types explicitly provided 
+
+* For expressions, do typechecking.
+
+TypeCheck :: (Expr * TyEnv) -> Boolean
+TypeCheck' :: (Expr * TyEnv) -> Type
+TypeCheck'' :: (Expr * TyEnv * Type) -> Type
+TypeCheck''' :: (Expr * TyEnv * (Type U bottom)) -> (Type U bottom)
+
+* First, hang types on stuff,
+* Then, set up drawers and colors, 
+* Then, get some sort of typechecking in place.
+
+** I was in the middle of adding type annotations to the builtins in Lib!!!!
+
+** Car and Cdr are first (though I don't actually have a type definition for them,
+   and I might as well just comment them out, and just handle list function for the time being
+
