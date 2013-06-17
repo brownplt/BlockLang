@@ -50,7 +50,11 @@ Ray.Blocks.get_colour = function(types) {
   };
 
   var c = Ray.Blocks.TypeColourTable[types[0]];
-  return c || 90;
+  if(_.isNull(c)) {
+    throw new Ray.Error("Unknown type, no colour found!!");
+  } else {
+    return c;
+  }
 };
 
 Ray.Blocks.rest_arg_arg_block_name = "ray_rest_arg_arg_";
