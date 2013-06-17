@@ -4,7 +4,7 @@ goog.require('Ray._');
 goog.require('Blockly');
 
 
-Ray.Blocks.BLOCK_COLOUR = 173;
+//Ray.Blocks.BLOCK_COLOUR = 173;
 Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
 Ray.Blocks.BLOCK_PREFIX = "ray_";
 Ray.Blocks.PRIMITIVE_DATA_PREFIX = "ray_data_create_";
@@ -16,20 +16,41 @@ Ray.Blocks.block_name = function(name) {
   window._ = Ray._;
   return Ray.Blocks.BLOCK_PREFIX + _.escape(name);
 };
-
 Ray.Blocks.rest_arg_block_name = function(name) {
   window._ = Ray._;
   return Ray.Blocks.REST_ARG_PREFIX + _.escape(name);
 };
-
 Ray.Blocks.primitive_data_block_name = function(name) {
   window._ = Ray._;
   return Ray.Blocks.PRIMITIVE_DATA_PREFIX + _.escape(name);
 };
-
 Ray.Blocks.conditional_block_name = function(name) {
   window._ = Ray._;
   return Ray.Blocks.CONDITIONAL_PREFIX + _.escape(name);
+};
+
+Ray.Blocks.BaseTypes = ['boolean',
+                        'num',
+                        'str',
+                        'char',
+                        'bottom',
+                        'forms'];
+
+// Ray.Blocks.TypeColourTable is defined the first time get_colour is called!
+
+Ray.Blocks.get_colour = function(types) {
+  if(!Ray.Blocks.TypeColourTable) {
+    Ray.Blocks.TypeColourTable = {};
+    var hue_distance = 270 / Ray.Blocks.BaseTypes.length;
+    var current_hue = 0;
+    _.each(Ray.Blocks.BaseTypes, function(ty) {
+       Ray.Blocks.TypeColourTable[ty] = current_hue;
+      current_hue += hue_distance;
+    });
+  };
+
+  var c = Ray.Blocks.TypeColourTable[types[0]];
+  return c || 90;
 };
 
 Ray.Blocks.rest_arg_arg_block_name = "ray_rest_arg_arg_";
@@ -45,6 +66,29 @@ Ray.Blocks.rest_arg_arg_block = {
 };
 Ray.Blocks.cond_test_body_block_name = "ray_conditional_cond_test_body";
 Ray.Blocks.cond_else_block_name = "ray_conditional_cond_else";
+
+
+Ray.Blocks.get_drawers = function(block) {
+  var drawers = [];
+  if(block.__value__) {
+    var value = block.__value__;
+    var output_types = (value.R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
+    var input_types = value.arg_spec.arguments_type.get_all_base_types();
+    _.each(input_types, function(type) {
+      drawers.push(type + '_input');
+    });
+    _.each(output_types, function(type) {
+      drawers.push(type + '_output');
+    });
+  } else if(block.__form__) {
+    drawers.push('forms');
+  } else if(block.__datatype__) {
+    drawers.push(block.__datatype__ + '_output');
+  } else {
+    throw new Ray.Error("Unknown sort of block!!");
+  }
+  return drawers;
+};
 
 /**
  * Generates all the blocks for a given instance of Ray.
@@ -72,8 +116,8 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   // If
   var if_block = new ConditionalBlock('if');
-    if_block.init = function() {
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+  if_block.init = function() {
+    this.setColour(Ray.Blocks.get_colour(['forms']));
     this.appendValueInput('PRED')
         .appendTitle("if");
     this.appendValueInput('T_EXPR')
@@ -90,7 +134,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   var and_block = new ConditionalBlock('and');
   and_block.init = function() {
     this.setInputsInline(true);
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.get_colour(['forms']));
     this.setPreviousStatement(false);
     this.setNextStatement(false);
     this.setOutput(true);
@@ -112,7 +156,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   var or_block = new ConditionalBlock('or');
   or_block.init = function() {
     this.setInputsInline(true);
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.get_colour(['forms']));
     this.setPreviousStatement(false);
     this.setNextStatement(false);
     this.setOutput(true);
@@ -134,7 +178,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   var cond_block = new ConditionalBlock('cond');
   cond_block.init = function() {
     this.setInputsInline(true);
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.get_colour(['forms']));
     this.setPreviousStatement(false);
     this.setNextStatement(false);
 
@@ -238,7 +282,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   var cond_cond_block = {
     init: function() {
-      this.setColour(Ray.Blocks.BLOCK_COLOUR);
+      this.setColour(Ray.Blocks.get_colour(['forms']));
       this.appendDummyInput()
           .appendTitle('cond');
       this.appendStatementInput('STACK');
@@ -251,7 +295,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   var cond_test_body_block = {
     __type__: Ray.Blocks.cond_test_body_block_name,
     init: function() {
-      this.setColour(Ray.Blocks.BLOCK_COLOUR);
+      this.setColour(Ray.Blocks.get_colour(['forms']));
       this.appendDummyInput()
           .appendTitle('test/body');
       this.setPreviousStatement(true);
@@ -265,7 +309,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   var cond_else_block = {
     __type__: Ray.Blocks.cond_else_block_name,
     init: function() {
-      this.setColour(Ray.Blocks.BLOCK_COLOUR);
+      this.setColour(Ray.Blocks.get_colour(['forms']));
       this.appendDummyInput()
           .appendTitle('otherwise');
       this.setPreviousStatement(true);
@@ -296,7 +340,7 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   // Boolean
   var boolean_block = new PrimitiveDataBlock('boolean');
   boolean_block.init = function() {
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.get_colour([this.__datatype__]));
     var dropdown = new Blockly.FieldDropdown([['#t', 'TRUE'],['#f', 'FALSE']]);
     this.appendDummyInput()
         .appendTitle(dropdown, 'B');
@@ -306,21 +350,21 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   obj[Ray.Blocks.primitive_data_block_name('boolean')] = boolean_block;
 
   // Number
-  var number_block = new PrimitiveDataBlock('number');
+  var number_block = new PrimitiveDataBlock('num');
   number_block.init = function() {
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.get_colour([this.__datatype__]));
     var textfield = new Blockly.FieldTextInput('0', Blockly.FieldTextInput.numberValidator);
     this.appendDummyInput()
         .appendTitle(textfield, 'N');
     this.setOutput(true);
   };
 
-  obj[Ray.Blocks.primitive_data_block_name('number')] = number_block;
+  obj[Ray.Blocks.primitive_data_block_name('num')] = number_block;
 
   //String
-  var string_block = new PrimitiveDataBlock('string');
+  var string_block = new PrimitiveDataBlock('str');
   string_block.init = function() {
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.get_colour([this.__datatype__]));
     var textfield = new Blockly.FieldTextInput('Hello, World!');
     this.appendDummyInput()
         .appendTitle('"')
@@ -329,20 +373,19 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
     this.setOutput(true);
   };
 
-  obj[Ray.Blocks.primitive_data_block_name('string')] = string_block;
+  obj[Ray.Blocks.primitive_data_block_name('str')] = string_block;
 
   //Chars
   var char_block = new PrimitiveDataBlock('char');
   char_block.init = function() {
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.get_colour([this.__datatype__]));
     var char_validator = function(text) {
       return text.length === 1 ? text : null;
     };
     var textfield = new Blockly.FieldTextInput('a', char_validator);
     this.appendDummyInput()
-        .appendTitle('\'')
+        .appendTitle('#\\')
         .appendTitle(textfield, 'C')
-        .appendTitle('\'');
     this.setOutput(true);
   }
 
@@ -392,10 +435,10 @@ Ray.Blocks.define_builtin_blocks = function(r, obj) {
 Ray.Blocks.generate_block = function(r, name, value, obj) {
   var block_name = Ray.Blocks.block_name(name);
   var block = {};
-  switch(value.R.type(value)) {
+  switch(value.R.node_type(value)) {
     case 'pair':
     case 'number':
-    case 'null':
+    case 'empty':
     case 'boolean':
     case 'str':
     case 'char':
@@ -405,6 +448,9 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
       break;
     case 'primitive':
     case 'closure':
+      var output_types = (value.R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
+      var input_types = value.arg_spec.arguments_type.get_all_base_types();
+      var block_colour = Ray.Blocks.get_colour(output_types);
       var arg_spec = value.arg_spec;
       // Ignoring rest and keyword arguments
       var arity = arg_spec.p_args.length;
@@ -416,7 +462,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
       block.helpUrl = Ray.Blocks.HELP_URL;
       block.init = function() {
         this.setInputsInline(true);
-        this.setColour(Ray.Blocks.BLOCK_COLOUR);
+        this.setColour(block_colour);
         this.setPreviousStatement(false);
         this.setNextStatement(false);
         this.setOutput(true);
@@ -458,17 +504,47 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
  * @param obj, the object from which we want to get the block names we will use to generate the xml
  */
 Ray.Blocks.generate_toolbox = function(obj) {
+  var toolbox_obj = Ray.Blocks.generate_toolbox_obj(obj);
+  var toolbox_categories = _.keys(toolbox_obj);
+  toolbox_categories.sort();
+  var toolbox = "<xml id=\"toolbox\">\n";
+  _.each(toolbox_categories, function(category) {
+    var block_names = toolbox_obj[category];
+    toolbox += "  <category name=\"" + category + "\">\n";
+    _.each(block_names, function(block_name) {
+      toolbox += "    <block type=\"" + _.escape(block_name) + "\"></block>\n";
+    });
+    toolbox += "  </category>\n";
+  });
+  toolbox += "</xml>";
+  return toolbox;
+};
+
+Ray.Blocks.generate_toolbox_obj = function(obj) {
+  var toolbox_obj  = {};
+  _.each(['num', 'str', 'char', 'boolean', 'bottom'], function(ty) {
+    toolbox_obj[ty + '_input'] = [];
+    toolbox_obj[ty + '_output'] = [];
+  });
+
+  toolbox_obj['forms'] = [];
+  toolbox_obj['all'] = [];
+
   var block_names = _.reject(_.keys(obj), function(name) {
     var is_cond_cond = name.indexOf(Ray.Blocks.CONDITIONAL_PREFIX + 'cond_') === 0;
     var is_rest_arg = name.indexOf(Ray.Blocks.REST_ARG_PREFIX) === 0;
     return is_cond_cond || is_rest_arg;
   });
-  var toolbox = "<xml>";
   _.each(block_names, function(block_name) {
-    toolbox += "<block type=\"" + _.escape(block_name) + "\"></block>";
+    var block = obj[block_name];
+    var drawers = Ray.Blocks.get_drawers(block);
+    _.each(drawers, function(drawer) {
+      toolbox_obj[drawer].push(block_name);
+    });
+    toolbox_obj['all'].push(block_name);
   });
-  toolbox += "</xml>";
-  return toolbox;
+  return toolbox_obj;
+
 };
 
 Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {

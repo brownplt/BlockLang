@@ -37,6 +37,12 @@ TypeCheck''' :: (Expr * TyEnv * (Type U bottom)) -> (Type U bottom)
 
 ** I was in the middle of adding type annotations to the builtins in Lib!!!!
 
+Forget about lists and stuff, just get the atomic types working,
+
+also this new syntax for entering type annotations is so much better than the original one,
+I can't believe I even tried the other one
+
+
 ** Car and Cdr are first (though I don't actually have a type definition for them,
    and I might as well just comment them out, and just handle list function for the time being
 

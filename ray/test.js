@@ -4,6 +4,7 @@ goog.require('Ray.Ray');
 goog.require('Ray._');
 goog.require('Ray.JQuery');
 goog.require('Ray.Lib');
+goog.require('Ray.Types');
 
 var assert = function(bool, message) {
   var tests = $("#tests > dl");
@@ -188,11 +189,11 @@ Ray.Test = function() {
   assert_false(no_list2, "no_list2");
 
   var yes_list1 = r.app(r.name('list?'),
-                        r.p_args(r.pair(r.num(0), r.pair(r._null(), r._null()))));
+                        r.p_args(r.pair(r.num(0), r.pair(r.empty(), r.empty()))));
   assert_true(yes_list1, "yes_list1");
 
   var yes_list2 = r.app(r.name('list?'),
-                        r.p_args(r._null()));
+                        r.p_args(r.empty()));
   assert_true(yes_list2, "yes_list2");
 
   var add_0_arg = r.app(r.name('+'), r.p_args());
@@ -205,11 +206,13 @@ Ray.Test = function() {
          r.app(
              r.app(
                  r.fn(
-                     r.p_spec('x'),
+                     r.p_spec(['x', Ray.Types.num()]),
                      r.fn(
-                         r.p_spec('y'),
+                         r.p_spec(['y', Ray.Types.num()]),
                          r.app(r.name('+'),
-                               r.p_args(r.name('x'),r.name('y'))))),
+                               r.p_args(r.name('x'),r.name('y'))),
+                         Ray.Types.num()),
+                     Ray.Types.num()),
                  r.p_args(r.num(4))),
              r.p_args(r.num(5)));
   assert_equals(nested, 9, "nested lambdas");
@@ -217,11 +220,13 @@ Ray.Test = function() {
          r.app(
              r.app(
                  r.fn(
-                     r.p_spec('x'),
+                     r.p_spec(['x', Ray.Types.num()]),
                      r.fn(
-                         r.p_spec('y'),
+                         r.p_spec(['y', Ray.Types.num()]),
                          r.app(r.name('+'),
-                               r.p_args(r.name('x'),r.name('x'))))),
+                               r.p_args(r.name('x'),r.name('x'))),
+                         Ray.Types.num()),
+                     Ray.Types.num()),
                  r.p_args(r.num(4))),
              r.p_args(r.num(5)));
   assert_equals(nested2, 8, "closed over x");
@@ -264,7 +269,7 @@ Ray.Test = function() {
 
 
   describe("First, I bind <code>double</code> at the top level to:");
-  var double = r.fn(r.p_spec('x'), r.app(r.name('*'), r.p_args(r.name('x'), r.num(2))));
+  var double = r.fn(r.p_spec(['x', Ray.Types.num()]), r.app(r.name('*'), r.p_args(r.name('x'), r.num(2))), Ray.Types.num());
   display(double, false);
   r.top_level_bind('double', double);
   describe("The binding is available everywhere.");
@@ -272,14 +277,15 @@ Ray.Test = function() {
 
   describe("Since top level bindings are visible everywhere, we can make recursive bindings.");
   describe("Here, I bind <code>last</code>:");
-  var last = r.fn(r.p_spec('x'), r._if(r.app(r.name('null?'),
+  var last = r.fn(r.p_spec(['x', Ray.Types.list(Ray.Types.num())]), r._if(r.app(r.name('empty?'),
                                              r.p_args(r.app(r.name('cdr'),
                                                             r.p_args(r.name('x'))))),
                                        r.app(r.name('car'),
                                              r.p_args(r.name('x'))),
                                        r.app(r.name('last'),
                                              r.p_args(r.app(r.name('cdr'),
-                                                            r.p_args(r.name('x')))))));
+                                                            r.p_args(r.name('x')))))),
+                  Ray.Types.num());
   display(last, false);
   r.top_level_bind('last', last);
   describe('It works as expected.');
@@ -288,15 +294,17 @@ Ray.Test = function() {
 
   describe("We can use any function defined at the top level in any other definition at the top level");
   describe("Let's define <code>double-last</code> as");
-  var double_last = r.fn(r.p_spec('x'), r.app(r.name('double'), r.p_args(r.app(r.name('last'), r.p_args(r.name('x'))))));
+  var double_last = r.fn(r.p_spec(['x', Ray.Types.list(Ray.Types.num())]), r.app(r.name('double'), r.p_args(r.app(r.name('last'), r.p_args(r.name('x'))))),
+                         Ray.Types.num());
   r.top_level_bind('double-last', double_last);
   display(double_last, false);
   describe("No surprises here.");
   var double_last_of_5 = r.app(r.name('double-last'), r.p_args(r.app(r.name('list'), r.p_args(r.num(1), r.num(2), r.num(3), r.num(4), r.num(5)))));
   display_evaluation(double_last_of_5);
+
   describe("If we now change a binding at the top level, this will be reflected in any other definitions that rely upon it");
   describe("I will now change the definition of <code>double</code> to a function of one argument that always just returns the string <code>\"double\"</code>");
-  var double_str = r.fn(r.p_spec('x'), r.str("double"));
+  var double_str = r.fn(r.p_spec(['x', Ray.Types.num()]), r.str("double"), Ray.Types.str());
   r.top_level_bind('double', double_str);
   display_evaluation(r.app(r.name('double'), r.p_args(r.num(5))));
   display_evaluation(double_last_of_5);

@@ -17,9 +17,9 @@ Ray.Util = function() {
     });
   };
 
-  Util.construct = function(constructor, args) {
+  Util.construct = function(constructor, props, types) {
     function Builder() {
-      return constructor.apply(this, args);
+      return constructor.apply(this, props.concat(types));
     }
     Builder.prototype = constructor.proto;
     var b = new Builder();
@@ -27,20 +27,27 @@ Ray.Util = function() {
     return b;
   };
 
-  Util.product = function(/* args */) {
-    var props = Array.prototype.slice.call(arguments, 0);
+  Util.product = function(arg_props, type_props) {
+    var args = arg_props.slice();
+    var types = type_props ? type_props.slice() : [];
     var __constructor__ = function(/* args */) {
-      this.__props__ = props;
-      for(var i = 0; i < props.length; i++) {
-        this[props[i]] = arguments[i];
+      this.__args__ = args;
+      for(var i = 0; i < args.length; i++) {
+        this[args[i]] = arguments[i];
+      }
+      this.__types__ = types;
+      for(var i= 0; i < types.length; i++) {
+        this[types[i]] = arguments[i + args.length];
       }
     };
-    __constructor__.__props__ = props;
+    __constructor__.__args__ = args;
+    __constructor__.__types__ = types;
     return __constructor__;
   };
 
   Util.clone_constructor = function() {
-    var props = this.__props__;
+    var args = this.__args__;
+    var types = this.__types__;
     var self = this;
     function cloner(prop_name) {
       var prop = self[prop_name];
@@ -49,9 +56,10 @@ Ray.Util = function() {
       } else {
           return prop;
       }
-    };
-    var cloned_props = _.map(props, cloner);
-    return Util.construct(this.__node_constructor__, cloned_props);
+    }
+    var cloned_args = _.map(args, cloner);
+    var cloned_types = _.map(types, cloner);
+    return Util.construct(this.__node_constructor__, cloned_args, cloned_types);
   };
 
   return Util;

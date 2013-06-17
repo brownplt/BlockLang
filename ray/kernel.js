@@ -8,6 +8,7 @@ goog.provide('Ray.Kernel');
 goog.require('Ray._');
 goog.require('Ray.Util');
 goog.require('Ray.Env');
+goog.require('Ray.Types');
 
 Ray.Kernel = function() {
 
@@ -23,7 +24,7 @@ Ray.Kernel = function() {
     var proto = {};
     _.extend(proto, obj);
     proto.toString = function() { return type + 'E'; };
-    proto.type = type.toLocaleLowerCase() + 'E';
+    proto.__node_type__ = type.toLocaleLowerCase() + 'E';
     proto.R = r;
     proto.expr = true;
     return proto;
@@ -33,7 +34,7 @@ Ray.Kernel = function() {
     var proto = {};
     _.extend(proto, obj);
     proto.toString = function() { return type; };
-    proto.type = type.toLocaleLowerCase();
+    proto.__node_type__ = type.toLocaleLowerCase();
     proto.R = r;
     proto.interp = function() {
       throw new Error(type + " has no interp method!!!");
@@ -50,7 +51,7 @@ Ray.Kernel = function() {
     var NodeConstructor = function() {
       var node = new Builder(arguments);
       //console.log('Making ' + Builder.prototype.type);
-      if(!node.__proto__.type) { throw new Error("No type set for this expr!!"); }
+      if(!node.__proto__.__node_type__) { throw new Error("No type set for this expr!!"); }
       return node;
     };
     r.Value[type] = NodeConstructor;
@@ -65,7 +66,7 @@ Ray.Kernel = function() {
     var NodeConstructor = function() {
       var node = new Builder(arguments);
       //console.log('Making ' + Builder.prototype.type);
-      if(!node.__proto__.type) { throw new Error("No type set for this expr!!"); }
+      if(!node.__proto__.__node_type__) { throw new Error("No type set for this expr!!"); }
       return node;
     };
     r.Expr[type] = NodeConstructor;
@@ -75,7 +76,7 @@ Ray.Kernel = function() {
   /**
    * @desc Values
    */
-  var Pair = product('car','cdr');
+  var Pair = product(['car','cdr']);
   Pair.proto = {
     clone: clone_constructor,
     display: function() { 
@@ -83,15 +84,15 @@ Ray.Kernel = function() {
     }
   };
 
-  var Null = product();
-  Null.proto = {
+  var Empty = product([]);
+  Empty.proto = {
     clone: clone_constructor,
     display: function() { 
       return '()';
     }
   };
 
-  var Boolean = product('b');
+  var Boolean = product(['b']);
   Boolean.proto = {
     clone: clone_constructor,
     display: function() {
@@ -99,7 +100,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var Num = product('n');
+  var Num = product(['n']);
   Num.proto = {
     clone: clone_constructor,
     display: function() { 
@@ -107,7 +108,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var Str = product('s');
+  var Str = product(['s']);
   Str.proto = {
     clone: clone_constructor,
     display: function() {
@@ -115,7 +116,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var Char = product('c');
+  var Char = product(['c']);
   Char.proto = {
     clone: clone_constructor,
     display: function() {
@@ -123,7 +124,7 @@ Ray.Kernel = function() {
     }
   }
 
-  var Primitive = product('arg_spec', 'f');
+  var Primitive = product(['arg_spec', 'f'], ['f_type']);
   Primitive.proto = {
     clone: clone_constructor,
     bind_arguments: function(args) {      
@@ -153,12 +154,13 @@ Ray.Kernel = function() {
     }
   };
 
-  var Closure = product('arg_spec', 'body', 'envs');
+  var Closure = product(['arg_spec', 'body', 'envs'], ['body_type']);
   Closure.proto = {
     clone: function() {
       return new this.R.Value.Closure(this.R.clone(this.arg_spec), 
                                       this.R.clone(this.body),
-                                      this.R.clone_envs(this.envs));
+                                      this.R.clone_envs(this.envs),
+                                      this.body_type);
     },
     bind_arguments: function(args) {
       if(!this.saved_envs) { this.saved_envs = []; }
@@ -180,7 +182,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var ArgumentSpec = product('p_args', 'kw_args', 'rest_arg');
+  var ArgumentSpec = product(['p_args', 'kw_args', 'rest_arg'], ['arguments_type']);
   ArgumentSpec.proto = { 
     clone: function() { 
       return new this.R.Value.ArgumentSpec(_.map(this.p_args, _.identity),
@@ -232,7 +234,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var Arguments = product('p_args','kw_args');
+  var Arguments = product(['p_args','kw_args']);
   Arguments.proto = {
     clone: function() {
       return new this.R.Value.Arguments(_.map(this.p_args, _.identity), _.clone(this.kw_args));
@@ -241,7 +243,7 @@ Ray.Kernel = function() {
 
   /////////////////////////////////////////////////////// Expressions
 
-  var PairExpr = product('car','cdr');
+  var PairExpr = product(['car','cdr']);
   PairExpr.proto = {
     clone: clone_constructor,
     interp: function() {
@@ -253,18 +255,18 @@ Ray.Kernel = function() {
     }
   };
 
-  var NullExpr = product();
-  NullExpr.proto = {
+  var EmptyExpr = product([]);
+  EmptyExpr.proto = {
     clone: clone_constructor,
     interp: function() {
-      return new this.R.Value.Null();      
+      return new this.R.Value.Empty();
     },
     display: function() { 
       return '()';
     }
   };
 
-  var BooleanExpr = product('b');
+  var BooleanExpr = product(['b']);
   BooleanExpr.proto = {
     clone: clone_constructor,
     interp: function() {
@@ -275,7 +277,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var NumExpr = product('n');
+  var NumExpr = product(['n']);
   NumExpr.proto = {
     clone: clone_constructor,
     interp: function() {
@@ -286,7 +288,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var StrExpr = product('s');
+  var StrExpr = product(['s']);
   StrExpr.proto = {
     clone: clone_constructor,
     interp: function() {
@@ -297,7 +299,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var CharExpr = product('c');
+  var CharExpr = product(['c']);
   CharExpr.proto = {
     clone: clone_constructor,
     interp: function() {
@@ -308,18 +310,18 @@ Ray.Kernel = function() {
     }
   };
 
-  var PrimitiveExpr = product('arg_spec', 'f');
+  var PrimitiveExpr = product(['arg_spec', 'f'], ['f_type']);
   PrimitiveExpr.proto = {
     clone: clone_constructor,
     interp: function() {
-      return new this.R.Value.Primitive(this.R.interp(this.arg_spec), this.f);
+      return new this.R.Value.Primitive(this.R.interp(this.arg_spec), this.f, this.f_type);
     },
     display: function() { 
       return '(primitive ' + this.R.display(this.arg_spec) + ' ...)';
     }
   };
 
-  var If = product('pred', 't_expr', 'f_expr');
+  var If = product(['pred', 't_expr', 'f_expr']);
   If.proto = {
     clone: clone_constructor,
     interp: function() {
@@ -335,7 +337,7 @@ Ray.Kernel = function() {
   };
 
   // Note that at least one clause must be present, but it can be an else clause!!
-  var Cond = product('test_clauses', 'else_clause');
+  var Cond = product(['test_clauses', 'else_clause']);
   Cond.proto = {
     clone: function() {
       var self = this;
@@ -352,7 +354,7 @@ Ray.Kernel = function() {
       }
       for(var i = 0; i < this.test_clauses.length; i++) {
         var test_value = this.R.interp(this.test_clauses[i][0]);
-        if(this.R.type(test_value) !== 'boolean' || test_value.b) {
+        if(this.R.node_type(test_value) !== 'boolean' || test_value.b) {
           return this.R.interp(this.test_clauses[i][1]);
         }
       }
@@ -374,7 +376,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var And = product('args');
+  var And = product(['args']);
   And.proto = {
     clone: function() {
       var self = this;
@@ -386,7 +388,7 @@ Ray.Kernel = function() {
       var arg_val = new this.R.Value.Boolean(true);
       for(var i = 0; i < this.args.length; i++) {
         arg_val = this.R.interp(this.args[i]);
-        if((this.R.type(arg_val) === 'boolean') && (arg_val.b === false)) {
+        if((this.R.node_type(arg_val) === 'boolean') && (arg_val.b === false)) {
             return new this.R.Value.Boolean(false);
         }
       }
@@ -399,7 +401,7 @@ Ray.Kernel = function() {
     }
   };
 
-  var Or = product('args');
+  var Or = product(['args']);
   Or.proto = {
     clone: function() {
       var self = this;
@@ -411,7 +413,7 @@ Ray.Kernel = function() {
       var arg_val;
       for(var i = 0; i < this.args.length; i++) {
         arg_val = this.R.interp(this.args[i]);
-        if((this.R.type(arg_val) !== 'boolean') || (arg_val.b === true)) {
+        if((this.R.node_type(arg_val) !== 'boolean') || (arg_val.b === true)) {
             return arg_val;
         }
       }
@@ -427,7 +429,7 @@ Ray.Kernel = function() {
   /**
    * @desc Names/Identifiers
    */
-  var Name = product('name');
+  var Name = product(['name']);
   Name.proto = {
     clone: clone_constructor,
     interp: function() {
@@ -446,7 +448,7 @@ Ray.Kernel = function() {
   /**
    * @desc Arguments objects
    */
-  var ArgumentsExpr = product('p_args','kw_args');
+  var ArgumentsExpr = product(['p_args','kw_args']);
   ArgumentsExpr.proto = {
     clone: function() {
       return new this.R.Expr.Arguments(_.map(this.p_args, _.identity), _.clone(this.kw_args));
@@ -471,13 +473,13 @@ Ray.Kernel = function() {
   /**
    * @desc Function Applications
    */
-  var App = product('f', 'args');
+  var App = product(['f', 'args']);
   App.proto = {
     clone: clone_constructor,
     interp: function() {
 	    var f_value = this.R.interp(this.f);
-	    if(!(this.R.type(f_value) === 'closure' ||
-	         this.R.type(f_value) === 'primitive')) {
+	    if(!(this.R.node_type(f_value) === 'closure' ||
+	         this.R.node_type(f_value) === 'primitive')) {
 	      throw new Error("Tried to apply a non-function");
 	    }
 	    if(!f_value.arg_spec.accepts(this.args)) {
@@ -499,17 +501,19 @@ Ray.Kernel = function() {
   /**
    * @desc Argument specification for a function
    */
-  var ArgumentSpecExpr = product('p_args', 'kw_args', 'rest_arg');
+  var ArgumentSpecExpr = product(['p_args', 'kw_args', 'rest_arg'], ['arguments_type']);
   ArgumentSpecExpr.proto = {
     clone: function() { 
       return new this.R.Expr.ArgumentSpec(_.map(this.p_args, _.identity),
                                           _.clone(this.kw_args),
-                                          this.rest_arg);
+                                          this.rest_arg,
+                                          this.arguments_type);
     },
     interp: function() {
       return new this.R.Value.ArgumentSpec(_.map(this.p_args, _.identity),
                                           _.clone(this.kw_args),
-                                          this.rest_arg);
+                                          this.rest_arg,
+                                          this.arguments_type);
     },
     display: function() {
       var args = _.map(this.p_args, _.identity);
@@ -526,11 +530,11 @@ Ray.Kernel = function() {
   /**
    * @desc Lambdas
    */
-  var Lambda = product('arg_spec', 'body');
+  var Lambda = product(['arg_spec', 'body'], ['body_type']);
   Lambda.proto = {
     clone: clone_constructor,
     interp: function() {
-	    return new this.R.Value.Closure(this.R.interp(this.arg_spec), this.R.clone(this.body), this.R.clone_envs());
+	    return new this.R.Value.Closure(this.R.interp(this.arg_spec), this.R.clone(this.body), this.R.clone_envs(), this.body_type);
     },
     display: function() {
       return ['(lambda',
@@ -555,7 +559,7 @@ Ray.Kernel = function() {
 
     this.Value = {};
     attach_value_node(self,Pair,'Pair',Pair.proto);
-    attach_value_node(self,Null,'Null',Null.proto);
+    attach_value_node(self,Empty,'Empty',Empty.proto);
     attach_value_node(self,Num,'Num',Num.proto);
     attach_value_node(self,Boolean,'Boolean',Boolean.proto);
     attach_value_node(self,Primitive,'Primitive',Primitive.proto);
@@ -566,7 +570,7 @@ Ray.Kernel = function() {
 
     this.Expr = {};
     attach_expr_node(self,PairExpr,'Pair',PairExpr.proto);
-    attach_expr_node(self,NullExpr,'Null',NullExpr.proto);
+    attach_expr_node(self,EmptyExpr,'Empty',EmptyExpr.proto);
     attach_expr_node(self,NumExpr,'Num',NumExpr.proto);
     attach_expr_node(self,BooleanExpr,'Boolean',BooleanExpr.proto);
     attach_expr_node(self,PrimitiveExpr,'Primitive',PrimitiveExpr.proto);
@@ -626,8 +630,8 @@ Ray.Kernel = function() {
 
       return null;
     },
-    type: function(obj) {
-      return obj.type;
+    node_type: function(obj) {
+      return obj.__node_type__;
     },
     clone: function(expr) {
       return expr.clone();
@@ -722,8 +726,8 @@ Ray.Kernel = function() {
       app: function(f, args) {
 	      return new r.Expr.App(f, args);
       },
-      prim: function(arg_spec, f) {
-	      return new r.Expr.Primitive(arg_spec, f);
+      prim: function(arg_spec, f, f_type) {
+	      return new r.Expr.Primitive(arg_spec, f, f_type);
       },
       args: function(p_args, kw_args) {
 	      return new r.Expr.Arguments(p_args, kw_args);
@@ -735,19 +739,35 @@ Ray.Kernel = function() {
 	      return new r.Expr.Name(name_arg);
       },
       spec: function(p_args, kw_args, rest_arg) {
-	      return new r.Expr.ArgumentSpec(p_args, kw_args, rest_arg);
+        var p_arg_names = _.map(p_args, function(p_arg) { return p_arg[0]; });
+        var p_arg_types = _.map(p_args, function(p_arg) { return p_arg[1]; });
+        var rest_arg_name = rest_arg[0];
+        var rest_arg_type = rest_arg[1];
+        return new r.Expr.ArgumentSpec(p_arg_names,
+                                       kw_args,
+                                       rest_arg_name,
+                                       Ray.Types.args(Ray.Types.ty_list(p_arg_types),
+                                                      Ray.Types.ty_n_arity(rest_arg_type)));
       },
       p_spec: function(/* args */) {
-        return new r.Expr.ArgumentSpec(Array.prototype.slice.call(arguments,0), {}, null);
+        var args = _.toArray(arguments);
+        var arg_names = _.map(args, function(arg) { return arg[0]; });
+        var arg_types = _.map(args, function(arg) { return arg[1]; });
+        return new r.Expr.ArgumentSpec(arg_names,
+                                       {}, // kw_args
+                                       null, // rest_arg
+                                       Ray.Types.args(Ray.Types.ty_list(arg_types), null)); // Type annotations
       },
-      kw_spec: function(args) {
-        return new r.Expr.ArgumentSpec([], args, null);
+      kw_spec: function(args, arg_types) {
+        // Ignoring kw_args for now
+        throw new Error("kw_args not implemented yet!");
+        // return new r.Expr.ArgumentSpec([], args, null, arg_types);
       },
-      rest_spec: function(name) {
-        return new r.Expr.ArgumentSpec([], {}, name);
+      rest_spec: function(name, type) {
+        return new r.Expr.ArgumentSpec([], {}, name, Ray.Types.rest_arg(type));
       },
-      fn: function(arg_spec, body) {
-	      return new r.Expr.Lambda(arg_spec, body);
+      fn: function(arg_spec, body, body_type) {
+	      return new r.Expr.Lambda(arg_spec, body, body_type);
       },
       num: function(n) {
         return new r.Expr.Num(n);
@@ -761,8 +781,8 @@ Ray.Kernel = function() {
       pair: function(car, cdr) {
         return new r.Expr.Pair(car, cdr);
       },
-      _null: function() {
-        return new r.Expr.Null();
+      empty: function() {
+        return new r.Expr.Empty();
       },
       bool: function(b) {
         return new r.Expr.Boolean(b);

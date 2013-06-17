@@ -7,4 +7,18 @@
   inputs. Otherwise, make an inner field for props. This will work
   nicely with typing. 
 * TODO Figure out how I want to represent types. 
-- Feel free to have types be associated with arguments. 
+- Feel free to have types be associated with arguments.
+
+File a bug report, getting cond to use a tabular layout
+
+Make cond default to two clauses, no else
+
+File bug reports about anything that comes up,
+- Editing hello, world in the toolbox
+- Check target sizes
+- Figure out block sizes
+- Get type drawers in place
+- Put everything that inputs or outputs a string, in one drawer, along with the string constructor
+- Separate the forms into a drawer of their own
+
+

@@ -20,7 +20,7 @@ var AtomicType = function (type_name) {
 };
 
 // Atomic Types
-Ray.Types.Bool = AtomicType('bool');
+Ray.Types.Bool = AtomicType('boolean');
 Ray.Types.Num = AtomicType('num');
 Ray.Types.Str = AtomicType('str');
 Ray.Types.Char = AtomicType('char');
@@ -146,8 +146,12 @@ Ray.Types.char = function() {
 Ray.Types.bottom = function() {
   return new Ray.Types.Bottom();
 };
-Ray.Types.ty_list = function(/* args */) {
-  var args = Array.prototype.slice.call(arguments, 0);
+Ray.Types.list = function(ty) {
+  return new Ray.Types.List(ty);
+};
+
+Ray.Types.ty_list = function(args) {
+  // var args = Array.prototype.slice.call(arguments, 0);
   return new Ray.Types.ListOfTypes(args);
 };
 Ray.Types.ty_n_arity = function(ty) {
@@ -161,4 +165,7 @@ Ray.Types.rest_arg = function(ty) {
 };
 Ray.Types.args = function(ls, n_arity) {
   return new Ray.Types.ArgumentType(ls, n_arity);
+};
+Ray.Types.fn = function(args, body) {
+  return new Ray.Types.FunctionType(args, body);
 };
