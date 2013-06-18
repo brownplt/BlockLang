@@ -33,17 +33,18 @@ Ray.Blocks.BaseTypes = ['boolean',
                         'num',
                         'str',
                         'char',
-                        'bottom',
-                        'forms'];
+                        'bottom'];
+
 
 // Ray.Blocks.TypeColourTable is defined the first time get_colour is called!
 
 Ray.Blocks.get_colour = function(types) {
   if(!Ray.Blocks.TypeColourTable) {
     Ray.Blocks.TypeColourTable = {};
-    var hue_distance = 270 / Ray.Blocks.BaseTypes.length;
+    var base_types = Ray.Blocks.BaseTypes.concat(['forms']);
+    var hue_distance = 270 / base_types.length;
     var current_hue = 0;
-    _.each(Ray.Blocks.BaseTypes, function(ty) {
+    _.each(base_types, function(ty) {
        Ray.Blocks.TypeColourTable[ty] = current_hue;
       current_hue += hue_distance;
     });
@@ -513,11 +514,32 @@ Ray.Blocks.generate_toolbox = function(obj) {
   toolbox_categories.sort();
   var toolbox = "<xml id=\"toolbox\">\n";
   _.each(toolbox_categories, function(category) {
-    var block_names = toolbox_obj[category];
     toolbox += "  <category name=\"" + category + "\">\n";
-    _.each(block_names, function(block_name) {
-      toolbox += "    <block type=\"" + _.escape(block_name) + "\"></block>\n";
-    });
+
+    if(!_.isArray(toolbox_obj[category])) {
+      _.each(_.keys(toolbox_obj[category]), function(subcategory) {
+        var block_names = toolbox_obj[category][subcategory];
+        var subcategory_name;
+        if(subcategory === 'input') {
+          subcategory_name = 'consumes ' + category;
+        } else if(subcategory === 'output') {
+          subcategory_name = 'produces ' + category;
+        } else {
+          subcategory_name = subcategory;
+        }
+
+        toolbox += "    <category name=\"" + subcategory_name + "\">\n";
+        _.each(block_names, function(block_name) {
+          toolbox += "      <block type=\"" + _.escape(block_name) + "\"></block>\n";
+        });
+        toolbox += "    </category>\n";
+      })
+    } else {
+      var block_names = toolbox_obj[category];
+      _.each(block_names, function(block_name) {
+        toolbox += "    <block type=\"" + _.escape(block_name) + "\"></block>\n";
+      });
+    }
     toolbox += "  </category>\n";
   });
   toolbox += "</xml>";
@@ -527,8 +549,9 @@ Ray.Blocks.generate_toolbox = function(obj) {
 Ray.Blocks.generate_toolbox_obj = function(obj) {
   var toolbox_obj  = {};
   _.each(['num', 'str', 'char', 'boolean', 'bottom'], function(ty) {
-    toolbox_obj[ty + '_input'] = [];
-    toolbox_obj[ty + '_output'] = [];
+    toolbox_obj[ty] = {};
+    toolbox_obj[ty]['input'] = [];
+    toolbox_obj[ty]['output'] = [];
   });
 
   toolbox_obj['forms'] = [];
@@ -543,7 +566,14 @@ Ray.Blocks.generate_toolbox_obj = function(obj) {
     var block = obj[block_name];
     var drawers = Ray.Blocks.get_drawers(block);
     _.each(drawers, function(drawer) {
-      toolbox_obj[drawer].push(block_name);
+      var end_index = drawer.search(/(input|output)/);
+      if(end_index < 0) {
+        toolbox_obj[drawer].push(block_name);
+      } else {
+        var in_or_out = drawer.substring(end_index);
+        var type = drawer.substring(0, end_index - 1);
+        toolbox_obj[type][in_or_out].push(block_name);
+      }
     });
     toolbox_obj['all'].push(block_name);
   });
