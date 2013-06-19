@@ -46,3 +46,12 @@ I can't believe I even tried the other one
 ** Car and Cdr are first (though I don't actually have a type definition for them,
    and I might as well just comment them out, and just handle list function for the time being
 
+Add in fake placeholder blocks with the appropriate colors, instead of actually coloring holes.
+
+Ghosts, I can then use it for typechecking as well.
+
+File a bug report saying that this functionality is necessary, and asking why it's not there.
+
+List types should be the report.
+
+Start function definition UI. Try and get something implemented.

@@ -190,7 +190,7 @@ Blockly.Toolbox.clearSelection = function() {
 // Extending Closure's Tree UI.
 
 /**
- * Extention of a TreeControl object that uses a custom tree node.
+ * Extension of a TreeControl object that uses a custom tree node.
  * @param {string} html The HTML content of the node label.
  * @param {Object=} opt_config The configuration for the tree. See
  *    goog.ui.tree.TreeControl.DefaultConfig. If not specified, a default config

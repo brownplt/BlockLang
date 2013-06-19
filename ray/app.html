@@ -3,42 +3,34 @@
 <head>
     <title>Blocks!</title>
     <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
         iframe {
             width: 100%;
             height: 100%;
-            border-style: solid;
-            border-color: #ddd;
-            border-width: 0 1px 1px 0;
+            min-height: 100%;
         }
-
-        table {
+        div {
+            width: 100%;
             height: 100%;
-            width: 100%
+            overflow: auto;
+            display: block;
         }
 
-        .blocklyTD {
-            height: 99%;
-        }
     </style>
-
 </head>
 <body>
-<table width="100%" height="100%">
-    <tr>
-        <td>
-            <h1>Block Language</h1>
-        </td>
-    </tr>
-    <tr>
-        <td height="50%">
-            <script>
-                function blocklyLoaded(blockly) {
-                    window.Blockly = blockly;
-                }
-            </script>
-            <iframe src="frame.html"></iframe>
-        </td>
-    </tr>
-</table>
+<script>
+    function blocklyLoaded(blockly) {
+        window.Blockly = blockly;
+    }
+</script>
+<div id="container">
+    <iframe src="frame.html"></iframe>
+</div>
 </body>
 </html>

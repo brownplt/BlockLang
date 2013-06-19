@@ -43,7 +43,7 @@ goog.addDependency('../../../ray/lib.js', ['Ray.Lib'], ['Ray.Ray', 'Ray.Types', 
 goog.addDependency('../../../ray/main.js', ['Ray.Main'], ['Ray.Blocks', 'Ray.Generator', 'Ray.Lib', 'Ray.Ray', 'Ray.Test']);
 goog.addDependency('../../../ray/ray-numbers.js', ['Ray.RayNumbers'], ['Ray.JSNumbers']);
 goog.addDependency('../../../ray/ray.js', ['Ray.Ray'], ['Ray.Kernel', 'Ray.RayNumbers']);
-goog.addDependency('../../../ray/test.js', ['Ray.Test'], ['Ray.JQuery', 'Ray.Lib', 'Ray.Ray', 'Ray._']);
+goog.addDependency('../../../ray/test.js', ['Ray.Test'], ['Ray.JQuery', 'Ray.Lib', 'Ray.Ray', 'Ray.Types', 'Ray._']);
 goog.addDependency('../../../ray/types.js', ['Ray.Types'], ['Ray._']);
 goog.addDependency('../../../ray/underscore.js', ['Ray._'], []);
 goog.addDependency('../../../ray/util.js', ['Ray.Util'], ['Ray._']);
