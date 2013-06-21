@@ -1,6 +1,6 @@
 #! /usr/bin/env bash 
 
-cd blockly
-python build.py
-cd ..
+# cd blockly
+# python build.py
+# cd ..
 python -m SimpleHTTPServer

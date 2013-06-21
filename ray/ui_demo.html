@@ -1,0 +1,46 @@
+<html>
+<head>
+    <script type="text/javascript" src="../closure-library-read-only/closure/goog/base.js"></script>
+    <script type="text/javascript" src="ray-deps.js"></script>
+    <link rel="stylesheet" type="text/css" href="ui/css/ui.css">
+    <script>
+        goog.require('goog.dom');
+        goog.require('goog.events');
+        goog.require('goog.events.EventType');
+        goog.require('goog.object');
+        goog.require('goog.style');
+        goog.require('goog.ui.Button');
+        goog.require('goog.ui.Container');
+        goog.require('goog.ui.ContainerRenderer');
+        goog.require('goog.ui.Control');
+        goog.require('goog.ui.Dialog');
+        goog.require('goog.ui.Dialog.ButtonSet');
+        goog.require('goog.ui.LabelInput');
+        goog.require('goog.ui.FlatButtonRenderer');
+
+        goog.require('Ray.UI');
+    </script>
+</head>
+<body>
+<script>
+    var dialog = Ray.UI.make_function_definition_dialog();
+
+    Ray.UI.add_blockly();
+    Ray.UI.add_func_def_blockly();
+    Ray.UI.hide_func_def_blockly();
+    var showing_func_def_blockly = false;
+    var toggle_func_def_blockly = function() {
+        if(showing_func_def_blockly) {
+            Ray.UI.hide_func_def_blockly();
+        } else {
+            Ray.UI.show_func_def_blockly();
+        }
+        showing_func_def_blockly = !showing_func_def_blockly;
+    };
+
+</script>
+<button onclick="dialog.setVisible(true);">Open up a function definition dialog</button>
+<button onclick="toggle_func_def_blockly();">Open up a new instance of blockly</button>
+</body>
+
+</html>

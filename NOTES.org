@@ -179,3 +179,14 @@ prompt me for name, description, arguments, blah, blah, which I could
 then use to initialise a new instance of Blockly in a new
 workspace. When I was done editing that, I could have a button to
 return to the original page. 
+
+A lot of this depends on whether or not we want to try and make the
+new workspace directly on top of the old one, or whether we want to
+create a new workspace entirely. If we want to create a new one on
+top of an old one, a fair amount more work is required, and I'm not
+immediately sure how to make sure I can drag from the original
+toolbox onto the correct workspace. Also, where and how do I put the
+new function block? Should I just put it in the appropriate category,
+or should I make it extra obvious that it and the thing I am defining
+are one and the same by highlighting it or something?
+

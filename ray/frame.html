@@ -33,7 +33,7 @@
         function init() {
             Blockly.inject(document.body,
                            {path : '../blockly/', toolbox: toolbox});
-            window.parent.blocklyLoaded(Blockly);
+            window.parent.blocklyLoaded && window.parent.blocklyLoaded(Blockly);
         }
     </script>
 </head>

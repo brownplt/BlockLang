@@ -45,5 +45,6 @@ goog.addDependency('../../../ray/ray-numbers.js', ['Ray.RayNumbers'], ['Ray.JSNu
 goog.addDependency('../../../ray/ray.js', ['Ray.Ray'], ['Ray.Kernel', 'Ray.RayNumbers']);
 goog.addDependency('../../../ray/test.js', ['Ray.Test'], ['Ray.JQuery', 'Ray.Lib', 'Ray.Ray', 'Ray.Types', 'Ray._']);
 goog.addDependency('../../../ray/types.js', ['Ray.Types'], ['Ray._']);
+goog.addDependency('../../../ray/ui/ui.js', ['Ray.UI'], ['goog.dom', 'goog.events', 'goog.events.EventType', 'goog.object', 'goog.style', 'goog.ui.Button', 'goog.ui.Container', 'goog.ui.ContainerRenderer', 'goog.ui.Control', 'goog.ui.Dialog', 'goog.ui.Dialog.ButtonSet', 'goog.ui.FlatButtonRenderer', 'goog.ui.FlatMenuButtonRenderer', 'goog.ui.LabelInput', 'goog.ui.Option', 'goog.ui.Select']);
 goog.addDependency('../../../ray/underscore.js', ['Ray._'], []);
 goog.addDependency('../../../ray/util.js', ['Ray.Util'], ['Ray._']);

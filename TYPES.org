@@ -55,3 +55,18 @@ File a bug report saying that this functionality is necessary, and asking why it
 List types should be the report.
 
 Start function definition UI. Try and get something implemented.
+
+Get image type working
+
+Get rid of lists?!?
+
+Try to get a definition window working, with a new SVG canvas, but
+try to reuse the same toolbox
+
+First, create a new canvas (and toolbox) (which I think are the
+constituents of the workspace) for definition of function, then try and
+resize it to show that it is on top of current canvas (while
+preserving the layout of the toolbox for that new canvas)
+
+Have the answers produced by the evaluation of blocks themselves be
+blocks. 
