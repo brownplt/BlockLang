@@ -1,3 +1,16 @@
+/**
+ * @desc Defines blocks from Ray constructs.
+ *
+ * The standard usage pattern for Ray.Blocks is to first
+ * call Ray.Blocks.generate_all_blocks with an instance of Ray.Ray
+ * to get an object of block name & block key-value pairs and set Blockly.Language to that object
+ *
+ * With the set of blocks generated, we can then call Ray.Blocks.generate_toolbox,
+ * passing in the new Blockly.Language. This will return an xml string that can be passed in to
+ * Blockly.inject as the value of the toolbox argument.
+ *
+ */
+
 goog.provide('Ray.Blocks');
 
 goog.require('Ray._');
@@ -71,7 +84,6 @@ Ray.Blocks.rest_arg_arg_block = {
 };
 Ray.Blocks.cond_test_body_block_name = "ray_conditional_cond_test_body";
 Ray.Blocks.cond_else_block_name = "ray_conditional_cond_else";
-
 
 Ray.Blocks.get_drawers = function(block) {
   var drawers = [];

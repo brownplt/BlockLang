@@ -211,7 +211,12 @@ Ray.UI.make_function_definition_dialog = function() {
   var dom = goog.dom.getDomHelper(document.body);
 
   var dialog = new goog.ui.Dialog(null, true, dom);
-  dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
+  var dialog_buttons = new goog.ui.Dialog.ButtonSet();
+  dialog_buttons.set('create', 'Create Function');
+  dialog_buttons.set('cancel', 'Cancel');
+  dialog_buttons.setCancel('cancel');
+  dialog_buttons.setDefault('create');
+  dialog.setButtonSet(dialog_buttons);
   dialog.setTitle("Define a new function");
   //var ok_button = dialog.getButtonSet().getButton('ok');
   /**goog.events.listen(ok_button, goog.events.EventType.CLICK, function(e) {

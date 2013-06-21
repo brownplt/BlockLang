@@ -70,3 +70,15 @@ preserving the layout of the toolbox for that new canvas)
 
 Have the answers produced by the evaluation of blocks themselves be
 blocks. 
+
+Make it possible to modify test cases and use them in the definition
+of a function
+
+Copy expressions into definition window, (look into this)
+
+Big-bang and a place to direct it's output
+
+1. Function definition
+2. Image primitives
+2. Add in big bang
+3. Type checking
