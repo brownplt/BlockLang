@@ -19,28 +19,26 @@
         goog.require('goog.ui.FlatButtonRenderer');
 
         goog.require('Ray.UI');
+        goog.require('Ray.Main');
     </script>
 </head>
 <body>
 <script>
+    var r = Ray.Main.create_ray();
+    var blocks = Ray.Main.create_ray_blocks(r);
     var dialog = Ray.UI.make_function_definition_dialog();
-
-    Ray.UI.add_blockly();
-    Ray.UI.add_func_def_blockly();
-    Ray.UI.hide_func_def_blockly();
-    var showing_func_def_blockly = false;
-    var toggle_func_def_blockly = function() {
-        if(showing_func_def_blockly) {
-            Ray.UI.hide_func_def_blockly();
-        } else {
-            Ray.UI.show_func_def_blockly();
-        }
-        showing_func_def_blockly = !showing_func_def_blockly;
-    };
-
+    goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
+        console.log(Ray.UI.get_function_definition_dialog_values(dialog));
+    });
 </script>
 <button onclick="dialog.setVisible(true);">Open up a function definition dialog</button>
-<button onclick="toggle_func_def_blockly();">Open up a new instance of blockly</button>
+<div class="container">
+    <iframe id="blockly_main" src="Javascript:''"></iframe>
+</div>
+<div class=""
+<script>
+    Ray.Main.load_blockly(goog.dom.getElement('blockly_main'), blocks);
+</script>
 </body>
 
 </html>

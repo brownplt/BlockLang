@@ -1,6 +1,7 @@
 goog.provide('Ray.UI');
 
 goog.require('goog.dom');
+goog.require('goog.dom.query');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 goog.require('goog.object');
@@ -16,7 +17,6 @@ goog.require('goog.ui.FlatButtonRenderer');
 goog.require('goog.ui.FlatMenuButtonRenderer');
 goog.require('goog.ui.Option');
 goog.require('goog.ui.Select');
-
 
 /** @typedef {{type:Ray.Types.*, name: string}} */
 var Arg = function(name, type) {
@@ -114,6 +114,7 @@ ArgUI.prototype.initializeDom = function(elem) {
   arg_type.setSelectedIndex(0);
   arg_type.setDefaultCaption('Pick a type for this argument');
   arg_type.render(div);
+  this.arg_type_ = arg_type;
 
   var arg_remove_button = new goog.ui.Button('-', goog.ui.FlatButtonRenderer.getInstance());
   arg_remove_button.render(div);
@@ -128,6 +129,12 @@ ArgUI.prototype.initializeDom = function(elem) {
   }
   this.dom_ = div;
   return div;
+};
+ArgUI.prototype.getName = function() {
+  return this.arg_name_.getValue();
+};
+ArgUI.prototype.getType = function() {
+  return this.arg_type_.getSelectedItem().getValue();
 };
 
 ArgListContainer = function(argList) {
@@ -205,7 +212,12 @@ ArgListContainer.prototype.onRemoveArg_ = function(e) {
     this.getChildAt(i).setArgIndex(i);
   }
 };
-
+ArgListContainer.prototype.getArgNamesAndTypes = function() {
+  var children = this.children_;
+  return goog.array.map(children, function(child) {
+    return {name: child.getName(), type: child.getType()};
+  });
+};
 
 Ray.UI.make_function_definition_dialog = function() {
   var dom = goog.dom.getDomHelper(document.body);
@@ -223,35 +235,42 @@ Ray.UI.make_function_definition_dialog = function() {
     console.log('OK!');
   }, false, this);*/
 
-  var func_def = goog.dom.createDom('div', 'function_definition');
+  var elem = dialog.getContentElement();
 
+  goog.dom.append(elem, "What will you name the function?");
+  goog.dom.append(elem, goog.dom.createElement('br'));
 
-  goog.dom.append(func_def, "What will you name the function?");
-  goog.dom.append(func_def, goog.dom.createElement('br'));
   var f_name = new goog.ui.LabelInput('name');
-  f_name.render(func_def);
+  dialog.addChild(f_name, true);
 
-  goog.dom.append(func_def, goog.dom.createElement('br'));
+  goog.dom.append(elem, goog.dom.createElement('br'));
 
-  goog.dom.append(func_def, "Describe the input to the function:");
-  goog.dom.append(func_def, goog.dom.createElement('br'));
+  goog.dom.append(elem, "Describe the input to the function:");
+  goog.dom.append(elem, goog.dom.createElement('br'));
   var f_desc = new goog.ui.LabelInput('description');
-  f_desc.render(func_def);
+  dialog.addChild(f_desc, true);
 
   var arg_list = new ArgList([new Arg('x'), new Arg('y')]);
   var arg_list_container = new ArgListContainer(arg_list);
-  arg_list_container.initializeDom(func_def);
+  arg_list_container.initializeDom(elem);
+  dialog.arg_list_container_ = arg_list_container;
 
-  goog.dom.append(dialog.getContentElement(), func_def);
   //dialog.setVisible(true);
   return dialog;
 };
 
-Ray.UI.add_func_def_blockly = function() {
+Ray.UI.get_function_definition_dialog_values = function(dialog) {
+  var name = dialog.getChildAt(0).getValue();
+  var desc = dialog.getChildAt(1).getValue();
+  var args = dialog.arg_list_container_.getArgNamesAndTypes();
+  return {name: name, desc: desc, args: args};
+};
+
+Ray.UI.add_func_def_blockly = function(elem) {
   var func_def_blockly = Ray.UI.make_blockly();
   goog.dom.classes.add(func_def_blockly, 'func_def_blockly');
-  goog.dom.appendChild(document.body, func_def_blockly);
-}
+  goog.dom.appendChild(elem, func_def_blockly);
+};
 
 Ray.UI.show_func_def_blockly = function() {
   goog.style.showElement(goog.dom.getElementsByClass('container')[0], false);
@@ -268,9 +287,9 @@ Ray.UI.make_blockly = function() {
                             goog.dom.createDom('iframe', {src: 'frame.html'}));
 };
 
-Ray.UI.add_blockly = function() {
+Ray.UI.add_blockly = function(elem) {
   var blockly_div = Ray.UI.make_blockly();
-  goog.dom.appendChild(document.body, blockly_div);
+  goog.dom.appendChild(elem, blockly_div);
 };
 /**
 Ray.FuncDefDialog.blockly_two = function() {

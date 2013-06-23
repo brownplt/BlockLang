@@ -22,15 +22,10 @@
         }
     </style>
     <script>
-        var r = Ray.Main.create_ray();
-        var ray_blocks = Ray.Blocks.generate_all_blocks(r);
-        Blockly.Language = ray_blocks;
-        var toolbox = Ray.Blocks.generate_toolbox(ray_blocks);
 
-        Ray.Main.install_generators(ray_blocks);
     </script>
     <script>
-        function init() {
+        function init(j) {
             Blockly.inject(document.body,
                            {path : '../blockly/', toolbox: toolbox});
             window.parent.blocklyLoaded && window.parent.blocklyLoaded(Blockly);

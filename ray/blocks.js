@@ -518,10 +518,10 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
 
 /**
  * Generates an xml string representing the toolbox of blocks that will be available on a Blockly page.
- * @param obj, the object from which we want to get the block names we will use to generate the xml
+ * @param blocks, the object from which we want to get the block names we will use to generate the xml
  */
-Ray.Blocks.generate_toolbox = function(obj) {
-  var toolbox_obj = Ray.Blocks.generate_toolbox_obj(obj);
+Ray.Blocks.generate_toolbox = function(blocks) {
+  var toolbox_obj = Ray.Blocks.generate_toolbox_obj(blocks);
   var toolbox_categories = _.keys(toolbox_obj);
   toolbox_categories.sort();
   var toolbox = "<xml id=\"toolbox\">\n";
@@ -558,7 +558,7 @@ Ray.Blocks.generate_toolbox = function(obj) {
   return toolbox;
 };
 
-Ray.Blocks.generate_toolbox_obj = function(obj) {
+Ray.Blocks.generate_toolbox_obj = function(blocks) {
   var toolbox_obj  = {};
   _.each(['num', 'str', 'char', 'boolean', 'bottom'], function(ty) {
     toolbox_obj[ty] = {};
@@ -569,13 +569,13 @@ Ray.Blocks.generate_toolbox_obj = function(obj) {
   toolbox_obj['forms'] = [];
   toolbox_obj['all'] = [];
 
-  var block_names = _.reject(_.keys(obj), function(name) {
+  var block_names = _.reject(_.keys(blocks), function(name) {
     var is_cond_cond = name.indexOf(Ray.Blocks.CONDITIONAL_PREFIX + 'cond_') === 0;
     var is_rest_arg = name.indexOf(Ray.Blocks.REST_ARG_PREFIX) === 0;
     return is_cond_cond || is_rest_arg;
   });
   _.each(block_names, function(block_name) {
-    var block = obj[block_name];
+    var block = blocks[block_name];
     var drawers = Ray.Blocks.get_drawers(block);
     _.each(drawers, function(drawer) {
       var end_index = drawer.search(/(input|output)/);

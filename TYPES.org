@@ -78,7 +78,13 @@ Copy expressions into definition window, (look into this)
 
 Big-bang and a place to direct it's output
 
+Priorities:
 1. Function definition
 2. Image primitives
 2. Add in big bang
 3. Type checking
+
+Thoughts on getting function definitions working:
+
+I need to build some abstractions to communicate across blockly
+instances! I want to be able to say 'make an instance from this
