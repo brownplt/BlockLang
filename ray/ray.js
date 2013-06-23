@@ -9,5 +9,6 @@ goog.require('Ray.Kernel');
 goog.require('Ray.RayNumbers');
 
 Ray.Ray = function() {
-  return Ray.RayNumbers(Ray.Kernel());
+  var ray_w_numbers = Ray.RayNumbers(Ray.Kernel());
+  return ray_w_numbers;
 };

@@ -35,12 +35,7 @@
 <script>
     var r = Ray.Main.create_ray();
     var ray_blocks = Ray.Main.create_ray_blocks(r);
-    function load_blockly() {
-        var container_div = goog.dom.getElementByClass('empty_container');
-        goog.dom.classes.remove(container_div, 'empty_container');
-        goog.dom.classes.add(container_div, 'container');
-        Ray.Main.load_blockly(goog.dom.getElement('blockly_main'), ray_blocks);
-    }
+
 </script>
 <div class="empty_container">
     <iframe id="blockly_main" src="Javascript:''"></iframe>

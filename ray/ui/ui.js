@@ -1,5 +1,7 @@
 goog.provide('Ray.UI');
 
+goog.require('Ray.Types');
+
 goog.require('goog.dom');
 goog.require('goog.dom.query');
 goog.require('goog.events');
@@ -17,6 +19,9 @@ goog.require('goog.ui.FlatButtonRenderer');
 goog.require('goog.ui.FlatMenuButtonRenderer');
 goog.require('goog.ui.Option');
 goog.require('goog.ui.Select');
+
+Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
+Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
 
 /** @typedef {{type:Ray.Types.*, name: string}} */
 var Arg = function(name, type) {
@@ -107,10 +112,9 @@ ArgUI.prototype.initializeDom = function(elem) {
 
   var arg_type = new goog.ui.Select(null, null, goog.ui.FlatMenuButtonRenderer.getInstance(), goog.dom.getDomHelper(div));
   //arg_type.setRenderer(goog.ui.FlatMenuButtonRenderer.getInstance());
-  arg_type.addItem(new goog.ui.Option('Boolean'));
-  arg_type.addItem(new goog.ui.Option('Char'));
-  arg_type.addItem(new goog.ui.Option('Number'));
-  arg_type.addItem(new goog.ui.Option('String'));
+  goog.array.forEach(Ray.Types.atomic_types, function(type) {
+    arg_type.addItem(new goog.ui.Option(type.toLocaleUpperCase(), type));
+  });
   arg_type.setSelectedIndex(0);
   arg_type.setDefaultCaption('Pick a type for this argument');
   arg_type.render(div);
@@ -266,41 +270,11 @@ Ray.UI.get_function_definition_dialog_values = function(dialog) {
   return {name: name, desc: desc, args: args};
 };
 
-Ray.UI.add_func_def_blockly = function(elem) {
-  var func_def_blockly = Ray.UI.make_blockly();
-  goog.dom.classes.add(func_def_blockly, 'func_def_blockly');
-  goog.dom.appendChild(elem, func_def_blockly);
+Ray.UI.switch_displayed_blockly = function(from, to) {
+  goog.dom.classes.swap(goog.dom.getParentElement(from),
+                        Ray.UI.VISIBLE_CONTAINER_CLASS,
+                        Ray.UI.HIDDEN_CONTAINER_CLASS);
+  goog.dom.classes.swap(goog.dom.getParentElement(to),
+                        Ray.UI.HIDDEN_CONTAINER_CLASS,
+                        Ray.UI.VISIBLE_CONTAINER_CLASS);
 };
-
-Ray.UI.show_func_def_blockly = function() {
-  goog.style.showElement(goog.dom.getElementsByClass('container')[0], false);
-  goog.style.showElement(goog.dom.getElementByClass('func_def_blockly'), true);
-};
-
-Ray.UI.hide_func_def_blockly = function() {
-  goog.style.showElement(goog.dom.getElementsByClass('container')[0], true);
-  goog.style.showElement(goog.dom.getElementByClass('func_def_blockly'), false);
-};
-
-Ray.UI.make_blockly = function() {
-  return goog.dom.createDom('div', 'container',
-                            goog.dom.createDom('iframe', {src: 'frame.html'}));
-};
-
-Ray.UI.add_blockly = function(elem) {
-  var blockly_div = Ray.UI.make_blockly();
-  goog.dom.appendChild(elem, blockly_div);
-};
-/**
-Ray.FuncDefDialog.blockly_two = function() {
-  var BlocklyTwo =
-  var dom = goog.dom.getDomHelper(document.body);
-  var dialog = new goog.ui.Dialog(null, false, dom);
-  dialog.setButtonSet(goog.ui.Dialog.ButtonSet.createOkCancel());
-  var b2 = goog.dom.createDom('div', 'container',
-                                goog.dom.createDom('iframe',  {src: 'frame.html'}));
-  dialog.setContent(b2.outerHTML);
-  //dialog.setVisible(true);
-  return dialog;
-};
- */

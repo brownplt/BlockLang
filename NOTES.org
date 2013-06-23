@@ -190,3 +190,43 @@ new function block? Should I just put it in the appropriate category,
 or should I make it extra obvious that it and the thing I am defining
 are one and the same by highlighting it or something?
 
+* Difficulties I've been having
+
+Hi, 
+
+I've been running into a lot of difficulties getting a separate
+blockly function definition canvas working, and I wanted to write
+what exactly the problems are in the hopes that someone will be able
+to help me figure out how to get past them. 
+
+As Blockly is currently designed, multiple instances cannot coexist
+on the same HTML page. This is because Blockly uses a global variable
+'Blockly' and partitions that into namespaces, ('Blockly.Blocks',
+'Blockly.Field', 'Blockly.Workspace', ...) which all refer to each
+other. Dependency management is handled by Google's closure library's
+'goog.require' and 'goog.provide' functions. Each file begins with a
+call to goog.provide indicating which namespace/s it provides, and
+then a series of calls to 'goog.require', indicating what it requires
+to be loaded in order for it to be executed. To run an app using this
+system, you can either compile it into a single minified monolithic
+javascript file, or generate another file (using a python script
+bundled with the closure library) which keeps track of which
+file each namespace can be found in, and which namespaces that file
+requires. Then, when runnning your application, you load 'base.js' in the
+closure-library (which sets up 'goog', 'goog.provide','goog.require')
+and the dependencies file you generated. Then any subsequent calls to
+'goog.require' will cause the required namespace's dependencies to be
+loaded in an order based on a topological sort of the requirements
+graph.
+
+In order for this all to work, 'Blockly' must be in the global
+namespace throughout the whole process, and each namespace loaded
+must then be a sub-namespace of 'Blockly'. 
+
+As a consequence, it is not possible to run two instances of Blockly
+in the same document. In order to get around this limitation, the
+Blockly wiki suggest that you load Blockly into the document body of
+an iframe in your main page, and if you need another instance create
+another iframe with Blockly inside. 
+
+From the container page, I can then 

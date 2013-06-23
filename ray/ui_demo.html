@@ -4,22 +4,18 @@
     <script type="text/javascript" src="ray-deps.js"></script>
     <link rel="stylesheet" type="text/css" href="ui/css/ui.css">
     <script>
+        /** Ray Imports */
+        goog.require('Ray.UI');
+        goog.require('Ray.Main');
+        /** Closure Library Imports */
         goog.require('goog.dom');
         goog.require('goog.events');
         goog.require('goog.events.EventType');
-        goog.require('goog.object');
-        goog.require('goog.style');
         goog.require('goog.ui.Button');
-        goog.require('goog.ui.Container');
-        goog.require('goog.ui.ContainerRenderer');
-        goog.require('goog.ui.Control');
-        goog.require('goog.ui.Dialog');
-        goog.require('goog.ui.Dialog.ButtonSet');
-        goog.require('goog.ui.LabelInput');
         goog.require('goog.ui.FlatButtonRenderer');
+    </script>
+    <script>
 
-        goog.require('Ray.UI');
-        goog.require('Ray.Main');
     </script>
 </head>
 <body>
@@ -27,17 +23,25 @@
     var r = Ray.Main.create_ray();
     var blocks = Ray.Main.create_ray_blocks(r);
     var dialog = Ray.UI.make_function_definition_dialog();
-    goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
-        console.log(Ray.UI.get_function_definition_dialog_values(dialog));
+
+    var button = new goog.ui.Button('Open up a function definition dialog', goog.ui.FlatButtonRenderer.getInstance());
+    button.render(document.body);
+    goog.events.listen(button.getContentElement(), goog.events.EventType.CLICK, function(e) {
+        dialog.setVisible(true);
     });
-</script>
-<button onclick="dialog.setVisible(true);">Open up a function definition dialog</button>
-<div class="container">
-    <iframe id="blockly_main" src="Javascript:''"></iframe>
-</div>
-<div class=""
-<script>
-    Ray.Main.load_blockly(goog.dom.getElement('blockly_main'), blocks);
+
+    goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
+        var dialog_values = Ray.UI.get_function_definition_dialog_values(dialog);
+        var args = dialog_values.args;
+        var blocks_w_args = Ray.Main.add_arg_blocks(r, args, blocks);
+        Ray.Main.load_blockly(Ray.Main.function_definition_blockly(), blocks_w_args);
+        Ray.UI.switch_displayed_blockly(Ray.Main.main_blockly(), Ray.Main.function_definition_blockly());
+    });
+
+    Ray.Main.initialize_main_blockly_dom();
+    Ray.Main.initialize_function_definition_blockly_dom();
+    Ray.Main.load_blockly(Ray.Main.main_blockly(), blocks);
+
 </script>
 </body>
 

@@ -22,6 +22,7 @@ Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
 Ray.Blocks.BLOCK_PREFIX = "ray_";
 Ray.Blocks.PRIMITIVE_DATA_PREFIX = "ray_data_create_";
 Ray.Blocks.CONDITIONAL_PREFIX = "ray_conditional_";
+Ray.Blocks.ARG_PREFIX = "ray_function_arg_";
 Ray.Blocks.HELP_URL = "#";
 
 
@@ -41,7 +42,10 @@ Ray.Blocks.conditional_block_name = function(name) {
   window._ = Ray._;
   return Ray.Blocks.CONDITIONAL_PREFIX + _.escape(name);
 };
-
+Ray.Blocks.arg_block_name = function(name) {
+  window._ = Ray._;
+  return Ray.Blocks.ARG_PREFIX + _.escape(name);
+};
 Ray.Blocks.BaseTypes = ['boolean',
                         'num',
                         'str',
@@ -50,7 +54,6 @@ Ray.Blocks.BaseTypes = ['boolean',
 
 
 // Ray.Blocks.TypeColourTable is defined the first time get_colour is called!
-
 Ray.Blocks.get_colour = function(types) {
   if(!Ray.Blocks.TypeColourTable) {
     Ray.Blocks.TypeColourTable = {};
@@ -101,6 +104,8 @@ Ray.Blocks.get_drawers = function(block) {
     drawers.push('forms');
   } else if(block.__datatype__) {
     drawers.push(block.__datatype__ + '_output');
+  } else if(block.__arguments__) {
+    drawers.push('arguments');
   } else {
     throw new Ray.Error("Unknown sort of block!!");
   }
@@ -122,6 +127,32 @@ Ray.Blocks.generate_all_blocks = function(r) {
   return obj;
 };
 
+Ray.Blocks.define_arg_blocks = function(r, obj, args) {
+  function ArgumentBlock(name, type) {
+    this.helpUrl = Ray.Blocks.HELP_URL;
+    this.__value__ = null;
+    this.__datatype__ = null;
+    this.__form__ = null;
+    this.__name__ = name;
+    this.__arg_type__ = type;
+    this.__arguments__ = true;
+    this.init = function() {
+      this.setColour(Ray.Blocks.get_colour([this.__arg_type__]));
+      this.appendDummyInput()
+        .appendTitle(this.__name__);
+      this.setOutput(true);
+      this.setNextStatement(false);
+      this.setPreviousStatement(false);
+    };
+  }
+
+  _.each(args, function(arg) {
+    var arg_block = new ArgumentBlock(arg.name, arg.type);
+    obj[Ray.Blocks.arg_block_name(arg.name)] = arg_block;
+  });
+  return obj;
+};
+
 Ray.Blocks.define_conditional_blocks = function(r, obj) {
   function ConditionalBlock(name) {
     this.helpUrl = Ray.Blocks.HELP_URL;
@@ -129,7 +160,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.__datatype__ = null;
     this.__form__ = name;
     this.__name__ = name;
-  };
+  }
 
   // If
   var if_block = new ConditionalBlock('if');
@@ -526,6 +557,10 @@ Ray.Blocks.generate_toolbox = function(blocks) {
   toolbox_categories.sort();
   var toolbox = "<xml id=\"toolbox\">\n";
   _.each(toolbox_categories, function(category) {
+    // Don't display empty categories
+    if(goog.isArray(toolbox_obj[category]) && !(toolbox_obj[category].length)) {
+      return;
+    }
     toolbox += "  <category name=\"" + category + "\">\n";
 
     if(!_.isArray(toolbox_obj[category])) {
@@ -567,6 +602,7 @@ Ray.Blocks.generate_toolbox_obj = function(blocks) {
   });
 
   toolbox_obj['forms'] = [];
+  toolbox_obj['arguments'] = [];
   toolbox_obj['all'] = [];
 
   var block_names = _.reject(_.keys(blocks), function(name) {

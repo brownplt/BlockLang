@@ -4,7 +4,9 @@ goog.require('Ray._');
 
 var _ = Ray._;
 
+Ray.Types.atomic_types = [];
 var AtomicType = function (type_name) {
+  Ray.Types.atomic_types.push(type_name);
   function AtomicTypeConstructor() {
     this.__type__ = type_name;
   }
