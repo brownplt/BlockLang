@@ -1,16 +1,16 @@
 * DONE First, switch to my list implementation. 
 * DONE Add in test cases for user-defined functions. 
-* TODO Then spend a day on code generation, so that we can have a representative sample of blocks to play with  
+* DONE Then spend a day on code generation, so that we can have a representative sample of blocks to play with  
 - I also have to put an instance of Ray in place on the page, so I can use that, and I have to get the code generation working!
 - First, figure out how to generate blocks from calls to builtins. Basically,
   look at type. If Primitive or Closure, match argument spec to determine
   inputs. Otherwise, make an inner field for props. This will work
   nicely with typing. 
-* TODO Figure out how I want to represent types. 
+* DONE Figure out how I want to represent types. 
 - Feel free to have types be associated with arguments.
 
+* Misc
 File a bug report, getting cond to use a tabular layout
-
 Make cond default to two clauses, no else
 
 File bug reports about anything that comes up,
@@ -22,3 +22,27 @@ File bug reports about anything that comes up,
 - Separate the forms into a drawer of their own
 
 
+* TODO Make it possible to copy blocks from main workspace to function definition space
+* TODO Make tabs for each function definition
+Here's how I am going to do this:
+
+In the workspace_content div, I am going to have a whole bunch of
+divs, one for each workspace. They will all be hidden except for the
+one which is selected. I will do this by setting all of their classes
+to 'hidden_container' except for the one that is ok. I should add a
+UI method that does this.
+
+I also then need to have the create a new function definition dialog
+make sure I don't crete a function with same name as another function
+I have already created, because otherwise I could have two tabs with
+the same name. 
+
+I also need to be able to close tabs, and to be able to open new ones
+when I create a function definition. I can also have the main tab
+look different. 
+
+I need to have a global function registry, which I can edit as I go
+along. Maybe!!!
+
+
+* TODO Make function definitions active back in the main workpace

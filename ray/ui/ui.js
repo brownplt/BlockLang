@@ -19,6 +19,7 @@ goog.require('goog.ui.FlatButtonRenderer');
 goog.require('goog.ui.FlatMenuButtonRenderer');
 goog.require('goog.ui.Option');
 goog.require('goog.ui.Select');
+goog.require('goog.ui.Tab');
 
 Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
 Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
@@ -122,6 +123,7 @@ ArgUI.prototype.initializeDom = function(elem) {
 
   var arg_remove_button = new goog.ui.Button('-', goog.ui.FlatButtonRenderer.getInstance());
   arg_remove_button.render(div);
+  goog.style.setInlineBlock(arg_remove_button.getContentElement());
 
   goog.events.listen(arg_remove_button.getContentElement(), goog.events.EventType.CLICK, function(e) {
     console.log('arg_remove_button clicked, ix: ' + this.ix_);
@@ -189,6 +191,7 @@ ArgListContainer.prototype.initializeDom = function(elem) {
 
   var arg_add_button = new goog.ui.Button('+', goog.ui.FlatButtonRenderer.getInstance());
   arg_add_button.render(container_div);
+  goog.style.setInlineBlock(arg_add_button.getContentElement());
 
   goog.events.listen(arg_add_button.getContentElement(), goog.events.EventType.CLICK, function(e) {
     this.addArg();
@@ -281,7 +284,6 @@ Ray.UI.make_function_definition_dialog = function() {
   return_type.setDefaultCaption('Pick a return type for this function');
   dialog.addChild(return_type, true);
 
-  //dialog.setVisible(true);
   return dialog;
 };
 
@@ -308,4 +310,34 @@ Ray.UI.switch_displayed_blockly = function(from, to) {
   goog.dom.classes.swap(goog.dom.getParentElement(to),
                         Ray.UI.HIDDEN_CONTAINER_CLASS,
                         Ray.UI.VISIBLE_CONTAINER_CLASS);
+};
+
+Ray.UI.show_workspace_from_tab = function(tab, workspace_content) {
+  var active_workspace_id = tab.workspace_id_;
+  var containers = goog.dom.getChildren(workspace_content);
+  goog.array.forEach(containers, function(container) {
+    var workspace = goog.dom.getFirstElementChild(container);
+    if(workspace.id === active_workspace_id) {
+      goog.dom.classes.swap(container, Ray.UI.HIDDEN_CONTAINER_CLASS, Ray.UI.VISIBLE_CONTAINER_CLASS);
+    } else {
+      goog.dom.classes.swap(container, Ray.UI.VISIBLE_CONTAINER_CLASS, Ray.UI.HIDDEN_CONTAINER_CLASS);
+    }
+  });
+};
+
+Ray.UI.add_function_definition_workspace_dom = function(function_name, container) {
+  var func_def_div = goog.dom.createDom('div', 'hidden_container');
+  var func_def_iframe = goog.dom.createDom('iframe', {
+    id: 'blockly_function_definition_' + function_name,
+    src: "Javascript:''"});
+  goog.dom.appendChild(func_def_div, func_def_iframe);
+  goog.dom.appendChild(container, func_def_div);
+  return func_def_iframe;
+};
+
+Ray.UI.add_function_definition_workspace_tab = function(function_name, tabbar) {
+  var func_def_tab = new goog.ui.Tab('Edit ' + function_name, goog.ui.RoundedTabRenderer.getInstance());
+  func_def_tab.workspace_id_ = 'blockly_function_definition_' + function_name;
+  tabbar.addChild(func_def_tab, true);
+  return func_def_tab;
 };

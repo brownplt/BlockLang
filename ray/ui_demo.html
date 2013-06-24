@@ -14,35 +14,72 @@
         goog.require('goog.events.EventType');
         goog.require('goog.ui.Button');
         goog.require('goog.ui.FlatButtonRenderer');
+        goog.require('goog.ui.RoundedTabRenderer');
+        goog.require('goog.ui.Tab');
+        goog.require('goog.ui.TabBar');
     </script>
     <script>
 
     </script>
 </head>
 <body>
+<div id="create_function_button"
+     class="goog-flat-button goog-inline-block"
+     title="Define a new function to use in your program">
+Create a new function
+</div>
+<br />
+<!--<div id="outer-container">-->
+    <div id="workspace_tabs" class="goog-tab-bar goog-tab-bar-top">
+        <div id="tab_blockly_main" class="goog-rounded-tab goog-rounded-tab-selected">Main Workspace</div>
+    </div>
+    <div id="workspace_content" class="goog-rounded-tab-content">
+        <div class="container">
+            <iframe id="blockly_main" src="Javascript:''"></iframe>
+        </div>
+    </div>
+    <div class="goog-tab-bar-clear"></div>
+<!--</div>-->
 <script>
     var r = Ray.Main.create_ray();
     var blocks = Ray.Main.create_ray_blocks(r);
     var dialog = Ray.UI.make_function_definition_dialog();
     Ray.UI.populate_dialog_w_test_data(dialog);
+    var workspace_content = goog.dom.getElement('workspace_content');
+    var tabbar = new goog.ui.TabBar();
+    tabbar.decorate(goog.dom.getElement('workspace_tabs'));
+    tabbar.getSelectedTab().workspace_id_ = 'blockly_main';
+
+    goog.events.listen(tabbar, goog.ui.Component.EventType.SELECT, function(e) {
+        var tab_selected = e.target;
+        var content_element = goog.dom.getElement('workspace_content');
+    })
 
     var button = new goog.ui.Button('Open up a function definition dialog', goog.ui.FlatButtonRenderer.getInstance());
-    button.render(document.body);
+    button.decorate(goog.dom.getElement('create_function_button'));
     goog.events.listen(button.getContentElement(), goog.events.EventType.CLICK, function(e) {
         dialog.setVisible(true);
     });
 
     goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
-        var function_create_specs = Ray.UI.get_function_definition_dialog_values(dialog);
-        var blocks_w_function_create_specs = Ray.Main.add_function_creation_blocks(r, blocks, function_create_specs);
-        var func_block_name = Ray.Main.get_function_definition_block_name(function_create_specs.name);
-        Ray.Main.load_blockly(Ray.Main.function_definition_blockly(),
-                              blocks_w_function_create_specs,
+        var func_specs = Ray.UI.get_function_definition_dialog_values(dialog);
+        var func_def_blocks = Ray.Main.add_function_creation_blocks(r, blocks, func_specs);
+        var func_block_name = Ray.Main.get_function_definition_block_name(func_specs.name);
+        var func_def_workspace = Ray.UI.add_function_definition_workspace_dom(func_specs.name,
+                                                                         workspace_content);
+        var func_def_tab = Ray.UI.add_function_definition_workspace_tab(func_specs.name, tabbar);
+        Ray.Main.load_blockly(func_def_workspace,
+                              func_def_blocks,
                               [func_block_name]);
-        Ray.UI.switch_displayed_blockly(Ray.Main.main_blockly(), Ray.Main.function_definition_blockly());
+        tabbar.setSelectedTab(func_def_tab);
+        Ray.UI.show_workspace_from_tab(func_def_tab, workspace_content);
     });
 
-    Ray.Main.initialize_main_blockly_dom();
+    goog.events.listen(tabbar, goog.ui.Component.EventType.SELECT, function(e) {
+        Ray.UI.show_workspace_from_tab(e.target, workspace_content);
+    });
+
+    //Ray.Main.initialize_main_blockly_dom();
     Ray.Main.initialize_function_definition_blockly_dom();
     Ray.Main.load_blockly(Ray.Main.main_blockly(), blocks);
 </script>
