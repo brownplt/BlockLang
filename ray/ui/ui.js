@@ -191,12 +191,7 @@ ArgListContainer.prototype.initializeDom = function(elem) {
   arg_add_button.render(container_div);
 
   goog.events.listen(arg_add_button.getContentElement(), goog.events.EventType.CLICK, function(e) {
-    var arg = new Arg();
-    this.arg_list_.addArg(arg);
-    var arg_ui = new ArgUI(arg, this.getChildCount());
-    this.addChild(arg_ui);
-    arg_ui.initializeDom(args_div);
-    goog.events.listen(arg_ui, ArgList.EventType.REMOVE_ARG_EVENT, this.onRemoveArg_, false, this);
+    this.addArg();
   }, false, this);
 
   if(elem) {
@@ -204,6 +199,18 @@ ArgListContainer.prototype.initializeDom = function(elem) {
   }
   return container_div;
 
+};
+ArgListContainer.prototype.addArg = function(arg) {
+  if(!arg) {
+    arg = new Arg();
+  }
+  this.arg_list_.addArg(arg);
+  var arg_ui = new ArgUI(arg, this.getChildCount() - 1);
+  this.addChild(arg_ui);
+  if(this.dom_) {
+    arg_ui.initializeDom(goog.dom.getElementByClass('arg-list', this.dom_));
+  }
+  goog.events.listen(arg_ui, ArgList.EventType.REMOVE_ARG_EVENT, this.onRemoveArg_, false, this);
 };
 ArgListContainer.prototype.onRemoveArg_ = function(e) {
   e.stopPropagation();
@@ -254,20 +261,44 @@ Ray.UI.make_function_definition_dialog = function() {
   var f_desc = new goog.ui.LabelInput('description');
   dialog.addChild(f_desc, true);
 
-  var arg_list = new ArgList([new Arg('x'), new Arg('y')]);
+  goog.dom.append(elem, goog.dom.createElement('br'));
+  goog.dom.append(elem, "This function consumes:");
+  goog.dom.append(elem, goog.dom.createElement('br'));
+
+  var arg_list = new ArgList();
   var arg_list_container = new ArgListContainer(arg_list);
   arg_list_container.initializeDom(elem);
   dialog.arg_list_container_ = arg_list_container;
 
+  goog.dom.append(elem, "This function produces:");
+  goog.dom.append(elem, goog.dom.createElement('br'));
+  var return_type = new goog.ui.Select(null, null,
+                                       goog.ui.FlatMenuButtonRenderer.getInstance());
+  goog.array.forEach(Ray.Types.atomic_types, function(type) {
+    return_type.addItem(new goog.ui.Option(type.toLocaleUpperCase(), type));
+  });
+  return_type.setSelectedIndex(0);
+  return_type.setDefaultCaption('Pick a return type for this function');
+  dialog.addChild(return_type, true);
+
   //dialog.setVisible(true);
   return dialog;
+};
+
+Ray.UI.populate_dialog_w_test_data = function(dialog) {
+  dialog.getChildAt(0).setValue('double');
+  dialog.getChildAt(1).setValue('doubles a number');
+  dialog.arg_list_container_.addArg();
+  dialog.arg_list_container_.getChildAt(0).arg_type_.setSelectedIndex(1);
+  dialog.getChildAt(2).setSelectedIndex(1);
 };
 
 Ray.UI.get_function_definition_dialog_values = function(dialog) {
   var name = dialog.getChildAt(0).getValue();
   var desc = dialog.getChildAt(1).getValue();
   var args = dialog.arg_list_container_.getArgNamesAndTypes();
-  return {name: name, desc: desc, args: args};
+  var return_type = dialog.getChildAt(2).getSelectedItem().getValue();
+  return {name: name, desc: desc, args: args, return_type: return_type};
 };
 
 Ray.UI.switch_displayed_blockly = function(from, to) {

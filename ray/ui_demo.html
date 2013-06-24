@@ -2,6 +2,7 @@
 <head>
     <script type="text/javascript" src="../closure-library-read-only/closure/goog/base.js"></script>
     <script type="text/javascript" src="ray-deps.js"></script>
+    <title>UI Demo</title>
     <link rel="stylesheet" type="text/css" href="ui/css/ui.css">
     <script>
         /** Ray Imports */
@@ -23,6 +24,7 @@
     var r = Ray.Main.create_ray();
     var blocks = Ray.Main.create_ray_blocks(r);
     var dialog = Ray.UI.make_function_definition_dialog();
+    Ray.UI.populate_dialog_w_test_data(dialog);
 
     var button = new goog.ui.Button('Open up a function definition dialog', goog.ui.FlatButtonRenderer.getInstance());
     button.render(document.body);
@@ -31,17 +33,18 @@
     });
 
     goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
-        var dialog_values = Ray.UI.get_function_definition_dialog_values(dialog);
-        var args = dialog_values.args;
-        var blocks_w_args = Ray.Main.add_arg_blocks(r, args, blocks);
-        Ray.Main.load_blockly(Ray.Main.function_definition_blockly(), blocks_w_args);
+        var function_create_specs = Ray.UI.get_function_definition_dialog_values(dialog);
+        var blocks_w_function_create_specs = Ray.Main.add_function_creation_blocks(r, blocks, function_create_specs);
+        var func_block_name = Ray.Main.get_function_definition_block_name(function_create_specs.name);
+        Ray.Main.load_blockly(Ray.Main.function_definition_blockly(),
+                              blocks_w_function_create_specs,
+                              [func_block_name]);
         Ray.UI.switch_displayed_blockly(Ray.Main.main_blockly(), Ray.Main.function_definition_blockly());
     });
 
     Ray.Main.initialize_main_blockly_dom();
     Ray.Main.initialize_function_definition_blockly_dom();
     Ray.Main.load_blockly(Ray.Main.main_blockly(), blocks);
-
 </script>
 </body>
 

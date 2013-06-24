@@ -25,21 +25,10 @@
             display: none;
         }
     </style>
-    <script type="text/javascript" src="../closure-library-read-only/closure/goog/base.js"></script>
-    <script type="text/javascript" src="ray-deps.js"></script>
-    <script>
-        goog.require('Ray.Main');
-    </script>
 </head>
 <body>
-<script>
-    var r = Ray.Main.create_ray();
-    var ray_blocks = Ray.Main.create_ray_blocks(r);
-
-</script>
-<div class="empty_container">
-    <iframe id="blockly_main" src="Javascript:''"></iframe>
+<div class="container">
+    <iframe id="blockly_main" src="frame.html"></iframe>
 </div>
-<button onclick="load_blockly()">Load Blockly</button>
 </body>
 </html>

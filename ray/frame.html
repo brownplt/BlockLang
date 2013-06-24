@@ -2,10 +2,13 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <title>Frame</title>
     <script type="text/javascript" src="../closure-library-read-only/closure/goog/base.js"></script>
     <script type="text/javascript" src="ray-deps.js"></script>
     <script>
         goog.require('Ray.Main');
+        goog.require('Ray.Blocks');
+        goog.require('Blockly');
     </script>
     <style>
         html, body {
@@ -22,10 +25,14 @@
         }
     </style>
     <script>
-
+        var r = Ray.Main.create_ray();
+        var blocks = Ray.Main.create_ray_blocks(r);
+        var toolbox = Ray.Blocks.generate_toolbox(blocks);
+        Ray.Main.setup_language(Blockly, blocks);
+        Ray.Main.setup_generators(Blockly, blocks);
     </script>
     <script>
-        function init(j) {
+        function init() {
             Blockly.inject(document.body,
                            {path : '../blockly/', toolbox: toolbox});
             window.parent.blocklyLoaded && window.parent.blocklyLoaded(Blockly);

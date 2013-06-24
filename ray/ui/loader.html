@@ -2,10 +2,13 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <title>Loader</title>
     <script type="text/javascript" src="../../closure-library-read-only/closure/goog/base.js"></script>
     <script type="text/javascript" src="../ray-deps.js"></script>
     <script>
         goog.require('Blockly');
+        goog.require('Blockly.Xml');
+        goog.require('Ray.Main');
     </script>
     <style>
         html, body {
@@ -21,10 +24,26 @@
             width: 100%;
         }
     </style>
+    <script>
+        function init() {
+            var blocks = window.parent.__blocks__;
+            var attached_blocks = Ray.Main.attach_blockly(Blockly, blocks);
+            Ray.Main.setup_language(Blockly, attached_blocks);
+            Ray.Main.setup_toolbox(Blockly, attached_blocks);
+            Ray.Main.setup_generators(Blockly, attached_blocks);
+            Blockly.inject(document.body,
+                           {path: "../../blockly/", toolbox: Blockly.__toolbox__});
+            var initial_blocks = window.parent.__initial_blocks__;
+            if(initial_blocks) {
+                goog.array.map(initial_blocks, function(block_name) {
+                    var block = new Blockly.Block(Blockly.mainWorkspace, block_name);
+                    block.initSvg();
+                    block.render();
+                });
+            }
+        }
+    </script>
 </head>
-<body>
-<script>
-    window.parent.Ray.Main.blockly_deps_loaded();
-</script>
+<body onload="init()">
 </body>
 </html>

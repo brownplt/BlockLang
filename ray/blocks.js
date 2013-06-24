@@ -9,13 +9,13 @@
  * passing in the new Blockly.Language. This will return an xml string that can be passed in to
  * Blockly.inject as the value of the toolbox argument.
  *
+ * NOTE: You must call Ray.Main.attach_blockly on a set of Blocks before they can be used!!
+ * Otherwise, when they try to refer to this.Blockly, they will error!!
+ *
  */
 
 goog.provide('Ray.Blocks');
-
 goog.require('Ray._');
-goog.require('Blockly');
-
 
 //Ray.Blocks.BLOCK_COLOUR = 173;
 Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
@@ -23,6 +23,7 @@ Ray.Blocks.BLOCK_PREFIX = "ray_";
 Ray.Blocks.PRIMITIVE_DATA_PREFIX = "ray_data_create_";
 Ray.Blocks.CONDITIONAL_PREFIX = "ray_conditional_";
 Ray.Blocks.ARG_PREFIX = "ray_function_arg_";
+Ray.Blocks.FUNCTION_DEF_PREFIX = "ray_function_def_";
 Ray.Blocks.HELP_URL = "#";
 
 
@@ -45,6 +46,9 @@ Ray.Blocks.conditional_block_name = function(name) {
 Ray.Blocks.arg_block_name = function(name) {
   window._ = Ray._;
   return Ray.Blocks.ARG_PREFIX + _.escape(name);
+};
+Ray.Blocks.function_def_block_name = function(name) {
+  return Ray.Blocks.FUNCTION_DEF_PREFIX + _.escape(name);
 };
 Ray.Blocks.BaseTypes = ['boolean',
                         'num',
@@ -106,7 +110,9 @@ Ray.Blocks.get_drawers = function(block) {
     drawers.push(block.__datatype__ + '_output');
   } else if(block.__arguments__) {
     drawers.push('arguments');
-  } else {
+  } else if(block.__function_definition__) {
+    drawers.push('functions');
+  } else{
     throw new Ray.Error("Unknown sort of block!!");
   }
   return drawers;
@@ -124,6 +130,36 @@ Ray.Blocks.generate_all_blocks = function(r) {
   Ray.Blocks.define_primitive_data_blocks(r, obj);
   Ray.Blocks.define_builtin_blocks(r, obj);
   Ray.Blocks.define_conditional_blocks(r, obj);
+  return obj;
+};
+
+Ray.Blocks.define_function_def_block = function(r, obj, name, desc, return_type) {
+  var fun_def_block = {
+    helpUrl: Ray.Blocks.HELP_URL,
+    __value__: null,
+    __datatype__: null,
+    __form__: null,
+    __name__: name,
+    __arguments__: null,
+    __function_definition__: true,
+    __return_type__: return_type,
+    __desc__: desc
+  };
+
+  fun_def_block.init = function() {
+    this.setColour(Ray.Blocks.get_colour([this.__return_type__]));
+    this.appendDummyInput()
+      .appendTitle(this.__name__)
+      .setAlign(this.Blockly.ALIGN_CENTRE);
+    this.appendValueInput('BODY');
+    this.setInputsInline(true);
+    this.setNextStatement(false);
+    this.setPreviousStatement(false);
+    this.setTooltip(this.__desc__);
+    this.setOutput(false);
+  };
+
+  obj[Ray.Blocks.function_def_block_name(name)] = fun_def_block;
   return obj;
 };
 
@@ -188,12 +224,12 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.setOutput(true);
 
     this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_CENTRE)
+        .setAlign(this.Blockly.ALIGN_CENTRE)
         .appendTitle('and');
 
     this.appendDummyInput('NO_REST_ARGS')
         .appendTitle('...');
-    this.setMutator(new Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
+    this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
     this.rest_arg_count_ = 0;
   };
 
@@ -210,12 +246,12 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.setOutput(true);
 
     this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_CENTRE)
+        .setAlign(this.Blockly.ALIGN_CENTRE)
         .appendTitle('or');
 
     this.appendDummyInput('NO_REST_ARGS')
         .appendTitle('...');
-    this.setMutator(new Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
+    this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
     this.rest_arg_count_ = 0;
   };
 
@@ -231,7 +267,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.setNextStatement(false);
 
     this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_CENTRE)
+        .setAlign(this.Blockly.ALIGN_CENTRE)
         .appendTitle('cond');
 
     this.appendValueInput('CONDITION0')
@@ -239,7 +275,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.appendValueInput('BODY0');
 
 
-    this.setMutator(new Blockly.Mutator([Ray.Blocks.cond_test_body_block_name, Ray.Blocks.cond_else_block_name]));
+    this.setMutator(new this.Blockly.Mutator([Ray.Blocks.cond_test_body_block_name, Ray.Blocks.cond_else_block_name]));
     this.test_clause_count_ = 0;
     this.else_clause_ = false;
 
@@ -273,18 +309,18 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     }
   };
   cond_block.decompose = function(workspace) {
-    var container_block = new Blockly.Block(workspace, Ray.Blocks.conditional_block_name('cond_cond'));
+    var container_block = new this.Blockly.Block(workspace, Ray.Blocks.conditional_block_name('cond_cond'));
     container_block.initSvg();
     var connection = container_block.getInput('STACK').connection;
     for(var x = 1; x <= this.test_clause_count_; x++) {
-      var test_body_block = new Blockly.Block(workspace, Ray.Blocks.cond_test_body_block_name);
+      var test_body_block = new this.Blockly.Block(workspace, Ray.Blocks.cond_test_body_block_name);
       test_body_block.initSvg();
       connection.connect(test_body_block.previousConnection);
       connection = test_body_block.nextConnection;
     }
 
     if(this.else_clause_) {
-      var else_block = new Blockly.Block(workspace, Ray.Blocks.cond_else_block_name);
+      var else_block = new this.Blockly.Block(workspace, Ray.Blocks.cond_else_block_name);
       else_block.initSvg();
       connection.connect(else_block.previousConnection);
     }
@@ -371,7 +407,6 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   return obj;
 };
 
-
 /**
  * Defines the blocks that allow you to enter primitive data.
  * Currently, this is limited to: booleans, numbers, characters, and strings.
@@ -389,7 +424,7 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   var boolean_block = new PrimitiveDataBlock('boolean');
   boolean_block.init = function() {
     this.setColour(Ray.Blocks.get_colour([this.__datatype__]));
-    var dropdown = new Blockly.FieldDropdown([['#t', 'TRUE'],['#f', 'FALSE']]);
+    var dropdown = new this.Blockly.FieldDropdown([['#t', 'TRUE'],['#f', 'FALSE']]);
     this.appendDummyInput()
         .appendTitle(dropdown, 'B');
     this.setOutput(true);
@@ -401,7 +436,7 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   var number_block = new PrimitiveDataBlock('num');
   number_block.init = function() {
     this.setColour(Ray.Blocks.get_colour([this.__datatype__]));
-    var textfield = new Blockly.FieldTextInput('0', Blockly.FieldTextInput.numberValidator);
+    var textfield = new this.Blockly.FieldTextInput('0', this.Blockly.FieldTextInput.numberValidator);
     this.appendDummyInput()
         .appendTitle(textfield, 'N');
     this.setOutput(true);
@@ -413,7 +448,7 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   var string_block = new PrimitiveDataBlock('str');
   string_block.init = function() {
     this.setColour(Ray.Blocks.get_colour([this.__datatype__]));
-    var textfield = new Blockly.FieldTextInput('Hello, World!');
+    var textfield = new this.Blockly.FieldTextInput('Hello, World!');
     this.appendDummyInput()
         .appendTitle('"')
         .appendTitle(textfield, 'S')
@@ -430,7 +465,7 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
     var char_validator = function(text) {
       return text.length === 1 ? text : null;
     };
-    var textfield = new Blockly.FieldTextInput('a', char_validator);
+    var textfield = new this.Blockly.FieldTextInput('a', char_validator);
     this.appendDummyInput()
         .appendTitle('#\\')
         .appendTitle(textfield, 'C')
@@ -516,7 +551,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
         this.setOutput(true);
 
         this.appendDummyInput()
-            .setAlign(Blockly.ALIGN_CENTRE)
+            .setAlign(this.Blockly.ALIGN_CENTRE)
             .appendTitle(name);
 
         for(var i = 0; i < arity; i++) {
@@ -527,7 +562,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
         if(rest_arg) {
           this.appendDummyInput('NO_REST_ARGS')
               .appendTitle('...');
-          this.setMutator(new Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
+          this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
           this.rest_arg_count_ = 0;
         }
       };
@@ -603,7 +638,9 @@ Ray.Blocks.generate_toolbox_obj = function(blocks) {
 
   toolbox_obj['forms'] = [];
   toolbox_obj['arguments'] = [];
+  toolbox_obj['functions'] = [];
   toolbox_obj['all'] = [];
+
 
   var block_names = _.reject(_.keys(blocks), function(name) {
     var is_cond_cond = name.indexOf(Ray.Blocks.CONDITIONAL_PREFIX + 'cond_') === 0;
@@ -646,13 +683,13 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
   obj[container_block_name] = rest_arg_container;
 
   block.decompose = function(workspace) {
-    var container_block = new Blockly.Block(workspace,
+    var container_block = new this.Blockly.Block(workspace,
                                             container_block_name);
     container_block.initSvg();
     if(container_block.getInput('STACK')) {
       var connection = container_block.getInput('STACK').connection;
       for(var x = 0; x < this.rest_arg_count_; x++) {
-        var arg_block = new Blockly.Block(workspace, Ray.Blocks.rest_arg_arg_block_name);
+        var arg_block = new this.Blockly.Block(workspace, Ray.Blocks.rest_arg_arg_block_name);
         arg_block.initSvg();
         connection.connect(arg_block.previousConnection);
         connection = arg_block.nextConnection;

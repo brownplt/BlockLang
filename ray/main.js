@@ -10,6 +10,8 @@ goog.require('Ray.Ray');
 goog.require('Ray.Test');
 goog.require('Ray.UI');
 
+goog.require('Blockly.Xml');
+
 /**
  * Closure Library Imports
  */
@@ -50,22 +52,29 @@ Ray.Main.create_ray = function() {
   return r;
 };
 
-/**
- *
- * @param iframe
- * @param blocks
- */
-Ray.Main.load_blockly = function(iframe, blocks) {
-  Ray.Main.iframe = iframe;
-  Ray.Main.blockly_deps_loaded = function() {
-    var blockly = iframe.contentWindow.Blockly;
-    Ray.Main.setup_language(blockly, blocks);
-    Ray.Main.setup_toolbox(blockly, blocks);
-    Ray.Main.setup_generators(blockly, blocks);
-    blockly.inject(iframe.contentDocument.body,
-                   {path: '../../blockly/', toolbox: blockly.__toolbox__});
-  };
+Ray.Main.attach_blockly = function(Blockly, blocks) {
+  var new_blocks = goog.object.map(blocks, function(block, block_name) {
+    var new_block = goog.object.clone(block);
+    new_block.Blockly = Blockly;
+    return new_block;
+  });
+  return new_blocks;
+};
+
+Ray.Main.load_blockly = function(iframe, blocks, initial_blocks) {
+  window.__blocks__ = blocks;
+  window.__initial_blocks__ = initial_blocks || null;
   goog.dom.setProperties(iframe, {src: 'ui/loader.html'});
+};
+
+Ray.Main.block_to_workspace_xml = function(block_name, block) {
+  var block_instance = new Ray.Main.Block(block_name, block, false);
+  var xml = goog.dom.createDom('xml');
+  var element = Blockly.Xml.blockToDom_(block_instance);
+  element.setAttribute('x', 0);
+  element.setAttribute('y', 0);
+  xml.appendChild(element);
+  return xml;
 };
 
 Ray.Main.create_ray_blocks = function(r) {
@@ -73,10 +82,21 @@ Ray.Main.create_ray_blocks = function(r) {
   return blocks;
 };
 
-Ray.Main.add_arg_blocks = function(r, args, blocks) {
+Ray.Main.add_function_creation_blocks = function(r,  blocks, function_spec) {
   var blocks_clone = goog.object.clone(blocks);
-  var blocks_w_args = Ray.Blocks.define_arg_blocks(r, blocks_clone, args);
-  return blocks_w_args;
+  Ray.Blocks.define_arg_blocks(r, blocks_clone, function_spec.args);
+  Ray.Blocks.define_function_def_block(r, blocks_clone,
+                                       function_spec.name,
+                                       function_spec.desc,
+                                       function_spec.return_type);
+  return blocks_clone;
+};
+
+Ray.Main.get_function_definition_block_name = function(name) {
+  return Ray.Blocks.function_def_block_name(name);
+};
+Ray.Main.get_function_definition_block = function(name, blocks) {
+  return blocks[Ray.Blocks.function_def_block_name(name)];
 };
 
 Ray.Main.setup_language = function(Blockly, blocks) {
@@ -90,4 +110,32 @@ Ray.Main.setup_toolbox = function(Blockly, blocks) {
 Ray.Main.setup_generators = function(Blockly, blocks) {
   var generator = Ray.Generator(Blockly);
   generator.install_generators(generator.make_generators(blocks));
+};
+
+Ray.Main.Block = function(block_name, block, editable) {
+  this.outputConnection = null;
+  this.nextConnection = null;
+  this.previousConnection = null;
+  this.inputList = [];
+  this.inputsInline = false;
+  this.rendered = false;
+  this.collapsed = false;
+  this.disabled = false;
+  this.editable = editable;
+  this.deletable = editable;
+  this.tooltip = '';
+  this.contextMenu = true;
+
+  this.parentBlock_ = null;
+  this.childBlocks_ = [];
+
+  this.isInFlyout = false;
+  this.workspace = null;
+  this.type = block_name;
+  goog.mixin(this, block);
+
+  // Call an initialization function, if it exists.
+  if (goog.isFunction(this.init)) {
+    this.init();
+  }
 };
