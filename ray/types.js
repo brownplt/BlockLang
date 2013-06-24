@@ -4,9 +4,12 @@ goog.require('Ray._');
 
 var _ = Ray._;
 
-Ray.Types.atomic_types = [];
+Ray.Types.get_atomic_type = function(type_name) {
+  return Ray.Types.atomic_types[type_name];
+};
+
+Ray.Types.atomic_types = {};
 var AtomicType = function (type_name) {
-  Ray.Types.atomic_types.push(type_name);
   function AtomicTypeConstructor() {
     this.__type__ = type_name;
   }
@@ -18,6 +21,7 @@ var AtomicType = function (type_name) {
     return new AtomicTypeConstructor();
   };
 
+  Ray.Types.atomic_types[type_name] = AtomicTypeConstructor;
   return AtomicTypeConstructor;
 };
 

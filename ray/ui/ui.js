@@ -112,7 +112,7 @@ ArgUI.prototype.initializeDom = function(elem) {
 
   var arg_type = new goog.ui.Select(null, null, goog.ui.FlatMenuButtonRenderer.getInstance(), goog.dom.getDomHelper(div));
   //arg_type.setRenderer(goog.ui.FlatMenuButtonRenderer.getInstance());
-  goog.array.forEach(Ray.Types.atomic_types, function(type) {
+  goog.array.forEach(goog.object.getKeys(Ray.Types.atomic_types), function(type) {
     arg_type.addItem(new goog.ui.Option(type.toLocaleUpperCase(), type));
   });
   arg_type.setSelectedIndex(0);
@@ -274,7 +274,7 @@ Ray.UI.make_function_definition_dialog = function() {
   goog.dom.append(elem, goog.dom.createElement('br'));
   var return_type = new goog.ui.Select(null, null,
                                        goog.ui.FlatMenuButtonRenderer.getInstance());
-  goog.array.forEach(Ray.Types.atomic_types, function(type) {
+  goog.array.forEach(goog.object.getKeys(Ray.Types.atomic_types), function(type) {
     return_type.addItem(new goog.ui.Option(type.toLocaleUpperCase(), type));
   });
   return_type.setSelectedIndex(0);
