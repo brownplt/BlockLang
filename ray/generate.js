@@ -42,6 +42,8 @@ Ray.Generator = function(Blockly) {
         generator = Generator.datatype_generator(block);
       } else if (block.__form__) {
         generator = Generator.form_generator(block);
+      } else if (block.__arguments__) {
+        generator = Generator.argument_generator(block);
       } else {
         return;
         //return Ray.Generator.throwError();
@@ -155,6 +157,14 @@ Ray.Generator = function(Blockly) {
       default:
         return Ray.Generator.throwError();
     }
+  };
+
+  Generator.argument_generator = function(block) {
+    var generatedCode = Generator.generatedCode;
+    var arg_name = block.__name__;
+    return function() {
+      return generatedCode('r.name("' + arg_name + '")');
+    };
   };
 
   return Generator;
