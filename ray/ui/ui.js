@@ -336,7 +336,7 @@ Ray.UI.add_function_definition_workspace_dom = function(function_name, container
 };
 
 Ray.UI.add_function_definition_workspace_tab = function(function_name, tabbar) {
-  var func_def_tab = new goog.ui.Tab('Edit ' + function_name, goog.ui.RoundedTabRenderer.getInstance());
+  var func_def_tab = new goog.ui.Tab('Edit ' + function_name); //goog.ui.RoundedTabRenderer.getInstance());
   func_def_tab.workspace_id_ = 'blockly_function_definition_' + function_name;
   tabbar.addChild(func_def_tab, true);
   return func_def_tab;

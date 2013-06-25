@@ -15,9 +15,12 @@
 .goog-tab {
   position: relative;
   padding: 4px 8px;
-  color: #00c;
-  text-decoration: underline;
-  cursor: default;
+  color: #000;
+  background-color: #9f9;
+  font: normal 13px "Trebuchet MS", Tahoma, Arial, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
 }
 
 .goog-tab-bar-top .goog-tab {
@@ -53,27 +56,33 @@
 
 /* State: Hover */
 .goog-tab-hover {
-  background: #eee;
+  border-color: #ff9;
+  color: #ff9;
+  background-color: #9f9;
 }
 
 /* State: Disabled */
 .goog-tab-disabled {
-  color: #666;
+  border-color: #888;
+  color: #888;
+  background-color: #ccc;
+  cursor: default;
 }
 
 /* State: Selected */
 .goog-tab-selected {
-  color: #000;
-  background: #fff;
+  border: 1px solid #ff9;
+  background-color: #033;
+  color: #ff9;
   text-decoration: none;
   font-weight: bold;
-  border: 1px solid #6b90da;
+
 }
 
 .goog-tab-bar-top {
   padding-top: 5px !important;
   padding-left: 5px !important;
-  border-bottom: 1px solid #6b90da !important;
+  border-bottom: 1px solid #ff9 !important;
 }
 /*
  * Shift selected tabs 1px towards the contents (and compensate via margin and
