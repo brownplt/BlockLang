@@ -38,6 +38,13 @@ goog.require('Blockly.Xml');
 goog.require('goog.Timer');
 
 
+/** Informal requirements.
+ * I'm not going to actually load the scripts,
+ * because I want to reuse the instance from the parent frame
+ */
+// Ray.Shared
+
+
 /**
  * Unique ID counter for created blocks.
  * @private
@@ -52,6 +59,8 @@ Blockly.uidCounter_ = 0;
  * @constructor
  */
 Blockly.Block = function(workspace, prototypeName) {
+  this.Blockly = Blockly;
+
   this.id = ++Blockly.uidCounter_;
   this.outputConnection = null;
   this.nextConnection = null;
@@ -509,6 +518,14 @@ Blockly.Block.prototype.duplicate_ = function() {
   return newBlock;
 };
 
+Blockly.Block.prototype.saveToClipboard_ = function() {
+  Blockly.Ray_.Shared.save_block_xml(this);
+};
+
+Blockly.Block.prototype.loadFromClipboard = function() {
+  Blockly.Ray_.Shared.load_block_xml(Blockly, Blockly.mainWorkspace);
+};
+
 /**
  * Show the context menu for this block.
  * @param {number} x X-coordinate of mouse click.
@@ -522,6 +539,17 @@ Blockly.Block.prototype.showContextMenu_ = function(x, y) {
   // Save the current block in a variable for use in closures.
   var block = this;
   var options = [];
+
+  if (this.editable) {
+    var copyOption = {
+      enabled: true,
+      text: 'Copy Block to Clipboard',
+      callback: function() {
+        block.saveToClipboard_();
+      }
+    };
+    options.push(copyOption);
+  }
 
   if (this.deletable) {
     // Option to duplicate this block.
@@ -552,23 +580,6 @@ Blockly.Block.prototype.showContextMenu_ = function(x, y) {
         };
       }
       options.push(commentOption);
-    }
-
-    // Option to make block inline.
-    if (!this.collapsed) {
-      for (var i = 0; i < this.inputList.length; i++) {
-        if (this.inputList[i].type == Blockly.INPUT_VALUE) {
-          // Only display this option if there is a value input on the block.
-          var inlineOption = {enabled: true};
-          inlineOption.text = this.inputsInline ? Blockly.MSG_EXTERNAL_INPUTS :
-                                                  Blockly.MSG_INLINE_INPUTS;
-          inlineOption.callback = function() {
-            block.setInputsInline(!block.inputsInline);
-          };
-          options.push(inlineOption);
-          break;
-        }
-      }
     }
 
     // Option to collapse/expand block.

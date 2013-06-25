@@ -54,15 +54,6 @@ Ray.Main.create_ray = function() {
   return r;
 };
 
-Ray.Main.attach_blockly = function(Blockly, blocks) {
-  var new_blocks = goog.object.map(blocks, function(block, block_name) {
-    var new_block = goog.object.clone(block);
-    new_block.Blockly = Blockly;
-    return new_block;
-  });
-  return new_blocks;
-};
-
 Ray.Main.load_blockly = function(iframe, blocks, initial_blocks) {
   window.__blocks__ = blocks;
   window.__initial_blocks__ = initial_blocks || null;
@@ -122,16 +113,11 @@ Ray.Main.get_function_definition_block = function(name, blocks) {
 };
 
 Ray.Main.setup_language = function(Blockly, blocks) {
-  Blockly.Language = blocks;
+  Blockly.Language = goog.object.clone(blocks);
 };
 
 Ray.Main.setup_toolbox = function(Blockly, blocks) {
   Blockly.__toolbox__ = Ray.Blocks.generate_toolbox(blocks);
-};
-
-Ray.Main.setup_generators = function(Blockly, blocks) {
-  var generator = Ray.Generator(Blockly);
-  generator.install_generators(generator.make_generators(blocks));
 };
 
 Ray.Main.Block = function(block_name, block, editable) {

@@ -46,3 +46,34 @@ along. Maybe!!!
 
 
 * TODO Make function definitions active back in the main workpace
+
+
+Ok, so I am creating a module shared, and I'm going to share Ray
+across all Blockly instances, and I can just put stuff in there to
+share it. 
+
+ _Take out the definition-block thing_
+
+* TODO Add function definition functionality
+Ok, so there are a bunch of related pieces. 
+
+I need to be able to share definitions across everything.
+Since I'm already attaching an instance to everything, it shouldn't
+be that hard to share definitions, I just need to figure out when
+exactly I want to update things. 
+
+I can dynamically generate the required flyouts.
+
+Ideally I want to keep a static list of Blocks, and Generators and
+share it among everything. To do that, I can just go ahead and not
+use code generation infrastructure used by Blockly, and just generate
+the data structures myself, that way I don't have to bother with
+keeping all the data in sync across frames. I just have to have a
+current list of blocks, a currently list of functions, and a
+definition for each function. This will make my life so much easier. 
+
+I can handle this code, I shouldn't have to be so afraid of dealing
+with this data!
+
+* DONE got generators simplified, now doesn't require eval, just generates structures directly
+

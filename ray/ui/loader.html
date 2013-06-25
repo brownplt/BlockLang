@@ -8,7 +8,6 @@
     <script>
         goog.require('Blockly');
         goog.require('Blockly.Xml');
-        goog.require('Ray.Main');
     </script>
     <style>
         html, body {
@@ -42,11 +41,12 @@
             Blockly.MSG_COLLAPSE_ALL = 'Collapse Blocks';
             Blockly.MSG_EXPAND_ALL = 'Expand Blocks';
 
+            var Ray = window.parent.Ray;
+            Ray.Shared.attach_to_blockly(Blockly);
             var blocks = window.parent.__blocks__;
-            var attached_blocks = Ray.Main.attach_blockly(Blockly, blocks);
-            Ray.Main.setup_language(Blockly, attached_blocks);
-            Ray.Main.setup_toolbox(Blockly, attached_blocks);
-            Ray.Main.setup_generators(Blockly, attached_blocks);
+
+            Ray.Main.setup_language(Blockly, blocks);
+            Ray.Main.setup_toolbox(Blockly, blocks);
             Blockly.inject(document.body,
                            {path: "../../blockly/", toolbox: Blockly.__toolbox__});
             var initial_blocks = window.parent.__initial_blocks__;
