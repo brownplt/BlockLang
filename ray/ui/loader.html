@@ -43,12 +43,11 @@
 
             var Ray = window.parent.Ray;
             Ray.Shared.attach_to_blockly(Blockly);
-            var blocks = window.parent.__blocks__;
+            Blockly.FunctionDefinitionBlocks = window.parent.__function_definition_blocks__;
+            // First, get the blocks in the language, then work on getting them into the toolbox!!
 
-            Ray.Main.setup_language(Blockly, blocks);
-            Ray.Main.setup_toolbox(Blockly, blocks);
             Blockly.inject(document.body,
-                           {path: "../../blockly/", toolbox: Blockly.__toolbox__});
+                           {path: "../../blockly/", toolbox: Ray.Shared.get_toolbox()});
             var initial_blocks = window.parent.__initial_blocks__;
             if(initial_blocks) {
                 goog.array.map(initial_blocks, function(block_name) {

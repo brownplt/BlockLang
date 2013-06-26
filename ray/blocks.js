@@ -17,6 +17,9 @@
 goog.provide('Ray.Blocks');
 goog.require('Ray._');
 
+goog.require('goog.dom');
+goog.require('goog.dom.xml');
+
 //Ray.Blocks.BLOCK_COLOUR = 173;
 Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
 Ray.Blocks.BLOCK_PREFIX = "ray_";
@@ -586,51 +589,55 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
  * Generates an xml string representing the toolbox of blocks that will be available on a Blockly page.
  * @param blocks, the object from which we want to get the block names we will use to generate the xml
  */
-Ray.Blocks.generate_toolbox = function(blocks) {
-  var toolbox_obj = Ray.Blocks.generate_toolbox_obj(blocks);
+Ray.Blocks.generate_toolbox = function(toolbox_obj) {
   var toolbox_categories = _.keys(toolbox_obj);
   toolbox_categories.sort();
-  var toolbox = "<xml id=\"toolbox\">\n";
+  var toolbox = goog.dom.createDom('xml', {id: 'toolbox'});
   _.each(toolbox_categories, function(category) {
     // Don't display empty categories
     if(goog.isArray(toolbox_obj[category]) && !(toolbox_obj[category].length)) {
       return;
     }
-    toolbox += "  <category name=\"" + category + "\">\n";
+    var cat = goog.dom.createDom('category');
+    goog.dom.xml.setAttributes(cat, {name: category});
 
     if(!_.isArray(toolbox_obj[category])) {
       _.each(_.keys(toolbox_obj[category]), function(subcategory) {
         var block_names = toolbox_obj[category][subcategory];
-        var subcategory_name;
+        var attributes = {};
+        var key = null;
         if(subcategory === 'input') {
-          subcategory_name = 'consumes ' + category;
+          attributes.name = 'consumes ' + category;
+          attributes.key = 'input';
         } else if(subcategory === 'output') {
-          subcategory_name = 'produces ' + category;
+          attributes.name = 'produces ' + category;
+          attributes.key = 'output';
         } else {
-          subcategory_name = subcategory;
+          throw 'Unknown subcategory type!'
         }
 
-        toolbox += "    <category name=\"" + subcategory_name + "\">\n";
+        attributes.custom = category + '_' + attributes.key;
+        var subcat = goog.dom.createDom('category');
+        goog.dom.xml.setAttributes(subcat, attributes);
+        /**
         _.each(block_names, function(block_name) {
-          toolbox += "      <block type=\"" + _.escape(block_name) + "\"></block>\n";
+          goog.dom.appendChild(subcat, goog.dom.createDom('block', {type: _.escape(block_name)}));
         });
-        toolbox += "    </category>\n";
-      })
-    } else {
-      var block_names = toolbox_obj[category];
-      _.each(block_names, function(block_name) {
-        toolbox += "    <block type=\"" + _.escape(block_name) + "\"></block>\n";
+         */
+        goog.dom.appendChild(cat, subcat);
       });
+    } else {
+      goog.dom.xml.setAttributes(cat, {custom: category});
     }
-    toolbox += "  </category>\n";
+
+    goog.dom.appendChild(toolbox, cat);
   });
-  toolbox += "</xml>";
-  return toolbox;
+  return goog.dom.xml.serialize(toolbox);
 };
 
 Ray.Blocks.generate_toolbox_obj = function(blocks) {
   var toolbox_obj  = {};
-  _.each(['num', 'str', 'char', 'boolean', 'bottom'], function(ty) {
+  _.each(['num', 'str', 'char', 'boolean', 'bottom'], function(ty)   {
     toolbox_obj[ty] = {};
     toolbox_obj[ty]['input'] = [];
     toolbox_obj[ty]['output'] = [];

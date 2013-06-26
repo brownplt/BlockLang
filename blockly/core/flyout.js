@@ -304,19 +304,13 @@ Blockly.Flyout.prototype.show = function(xmlList) {
   // Create the blocks to be shown in this flyout.
   var blocks = [];
   var gaps = [];
-  if (xmlList == Blockly.Variables.NAME_TYPE) {
-    // Special category for variables.
-    Blockly.Variables.flyoutCategory(blocks, gaps, margin,
-        /** @type {!Blockly.Workspace} */ (this.workspace_));
-  } else if (xmlList == Blockly.Procedures.NAME_TYPE) {
-    // Special category for procedures.
-    Blockly.Procedures.flyoutCategory(blocks, gaps, margin,
-        /** @type {!Blockly.Workspace} */ (this.workspace_));
+  if(goog.isString(xmlList)) {
+    Blockly.Ray_.Shared.flyoutCategory(xmlList, blocks, gaps, margin, this.workspace_, Blockly);
   } else {
     for (var i = 0, xml; xml = xmlList[i]; i++) {
       if (xml.tagName && xml.tagName.toUpperCase() == 'BLOCK') {
         var block = Blockly.Xml.domToBlock_(
-            /** @type {!Blockly.Workspace} */ (this.workspace_), xml);
+          /** @type {!Blockly.Workspace} */ (this.workspace_), xml);
         blocks.push(block);
         gaps.push(margin * 2);
       }

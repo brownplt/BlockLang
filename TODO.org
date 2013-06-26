@@ -22,8 +22,8 @@ File bug reports about anything that comes up,
 - Separate the forms into a drawer of their own
 
 
-* TODO Make it possible to copy blocks from main workspace to function definition space
-* TODO Make tabs for each function definition
+* DONE Make it possible to copy blocks from main workspace to function definition space
+* DONE Make tabs for each function definition
 Here's how I am going to do this:
 
 In the workspace_content div, I am going to have a whole bunch of
@@ -44,16 +44,10 @@ look different.
 I need to have a global function registry, which I can edit as I go
 along. Maybe!!!
 
-
 * TODO Make function definitions active back in the main workpace
-
-
-Ok, so I am creating a module shared, and I'm going to share Ray
+Ok, so I am creating a module Ray.Shared, and I'm going to share Ray
 across all Blockly instances, and I can just put stuff in there to
 share it. 
-
- _Take out the definition-block thing_
-
 * TODO Add function definition functionality
 Ok, so there are a bunch of related pieces. 
 
@@ -76,4 +70,26 @@ I can handle this code, I shouldn't have to be so afraid of dealing
 with this data!
 
 * DONE got generators simplified, now doesn't require eval, just generates structures directly
+* TODO More function definition stuff
+Right now I am in the process of trying to switch the toolbox
+generated to use custom attributes that will then look up the
+appropriate values in Ray.Shared, and also I am switching the
+creation of the toolbox to use goog.dom, since it is much more
+maintainable that way.
+
+I got this done, but now I have to propagate function definitions
+across workspaces. 
+
+Make it so that function blocks are associated with their
+definitions, and if the number of arguments changes, they change as
+well. 
+
+Order of priorities:
+1. Move defined functions to the shared set of blocks. 
+2. Separate out argument blocks. 
+3. Hook up defined function blocks to the definition, so we can
+   change things as needed. 
+4. Hook up definition expressions to functions so that we have the
+   right semantics. 
+5. Add a run button, and show output somehow!
 

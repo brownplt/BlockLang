@@ -55,7 +55,7 @@ Ray.Main.create_ray = function() {
 };
 
 Ray.Main.load_blockly = function(iframe, blocks, initial_blocks) {
-  window.__blocks__ = blocks;
+  window.__function_definition_blocks__ = blocks;
   window.__initial_blocks__ = initial_blocks || null;
   goog.dom.setProperties(iframe, {src: 'ui/loader.html'});
 };
@@ -80,7 +80,7 @@ Ray.Main.atomic_type_to_type_instance = function(type_name) {
   return new type();
 };
 
-Ray.Main.add_function_creation_blocks = function(r,  blocks, function_spec) {
+Ray.Main.make_function_creation_blocks = function(r,  function_spec) {
   var p_args = function_spec.args;
   var return_type_name = function_spec.return_type;
   var return_type = Ray.Types.get_atomic_type(return_type_name);
@@ -95,14 +95,14 @@ Ray.Main.add_function_creation_blocks = function(r,  blocks, function_spec) {
                                     null,
                                     null,
                                     return_type_instance);
-  var blocks_clone = goog.object.clone(blocks);
-  Ray.Blocks.define_arg_blocks(r, blocks_clone, function_spec.args);
-  Ray.Blocks.define_function_def_block(r, blocks_clone,
+  var blocks = {};
+  Ray.Blocks.define_arg_blocks(r, blocks, function_spec.args);
+  Ray.Blocks.define_function_def_block(r, blocks,
                                        function_spec.name,
                                        function_spec.desc,
                                        function_spec.return_type);
-  Ray.Blocks.generate_block(r, function_spec.name, f_value, blocks_clone);
-  return blocks_clone;
+  Ray.Blocks.generate_block(r, function_spec.name, f_value, blocks);
+  return blocks;
 };
 
 Ray.Main.get_function_definition_block_name = function(name) {

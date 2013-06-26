@@ -44,6 +44,7 @@ Create a new function
 <script>
     var r = Ray.Main.create_ray();
     var blocks = Ray.Main.create_ray_blocks(r);
+    Ray.Shared.set_blocks(blocks);
     var dialog = Ray.UI.make_function_definition_dialog();
     Ray.UI.populate_dialog_w_test_data(dialog);
     var workspace_content = goog.dom.getElement('workspace_content');
@@ -64,7 +65,7 @@ Create a new function
 
     goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
         var func_specs = Ray.UI.get_function_definition_dialog_values(dialog);
-        var func_def_blocks = Ray.Main.add_function_creation_blocks(r, blocks, func_specs);
+        var func_def_blocks = Ray.Main.make_function_creation_blocks(r, func_specs);
         var func_block_name = Ray.Main.get_function_definition_block_name(func_specs.name);
         var func_def_workspace = Ray.UI.add_function_definition_workspace_dom(func_specs.name,
                                                                          workspace_content);

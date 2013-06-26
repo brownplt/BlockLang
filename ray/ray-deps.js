@@ -33,7 +33,7 @@ goog.addDependency('../../../blockly/core/variables.js', ['Blockly.Variables'], 
 goog.addDependency('../../../blockly/core/warning.js', ['Blockly.Warning'], []);
 goog.addDependency('../../../blockly/core/workspace.js', ['Blockly.Workspace'], ['Blockly.ScrollbarPair', 'Blockly.Trashcan', 'Blockly.Xml']);
 goog.addDependency('../../../blockly/core/xml.js', ['Blockly.Xml'], []);
-goog.addDependency('../../../ray/blocks.js', ['Ray.Blocks'], ['Ray._']);
+goog.addDependency('../../../ray/blocks.js', ['Ray.Blocks'], ['Ray._', 'goog.dom', 'goog.dom.xml']);
 goog.addDependency('../../../ray/env.js', ['Ray.Env'], ['Ray.Util', 'Ray._']);
 goog.addDependency('../../../ray/generate.js', ['Ray.Generator'], ['Ray.Blocks']);
 goog.addDependency('../../../ray/jquery.js', ['Ray.JQuery'], []);
@@ -43,7 +43,7 @@ goog.addDependency('../../../ray/lib.js', ['Ray.Lib'], ['Ray.Ray', 'Ray.Types', 
 goog.addDependency('../../../ray/main.js', ['Ray.Main'], ['Blockly.Xml', 'Ray.Blocks', 'Ray.Generator', 'Ray.Lib', 'Ray.Ray', 'Ray.Test', 'Ray.Types', 'Ray.UI', 'goog.dom', 'goog.object']);
 goog.addDependency('../../../ray/ray-numbers.js', ['Ray.RayNumbers'], ['Ray.JSNumbers']);
 goog.addDependency('../../../ray/ray.js', ['Ray.Ray'], ['Ray.Kernel', 'Ray.RayNumbers']);
-goog.addDependency('../../../ray/shared.js', ['Ray.Shared'], ['Blockly']);
+goog.addDependency('../../../ray/shared.js', ['Ray.Shared'], ['Blockly', 'Ray.Blocks']);
 goog.addDependency('../../../ray/test.js', ['Ray.Test'], ['Ray.JQuery', 'Ray.Lib', 'Ray.Ray', 'Ray.Types', 'Ray._']);
 goog.addDependency('../../../ray/types.js', ['Ray.Types'], ['Ray._']);
 goog.addDependency('../../../ray/ui/ui.js', ['Ray.UI'], ['Ray.Types', 'goog.dom', 'goog.dom.query', 'goog.events', 'goog.events.EventType', 'goog.object', 'goog.style', 'goog.ui.Button', 'goog.ui.Container', 'goog.ui.ContainerRenderer', 'goog.ui.Control', 'goog.ui.Dialog', 'goog.ui.Dialog.ButtonSet', 'goog.ui.FlatButtonRenderer', 'goog.ui.FlatMenuButtonRenderer', 'goog.ui.LabelInput', 'goog.ui.Option', 'goog.ui.Select', 'goog.ui.Tab']);

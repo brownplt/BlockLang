@@ -38,7 +38,8 @@ goog.require('Blockly.Xml');
 goog.require('goog.Timer');
 
 
-/** Informal requirements.
+/**
+ * Informal requirements.
  * I'm not going to actually load the scripts,
  * because I want to reuse the instance from the parent frame
  */
@@ -86,8 +87,12 @@ Blockly.Block = function(workspace, prototypeName) {
   // Copy the type-specific functions and data from the prototype.
   if (prototypeName) {
     this.type = prototypeName;
-    var prototype = Blockly.Language[prototypeName];
-    if (!prototype) {
+    var prototype = null;
+    if(Blockly.FunctionDefinitionBlocks[prototypeName]) {
+      prototype = Blockly.FunctionDefinitionBlocks[prototypeName];
+    } else if(Blockly.Ray_.Shared.saved_blocks_[prototypeName]) {
+      prototype = Blockly.Ray_.Shared.saved_blocks_[prototypeName];
+    } else {
       throw 'Error: "' + prototypeName + '" is an unknown language block.';
     }
     goog.mixin(this, prototype);
