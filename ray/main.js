@@ -97,10 +97,12 @@ Ray.Main.make_function_creation_blocks = function(r,  function_spec) {
                                     return_type_instance);
   var blocks = {};
   Ray.Blocks.define_arg_blocks(r, blocks, function_spec.args);
+  /**
   Ray.Blocks.define_function_def_block(r, blocks,
                                        function_spec.name,
                                        function_spec.desc,
                                        function_spec.return_type);
+   */
   Ray.Blocks.generate_block(r, function_spec.name, f_value, blocks);
   return blocks;
 };

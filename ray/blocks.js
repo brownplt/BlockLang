@@ -587,43 +587,28 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
 
 /**
  * Generates an xml string representing the toolbox of blocks that will be available on a Blockly page.
- * @param blocks, the object from which we want to get the block names we will use to generate the xml
+ * @param block_dir the block directory for which we will generate the toolbox
  */
-Ray.Blocks.generate_toolbox = function(toolbox_obj) {
-  var toolbox_categories = _.keys(toolbox_obj);
+Ray.Blocks.generate_toolbox = function(block_dir) {
+  var toolbox_categories = _.keys(block_dir);
   toolbox_categories.sort();
   var toolbox = goog.dom.createDom('xml', {id: 'toolbox'});
   _.each(toolbox_categories, function(category) {
     // Don't display empty categories
-    if(goog.isArray(toolbox_obj[category]) && !(toolbox_obj[category].length)) {
+    if(goog.isArray(block_dir[category]) && !(block_dir[category].length)) {
       return;
     }
     var cat = goog.dom.createDom('category');
     goog.dom.xml.setAttributes(cat, {name: category});
 
-    if(!_.isArray(toolbox_obj[category])) {
-      _.each(_.keys(toolbox_obj[category]), function(subcategory) {
-        var block_names = toolbox_obj[category][subcategory];
+    if(!_.isArray(block_dir[category])) {
+      _.each(_.keys(block_dir[category]), function(subcategory) {
         var attributes = {};
-        var key = null;
-        if(subcategory === 'input') {
-          attributes.name = 'consumes ' + category;
-          attributes.key = 'input';
-        } else if(subcategory === 'output') {
-          attributes.name = 'produces ' + category;
-          attributes.key = 'output';
-        } else {
-          throw 'Unknown subcategory type!'
-        }
-
+        attributes.name = (subcategory === 'input' ? 'consumes' : 'produces') + ' ' + category;
+        attributes.key = subcategory;
         attributes.custom = category + '_' + attributes.key;
         var subcat = goog.dom.createDom('category');
         goog.dom.xml.setAttributes(subcat, attributes);
-        /**
-        _.each(block_names, function(block_name) {
-          goog.dom.appendChild(subcat, goog.dom.createDom('block', {type: _.escape(block_name)}));
-        });
-         */
         goog.dom.appendChild(cat, subcat);
       });
     } else {
@@ -635,19 +620,39 @@ Ray.Blocks.generate_toolbox = function(toolbox_obj) {
   return goog.dom.xml.serialize(toolbox);
 };
 
-Ray.Blocks.generate_toolbox_obj = function(blocks) {
-  var toolbox_obj  = {};
+Ray.Blocks.add_to_block_directory = function(block_dir, block_name, block) {
+  var drawers = Ray.Blocks.get_drawers(block);
+  goog.array.forEach(drawers, function(drawer) {
+    var end_index = drawer.search(/(input|output)/);
+    if(end_index < 0) {
+      block_dir[drawer].push(block_name);
+    } else {
+      var in_or_out = drawer.substring(end_index);
+      var type = drawer.substring(0, end_index - 1);
+      block_dir[type][in_or_out].push(block_name);
+    }
+  });
+  block_dir['all'].push(block_name);
+  return block_dir;
+};
+
+Ray.Blocks.empty_block_directory = function() {
+  var block_dir  = {};
   _.each(['num', 'str', 'char', 'boolean', 'bottom'], function(ty)   {
-    toolbox_obj[ty] = {};
-    toolbox_obj[ty]['input'] = [];
-    toolbox_obj[ty]['output'] = [];
+    block_dir[ty] = {};
+    block_dir[ty]['input'] = [];
+    block_dir[ty]['output'] = [];
   });
 
-  toolbox_obj['forms'] = [];
-  toolbox_obj['arguments'] = [];
-  toolbox_obj['functions'] = [];
-  toolbox_obj['all'] = [];
+  block_dir['forms'] = [];
+  block_dir['arguments'] = [];
+  block_dir['functions'] = [];
+  block_dir['all'] = [];
+  return block_dir;
+};
 
+Ray.Blocks.generate_block_directory = function(blocks) {
+  var block_dir = Ray.Blocks.empty_block_directory();
 
   var block_names = _.reject(_.keys(blocks), function(name) {
     var is_cond_cond = name.indexOf(Ray.Blocks.CONDITIONAL_PREFIX + 'cond_') === 0;
@@ -656,20 +661,9 @@ Ray.Blocks.generate_toolbox_obj = function(blocks) {
   });
   _.each(block_names, function(block_name) {
     var block = blocks[block_name];
-    var drawers = Ray.Blocks.get_drawers(block);
-    _.each(drawers, function(drawer) {
-      var end_index = drawer.search(/(input|output)/);
-      if(end_index < 0) {
-        toolbox_obj[drawer].push(block_name);
-      } else {
-        var in_or_out = drawer.substring(end_index);
-        var type = drawer.substring(0, end_index - 1);
-        toolbox_obj[type][in_or_out].push(block_name);
-      }
-    });
-    toolbox_obj['all'].push(block_name);
+    Ray.Blocks.add_to_block_directory(block_dir, block_name, block);
   });
-  return toolbox_obj;
+  return block_dir;
 
 };
 

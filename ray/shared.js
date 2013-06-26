@@ -34,13 +34,9 @@ Ray.Shared.attach_to_blockly = function(Blockly) {
 
 Ray.Shared.set_blocks = function(blocks) {
   Ray.Shared.saved_blocks_ = blocks;
-  Ray.Shared.toolbox_obj_ = Ray.Blocks.generate_toolbox_obj(blocks);
-  Ray.Shared.toolbox_ = Ray.Blocks.generate_toolbox(Ray.Shared.toolbox_obj_);
+  Ray.Shared.block_dir_ = Ray.Blocks.generate_block_directory(blocks);
+  Ray.Shared.toolbox_ = Ray.Blocks.generate_toolbox(Ray.Shared.block_dir_);
 };
-
-Ray.Shared.get_blocks = function(blocks) {
-  Ray.Shared
-}
 
 Ray.Shared.get_toolbox = function() {
   return Ray.Shared.toolbox_;
@@ -51,9 +47,9 @@ Ray.Shared.get_toolbox = function() {
  * @param key
  * @returns {*}
  */
-Ray.Shared.get_blocks_in_category_from_toolbox_obj_ = function(key, toolbox_obj) {
+Ray.Shared.lookup_in_block_dir_ = function(key, block_dir) {
   var keys = key.split('_');
-  var curr_category = toolbox_obj;
+  var curr_category = block_dir;
   for(var i = 0; i < keys.length; i++) {
     curr_category = curr_category[keys[i]];
     if(!curr_category) {
@@ -63,8 +59,8 @@ Ray.Shared.get_blocks_in_category_from_toolbox_obj_ = function(key, toolbox_obj)
   return curr_category;
 };
 
-Ray.Shared.get_blocks_in_category = function(key) {
-  var category_blocks = Ray.Shared.get_blocks_in_category_from_toolbox_obj_(key, Ray.Shared.toolbox_obj_);
+Ray.Shared.lookup_in_shared_block_dir_ = function(key) {
+  var category_blocks = Ray.Shared.lookup_in_block_dir_(key, Ray.Shared.block_dir_);
   if(!category_blocks) {
     throw 'Unknown category!';
   } else {
@@ -76,14 +72,14 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
   var all_category_blocks = [];
   var func_def_blocks = Blockly.FunctionDefinitionBlocks;
   if(func_def_blocks) {
-    var func_def_toolbox = Ray.Blocks.generate_toolbox_obj(func_def_blocks);
-    var func_def_category_blocks = Ray.Shared.get_blocks_in_category_from_toolbox_obj_(key, func_def_toolbox);
+    var func_def_dir = Ray.Blocks.generate_block_directory(func_def_blocks);
+    var func_def_category_blocks = Ray.Shared.lookup_in_block_dir_(key, func_def_dir);
     if(func_def_category_blocks) {
       all_category_blocks = all_category_blocks.concat(func_def_category_blocks);
     }
   }
 
-  var category_blocks = Ray.Shared.get_blocks_in_category(key);
+  var category_blocks = Ray.Shared.lookup_in_shared_block_dir_(key);
   if(category_blocks) {
     all_category_blocks = all_category_blocks.concat(category_blocks);
   }
@@ -98,5 +94,4 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
     blocks.push(block);
     gaps.push(margin * 2);
   });
-
-}
+};

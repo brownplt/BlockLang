@@ -288,10 +288,17 @@ Ray.UI.make_function_definition_dialog = function() {
 };
 
 Ray.UI.populate_dialog_w_test_data = function(dialog) {
-  dialog.getChildAt(0).setValue('double');
-  dialog.getChildAt(1).setValue('doubles a number');
+  dialog.getChildAt(0).setValue('double_if');
+  dialog.getChildAt(1).setValue('doubles x if y is true');
+
   dialog.arg_list_container_.addArg();
   dialog.arg_list_container_.getChildAt(0).arg_type_.setSelectedIndex(1);
+  dialog.arg_list_container_.getChildAt(0).arg_name_.setValue('x');
+
+  dialog.arg_list_container_.addArg();
+  dialog.arg_list_container_.getChildAt(1).arg_type_.setSelectedIndex(0);
+  dialog.arg_list_container_.getChildAt(1).arg_name_.setValue('y');
+
   dialog.getChildAt(2).setSelectedIndex(1);
 };
 
