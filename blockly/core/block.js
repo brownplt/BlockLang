@@ -88,7 +88,8 @@ Blockly.Block = function(workspace, prototypeName) {
   if (prototypeName) {
     this.type = prototypeName;
     var prototype = null;
-    if(Blockly.FunctionDefinitionBlocks[prototypeName]) {
+
+    if(Blockly.FunctionDefinitionBlocks && Blockly.FunctionDefinitionBlocks[prototypeName]) {
       prototype = Blockly.FunctionDefinitionBlocks[prototypeName];
     } else if(Blockly.Ray_.Shared.saved_blocks_[prototypeName]) {
       prototype = Blockly.Ray_.Shared.saved_blocks_[prototypeName];

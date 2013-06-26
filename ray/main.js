@@ -54,9 +54,19 @@ Ray.Main.create_ray = function() {
   return r;
 };
 
+/**
+ *
+ * @param {HTMLIFrameElement} iframe
+ * @param {?Object=} blocks
+ * @param {?Array.<string>=} initial_blocks
+ */
 Ray.Main.load_blockly = function(iframe, blocks, initial_blocks) {
-  window.__function_definition_blocks__ = blocks;
-  window.__initial_blocks__ = initial_blocks || null;
+  if(blocks) {
+    window.__function_definition_blocks__ = blocks;
+  }
+  if(initial_blocks) {
+    window.__initial_blocks__ = initial_blocks || null;
+  }
   goog.dom.setProperties(iframe, {src: 'ui/loader.html'});
 };
 
@@ -80,7 +90,11 @@ Ray.Main.atomic_type_to_type_instance = function(type_name) {
   return new type();
 };
 
-Ray.Main.make_function_creation_blocks = function(r,  function_spec) {
+Ray.Main.make_function_argument_blocks = function(r, function_spec) {
+  return Ray.Blocks.define_arg_blocks(r, {}, function_spec.args);
+};
+
+Ray.Main.make_function_application_block = function(r, function_spec) {
   var p_args = function_spec.args;
   var return_type_name = function_spec.return_type;
   var return_type = Ray.Types.get_atomic_type(return_type_name);
@@ -89,29 +103,20 @@ Ray.Main.make_function_creation_blocks = function(r,  function_spec) {
   var arg_names = goog.array.map(function_spec.args, function(a)  {return a.name; });
   var arguments_type = new Ray.Types.ArgumentType(
     new Ray.Types.ListOfTypes(goog.array.map(arg_types,
-                                           Ray.Main.atomic_type_to_type_instance)));
+                                             Ray.Main.atomic_type_to_type_instance)));
   var arg_spec = new r.Value.ArgumentSpec(arg_names, {}, null, arguments_type);
   var f_value = new r.Value.Closure(arg_spec,
                                     null,
                                     null,
                                     return_type_instance);
-  var blocks = {};
-  Ray.Blocks.define_arg_blocks(r, blocks, function_spec.args);
-  /**
-  Ray.Blocks.define_function_def_block(r, blocks,
-                                       function_spec.name,
-                                       function_spec.desc,
-                                       function_spec.return_type);
-   */
-  Ray.Blocks.generate_block(r, function_spec.name, f_value, blocks);
-  return blocks;
+  return Ray.Blocks.generate_block(r, function_spec.name, f_value, {}, true);
 };
 
-Ray.Main.get_function_definition_block_name = function(name) {
-  return Ray.Blocks.function_def_block_name(name);
+Ray.Main.get_function_block_name = function(name) {
+  return Ray.Blocks.block_name(name);
 };
-Ray.Main.get_function_definition_block = function(name, blocks) {
-  return blocks[Ray.Blocks.function_def_block_name(name)];
+Ray.Main.get_function_block = function(name, blocks) {
+  return blocks[Ray.Blocks.block_name(name)];
 };
 
 Ray.Main.setup_language = function(Blockly, blocks) {

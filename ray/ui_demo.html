@@ -65,14 +65,19 @@ Create a new function
 
     goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
         var func_specs = Ray.UI.get_function_definition_dialog_values(dialog);
-        var func_def_blocks = Ray.Main.make_function_creation_blocks(r, func_specs);
-        var func_block_name = Ray.Main.get_function_definition_block_name(func_specs.name);
+        var func_arg_blocks = Ray.Main.make_function_argument_blocks(r, func_specs);
+        var func_use_block = Ray.Main.make_function_application_block(r, func_specs);
+        var func_block_name = Ray.Main.get_function_block_name(func_specs.name);
+        Ray.Shared.add_to_saved_blocks(func_block_name, func_use_block);
+
         var func_def_workspace = Ray.UI.add_function_definition_workspace_dom(func_specs.name,
                                                                          workspace_content);
         var func_def_tab = Ray.UI.add_function_definition_workspace_tab(func_specs.name, tabbar);
+
         Ray.Main.load_blockly(func_def_workspace,
-                              func_def_blocks,
+                              func_arg_blocks,
                               [func_block_name]);
+
         tabbar.setSelectedTab(func_def_tab);
         Ray.UI.show_workspace_from_tab(func_def_tab, workspace_content);
     });
@@ -83,7 +88,7 @@ Create a new function
 
     //Ray.Main.initialize_main_blockly_dom();
     Ray.Main.initialize_function_definition_blockly_dom();
-    Ray.Main.load_blockly(Ray.Main.main_blockly(), blocks);
+    Ray.Main.load_blockly(Ray.Main.main_blockly());
 </script>
 </body>
 

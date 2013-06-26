@@ -35,11 +35,23 @@ Ray.Shared.attach_to_blockly = function(Blockly) {
 Ray.Shared.set_blocks = function(blocks) {
   Ray.Shared.saved_blocks_ = blocks;
   Ray.Shared.block_dir_ = Ray.Blocks.generate_block_directory(blocks);
-  Ray.Shared.toolbox_ = Ray.Blocks.generate_toolbox(Ray.Shared.block_dir_);
 };
 
-Ray.Shared.get_toolbox = function() {
-  return Ray.Shared.toolbox_;
+/**
+ *
+ * @param {?boolean=} opt_include_arguments
+ * @returns {*}
+ */
+Ray.Shared.get_toolbox = function(opt_include_arguments) {
+  return Ray.Blocks.generate_toolbox(Ray.Shared.block_dir_, opt_include_arguments);
+};
+
+Ray.Shared.add_to_saved_blocks = function(block_name, block) {
+  if(Ray.Shared.saved_blocks_[block_name]) {
+    throw 'Would overwrite pre-existing block!';
+  }
+  Ray.Shared.saved_blocks_[block_name] = block;
+  Ray.Blocks.add_to_block_directory(Ray.Shared.block_dir_, block_name, block);
 };
 
 /**

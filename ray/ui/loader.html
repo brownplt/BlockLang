@@ -47,7 +47,8 @@
             // First, get the blocks in the language, then work on getting them into the toolbox!!
 
             Blockly.inject(document.body,
-                           {path: "../../blockly/", toolbox: Ray.Shared.get_toolbox()});
+                           {path: "../../blockly/", toolbox:
+                                   Ray.Shared.get_toolbox(!!Blockly.FunctionDefinitionBlocks)});
             var initial_blocks = window.parent.__initial_blocks__;
             if(initial_blocks) {
                 goog.array.map(initial_blocks, function(block_name) {

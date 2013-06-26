@@ -9,9 +9,6 @@
  * passing in the new Blockly.Language. This will return an xml string that can be passed in to
  * Blockly.inject as the value of the toolbox argument.
  *
- * NOTE: You must call Ray.Main.attach_blockly on a set of Blocks before they can be used!!
- * Otherwise, when they try to refer to this.Blockly, they will error!!
- *
  */
 
 goog.provide('Ray.Blocks');
@@ -26,7 +23,7 @@ Ray.Blocks.BLOCK_PREFIX = "ray_";
 Ray.Blocks.PRIMITIVE_DATA_PREFIX = "ray_data_create_";
 Ray.Blocks.CONDITIONAL_PREFIX = "ray_conditional_";
 Ray.Blocks.ARG_PREFIX = "ray_function_arg_";
-Ray.Blocks.FUNCTION_DEF_PREFIX = "ray_function_def_";
+Ray.Blocks.FUNCTION_DEF_PREFIX = "ray_user_function_";
 Ray.Blocks.HELP_URL = "#";
 
 
@@ -50,7 +47,7 @@ Ray.Blocks.arg_block_name = function(name) {
   window._ = Ray._;
   return Ray.Blocks.ARG_PREFIX + _.escape(name);
 };
-Ray.Blocks.function_def_block_name = function(name) {
+Ray.Blocks.user_function_block_name = function(name) {
   return Ray.Blocks.FUNCTION_DEF_PREFIX + _.escape(name);
 };
 Ray.Blocks.BaseTypes = ['boolean',
@@ -107,14 +104,15 @@ Ray.Blocks.get_drawers = function(block) {
     _.each(output_types, function(type) {
       drawers.push(type + '_output');
     });
+    if(block.__user_function__) {
+      drawers.push('functions');
+    }
   } else if(block.__form__) {
     drawers.push('forms');
   } else if(block.__datatype__) {
     drawers.push(block.__datatype__ + '_output');
   } else if(block.__arguments__) {
     drawers.push('arguments');
-  } else if(block.__function_definition__) {
-    drawers.push('functions');
   } else{
     throw new Ray.Error("Unknown sort of block!!");
   }
@@ -515,11 +513,15 @@ Ray.Blocks.define_builtin_blocks = function(r, obj) {
  *   a Closure,    this)
  *   an ArgumentSpec, <-- Should never be passed in directly
  *   an Arguments. <-- Should never be passed in directly, not really a Value either.
+ * @param r
  * @param name, the name of the block, will be used in looking it up, and as title on block.
  * @param value, the value from which we are creating the block
+ * @param obj
+ * @param {?boolean=} opt_mark_functions
  */
-Ray.Blocks.generate_block = function(r, name, value, obj) {
-  var block_name = Ray.Blocks.block_name(name);
+Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
+  var is_user_function = !!opt_user_function;
+  var block_name = is_user_function ? Ray.Blocks.user_function_block_name(name) : Ray.Blocks.block_name(name);
   var block = {};
   switch(value.R.node_type(value)) {
     case 'pair':
@@ -535,7 +537,6 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
     case 'primitive':
     case 'closure':
       var output_types = (value.R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
-      var input_types = value.arg_spec.arguments_type.get_all_base_types();
       var block_colour = Ray.Blocks.get_colour(output_types);
       var arg_spec = value.arg_spec;
       // Ignoring rest and keyword arguments
@@ -545,6 +546,9 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
       var block = {};
       block.__name__ = name;
       block.__value__ = value;
+      if(is_user_function) {
+        block.__user_function__ = true;
+      }
       block.helpUrl = Ray.Blocks.HELP_URL;
       block.init = function() {
         this.setInputsInline(true);
@@ -587,17 +591,20 @@ Ray.Blocks.generate_block = function(r, name, value, obj) {
 
 /**
  * Generates an xml string representing the toolbox of blocks that will be available on a Blockly page.
- * @param block_dir the block directory for which we will generate the toolbox
+ * @param {Object} block_dir the block directory for which we will generate the toolbox
+ * @param {?boolean=} opt_include_arguments
  */
-Ray.Blocks.generate_toolbox = function(block_dir) {
+Ray.Blocks.generate_toolbox = function(block_dir, opt_include_arguments) {
+  var include_arguments = goog.isDef(opt_include_arguments) ? opt_include_arguments : true;
   var toolbox_categories = _.keys(block_dir);
   toolbox_categories.sort();
   var toolbox = goog.dom.createDom('xml', {id: 'toolbox'});
   _.each(toolbox_categories, function(category) {
-    // Don't display empty categories
-    if(goog.isArray(block_dir[category]) && !(block_dir[category].length)) {
+    // Don't display arguments if false is passed in as opt_include_arguments
+    if(category === 'arguments' && !include_arguments) {
       return;
     }
+    // Otherwise, display category, even if it is empty!
     var cat = goog.dom.createDom('category');
     goog.dom.xml.setAttributes(cat, {name: category});
 
