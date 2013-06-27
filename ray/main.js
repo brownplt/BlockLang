@@ -54,20 +54,25 @@ Ray.Main.create_ray = function() {
   return r;
 };
 
+Ray.Main.load_main_blockly = function(iframe) {
+  goog.dom.setProperties(iframe, {src: 'main_blockly.html'});
+};
+
 /**
  *
  * @param {HTMLIFrameElement} iframe
- * @param {?Object=} blocks
+ * @param {?Object=} arg_blocks
+ * @param {?string=} func_name
  * @param {?Array.<string>=} initial_blocks
  */
-Ray.Main.load_blockly = function(iframe, blocks, initial_blocks) {
-  if(blocks) {
-    window.__function_definition_blocks__ = blocks;
-  }
-  if(initial_blocks) {
-    window.__initial_blocks__ = initial_blocks || null;
-  }
-  goog.dom.setProperties(iframe, {src: 'loader.html'});
+Ray.Main.load_func_def_blockly = function(iframe, arg_blocks, func_name, initial_blocks) {
+  var func_def = {
+    args: arg_blocks,
+    func_name: func_name,
+    initial_blocks: initial_blocks
+  };
+  window.__function_definition_info__ = func_def;
+  goog.dom.setProperties(iframe, {src: 'func_def_blockly.html'});
 };
 
 Ray.Main.block_to_workspace_xml = function(block_name, block) {
@@ -110,6 +115,16 @@ Ray.Main.make_function_application_block = function(r, function_spec) {
                                     null,
                                     return_type_instance);
   return Ray.Blocks.generate_block(r, function_spec.name, f_value, {}, true);
+};
+
+Ray.Main.get_function_body_expression = function(Blockly) {
+  var workspace = Blockly.mainWorkspace;
+  var topBlocks = workspace.getTopBlocks(false);
+  if(topBlocks.length > 1) {
+    throw 'Only one expression can be present at the top-level in a function definition workspace';
+  } else {
+    return topBlocks[0];
+  }
 };
 
 Ray.Main.get_function_block_name = function(name) {

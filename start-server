@@ -1,6 +1,3 @@
 #! /usr/bin/env bash 
-
-# cd blockly
-# python build.py
-# cd ..
+make deps
 python -m SimpleHTTPServer

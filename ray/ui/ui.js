@@ -81,7 +81,8 @@ ArgUI.prototype.createDom = function() {
   var div = this.getContentElement();
   goog.dom.classes.add(div, 'arg-control');
 
-  var arg_name = new goog.ui.LabelInput('arg' + String(this.ix_ + 1));
+  var index = this.getParent().indexOfChild(this);
+  var arg_name = new goog.ui.LabelInput('arg' + String(index));
   this.arg_name_ = arg_name;
 
   this.addChild(arg_name, true);
@@ -117,7 +118,7 @@ ArgUI.prototype.enterDocument = function() {
   goog.events.listen(this.arg_remove_button_, goog.ui.Component.EventType.ACTION, function(e) {
     this.dispatchEvent(ArgList.EventType.REMOVE_ARG_EVENT);
   }, true, this);
-  goog.events.listen(this.arg_name_, goog.ui.Component.EventType.CHANGE, function(e) {
+  goog.events.listen(this.arg_name_.getElement(), goog.ui.Component.EventType.BLUR, function(e) {
     this.arg_.setName(this.arg_name_.getValue());
   }, false, this);
   goog.events.listen(this.arg_type_, [goog.ui.Component.EventType.CHANGE, goog.ui.Component.EventType.ACTION], function(e) {
@@ -141,7 +142,10 @@ ArgUI.prototype.setArgName = function(name) {
   this.arg_name_.setValue(name);
   this.arg_.setName(name);
 };
-
+ArgUI.prototype.updateArgNameLabelIndex = function() {
+  var index = this.getParent().indexOfChild(this);
+  this.arg_name_.setLabel('arg' + String(index));
+};
 ArgListContainer = function(argList, opt_domHelper) {
   goog.base(this, opt_domHelper);
   this.arg_list_ = argList;
@@ -198,6 +202,9 @@ ArgListContainer.prototype.onRemoveArg_ = function(e) {
   e.stopPropagation();
   this.arg_list_.removeArgAt(this.indexOfChild(e.currentTarget));
   this.removeChild(e.currentTarget, true);
+  this.forEachChild(function(child) {
+    child.updateArgNameLabelIndex();
+  });
 };
 ArgListContainer.prototype.getArgs = function() {
   var args = [];

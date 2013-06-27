@@ -94,3 +94,12 @@ well.
   once created
 Clean up documentation, add some documentation, JSDoc comment
 everything complicated. 
+
+When you go to tab, flyout should refresh
+
+See if I can get mixed layouts
+
+Make sure to email every day with results
+
+Make it so you can't steal function argument blocks from a function
+definition and use them elsewhere

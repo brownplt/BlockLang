@@ -71,9 +71,10 @@ Create a new function
                                                                          workspace_content);
         var func_def_tab = Ray.UI.add_function_definition_workspace_tab(func_specs.name, tabbar);
 
-        Ray.Main.load_blockly(func_def_workspace,
-                              func_arg_blocks,
-                              [func_block_name]);
+        Ray.Main.load_func_def_blockly(func_def_workspace,
+                                       func_arg_blocks,
+                                       func_specs.name,
+                                       [func_block_name]);
 
         tabbar.setSelectedTab(func_def_tab);
         Ray.UI.show_workspace_from_tab(func_def_tab, workspace_content);
@@ -85,7 +86,7 @@ Create a new function
 
     //Ray.Main.initialize_main_blockly_dom();
     Ray.Main.initialize_function_definition_blockly_dom();
-    Ray.Main.load_blockly(Ray.Main.main_blockly());
+    Ray.Main.load_main_blockly(Ray.Main.main_blockly());
 </script>
 </body>
 

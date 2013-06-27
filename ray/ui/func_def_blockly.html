@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Loader</title>
+    <script type="text/javascript" src="../../closure-library-read-only/closure/goog/base.js"></script>
+    <script type="text/javascript" src="../ray-deps.js"></script>
+    <script>
+        goog.require('Blockly');
+        goog.require('Blockly.Xml');
+    </script>
+    <style>
+        html, body {
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+        .blocklySvg {
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+    <script>
+        function init() {
+            // Context menus.
+            Blockly.MSG_DUPLICATE_BLOCK = 'Duplicate';
+            Blockly.MSG_REMOVE_COMMENT = 'Remove Comment';
+            Blockly.MSG_ADD_COMMENT = 'Add Comment';
+            Blockly.MSG_EXTERNAL_INPUTS = 'External Inputs';
+            Blockly.MSG_INLINE_INPUTS = 'Inline Inputs';
+            Blockly.MSG_DELETE_BLOCK = 'Delete Block';
+            Blockly.MSG_DELETE_X_BLOCKS = 'Delete %1 Blocks';
+            Blockly.MSG_COLLAPSE_BLOCK = 'Collapse Block';
+            Blockly.MSG_EXPAND_BLOCK = 'Expand Block';
+            Blockly.MSG_DISABLE_BLOCK = 'Disable Block';
+            Blockly.MSG_ENABLE_BLOCK = 'Enable Block';
+            Blockly.MSG_HELP = 'Help';
+            Blockly.MSG_COLLAPSE_ALL = 'Collapse Blocks';
+            Blockly.MSG_EXPAND_ALL = 'Expand Blocks';
+
+            var Ray = window.parent.Ray;
+            Ray.Shared.attach_to_blockly(Blockly);
+            var func_def_info = window.parent.__function_definition_info__;
+            Blockly.FunctionDefinitionBlocks = func_def_info.args;
+            Blockly.FunctionName = func_def_info.func_name;
+
+            Blockly.inject(document.body,
+                           {path: "../../blockly/", toolbox:
+                                   Ray.Shared.get_toolbox(true)});
+
+            var initial_blocks = func_def_info.initial_blocks;
+            if(initial_blocks) {
+                goog.array.map(initial_blocks, function(block_name) {
+                    var block = new Blockly.Block(Blockly.mainWorkspace, block_name);
+                    block.initSvg();
+                    block.render();
+                });
+            }
+        }
+    </script>
+</head>
+<body onload="init()">
+</body>
+</html>
