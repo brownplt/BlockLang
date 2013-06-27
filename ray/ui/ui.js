@@ -11,6 +11,7 @@ goog.require('goog.style');
 goog.require('goog.ui.Button');
 goog.require('goog.ui.Container');
 goog.require('goog.ui.ContainerRenderer');
+goog.require('goog.ui.CustomButtonRenderer');
 goog.require('goog.ui.Control');
 goog.require('goog.ui.Dialog');
 goog.require('goog.ui.Dialog.ButtonSet');
@@ -27,11 +28,14 @@ Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
 /** @typedef {{type:Ray.Types.*, name: string}} */
 var Arg = function(name, type) {
   this.name_ = name || 'x';
-  this.type = type || null;
+  this.type_ = type || null;
 };
 Arg.prototype.getName = function() {
   return this.name_;
 };
+Arg.prototype.getType = function() {
+  return this.type_;
+}
 Arg.prototype.setName = function(name) {
   this.name_ = name;
 };
@@ -39,19 +43,6 @@ Arg.prototype.setType = function(type) {
   this.type_ = type;
 };
 
-RemoveArgEvent = function(argIndex) {
-  goog.events.Event.call(this, ArgList.EventType.REMOVE_ARG_EVENT, argIndex);
-  this.arg_index_ = argIndex;
-};
-goog.inherits(RemoveArgEvent, goog.events.Event);
-RemoveArgEvent.prototype.getArgIndex = function() {
-  return this.arg_index_;
-};
-
-/**
- * @extends {goog.ui.ControlRenderer}
- * @constructor
- */
 var ArgList = function(args) {
   /**
    * @type {Array.<Ray.FuncDefDialog.Arg>}
@@ -60,7 +51,7 @@ var ArgList = function(args) {
   this.args_ = args ? goog.array.clone(args) : [];
 };
 ArgList.EventType = {
-  REMOVE_ARG_EVENT: 'remove_arg_from_arg_list'
+  REMOVE_ARG_EVENT: 'REMOVE_ARG'
 };
 ArgList.prototype.getArgs = function() {
   return goog.array.clone(this.args_);
@@ -77,160 +68,155 @@ ArgList.prototype.addArg = function(arg) {
   this.args_.push(arg);
 };
 
-var ArgUI = function(arg, ix) {
+var ArgUI = function(arg) {
   goog.base(this);
   this.arg_ = arg;
-  this.ix_ = ix;
 };
-goog.inherits(ArgUI, goog.events.EventTarget);
-ArgUI.prototype.setArgIndex = function(ix) {
-  this.ix_ = ix;
-  if(this.arg_name_) {
-    this.arg_name_.setLabel('arg' + String(this.ix_ + 1));
-  }
+goog.inherits(ArgUI, goog.ui.Component);
+ArgUI.prototype.getArg = function() {
+  return this.arg_;
 };
-ArgUI.prototype.getDivId = function() {
-  return 'arg-control-' + this.ix_.toString();
-};
-ArgUI.prototype.getDom = function() {
-  return this.dom_;
-};
-ArgUI.prototype.initializeDom = function(elem) {
-  var div = goog.dom.createDom('div', {
-    class: 'arg-control', id: this.getDivId()
-  });
+ArgUI.prototype.createDom = function() {
+  goog.base(this, 'createDom');
+  var div = this.getContentElement();
+  goog.dom.classes.add(div, 'arg-control');
+
   var arg_name = new goog.ui.LabelInput('arg' + String(this.ix_ + 1));
   this.arg_name_ = arg_name;
 
-  arg_name.render(div);
+  this.addChild(arg_name, true);
+
   if(this.arg_.getName().length) {
     arg_name.setValue(this.arg_.getName());
   }
 
-
   goog.dom.append(div, ' of type ');
-  goog.dom.append(div, goog.dom.createDom('br'));
+  //goog.dom.append(div, goog.dom.createDom('br'));
 
-  var arg_type = new goog.ui.Select(null, null, goog.ui.FlatMenuButtonRenderer.getInstance(), goog.dom.getDomHelper(div));
-  //arg_type.setRenderer(goog.ui.FlatMenuButtonRenderer.getInstance());
-  goog.array.forEach(goog.object.getKeys(Ray.Types.atomic_types), function(type) {
-    arg_type.addItem(new goog.ui.Option(type.toLocaleUpperCase(), type));
-  });
-  arg_type.setSelectedIndex(0);
-  arg_type.setDefaultCaption('Pick a type for this argument');
-  arg_type.render(div);
+  var arg_type = Ray.UI.make_type_selector();
   this.arg_type_ = arg_type;
 
-  var arg_remove_button = new goog.ui.Button('-', goog.ui.FlatButtonRenderer.getInstance());
-  arg_remove_button.render(div);
+  arg_type.setSelectedIndex(0);
+  arg_type.setDefaultCaption('Pick a type for this argument');
+  this.addChild(arg_type, true);
+  //arg_type.setSupportedState(goog.ui.Component.State.ALL, true);
+  //arg_type.setDispatchTransitionEvents(goog.ui.Component.State.HOVER, true);
+
+  goog.style.setInlineBlock(arg_type.getContentElement());
+
+  var arg_remove_button = Ray.UI.make_button('-');
+  arg_remove_button.setSupportedState(goog.ui.Component.State.ALL, true);
+  arg_remove_button.setAutoStates(goog.ui.Component.State.ALL, true);
+  this.arg_remove_button_ = arg_remove_button;
+
+  this.addChild(arg_remove_button, true);
   goog.style.setInlineBlock(arg_remove_button.getContentElement());
-
-  goog.events.listen(arg_remove_button.getContentElement(), goog.events.EventType.CLICK, function(e) {
-    console.log('arg_remove_button clicked, ix: ' + this.ix_);
-    this.dispatchEvent(new RemoveArgEvent(this.ix_));
+};
+ArgUI.prototype.enterDocument = function() {
+  goog.base(this, 'enterDocument');
+  goog.events.listen(this.arg_remove_button_, goog.ui.Component.EventType.ACTION, function(e) {
+    this.dispatchEvent(ArgList.EventType.REMOVE_ARG_EVENT);
+  }, true, this);
+  goog.events.listen(this.arg_name_, goog.ui.Component.EventType.CHANGE, function(e) {
+    this.arg_.setName(this.arg_name_.getValue());
   }, false, this);
-
-  if(elem) {
-    goog.dom.append(elem, div);
-  }
-  this.dom_ = div;
-  return div;
+  goog.events.listen(this.arg_type_, [goog.ui.Component.EventType.CHANGE, goog.ui.Component.EventType.ACTION], function(e) {
+    this.arg_.setType(this.arg_type_.getValue());
+  }, false, this);
 };
 ArgUI.prototype.getName = function() {
-  return this.arg_name_.getValue();
+  return this.arg_.getName();
 };
 ArgUI.prototype.getType = function() {
-  return this.arg_type_.getSelectedItem().getValue();
+  return this.arg_.getType();
+};
+ArgUI.prototype.getArg = function() {
+  return this.arg_;
+};
+ArgUI.prototype.setArgTypeIndex = function(ix) {
+  this.arg_type_.setSelectedIndex(ix);
+  this.arg_.setType(this.arg_type_.getValue());
+};
+ArgUI.prototype.setArgName = function(name) {
+  this.arg_name_.setValue(name);
+  this.arg_.setName(name);
 };
 
-ArgListContainer = function(argList) {
+ArgListContainer = function(argList, opt_domHelper) {
+  goog.base(this, opt_domHelper);
   this.arg_list_ = argList;
-  this.id_num = ArgListContainer.makeUniqueIdNum();
-  this.children_ = [];
+  //this.setSupportedState(goog.ui.Component.State.ALL,  true);
 };
-ArgListContainer.prototype.getDivId = function() {
-  return 'arg-list-' + this.id_num.toString();
+goog.inherits(ArgListContainer, goog.ui.Component);
+ArgListContainer.next_id_ = 0;
+ArgListContainer.makeUniqueIdNum = function() {
+  return ArgListContainer.next_id_++;
 };
-ArgListContainer.makeUniqueIdNum = (function() {
-  var nextID = 0;
-  return function() {
-    return nextID++;
-  }
-})();
-ArgListContainer.prototype.addChild = function(child) {
-  this.children_.push(child);
-  child.setParentEventTarget(this);
+ArgListContainer.prototype.getContentElement = function() {
+  return this.arg_list_element_;
 };
-ArgListContainer.prototype.getChildAt = function(ix) {
-  return this.children_[ix]
-};
-ArgListContainer.prototype.removeChildAt = function(ix) {
-  this.children_.splice(ix, 1);
-};
-ArgListContainer.prototype.getChildCount = function() {
-  return this.arg_list_.getArgs().length;
-};
-ArgListContainer.prototype.initializeDom = function(elem) {
-  var container_div = goog.dom.createDom('div', {
-    class: 'arg-list-container', id: this.getDivId()
-  });
+ArgListContainer.prototype.createDom = function() {
+  goog.base(this, 'createDom');
+  var container_div = this.element_;
+  goog.dom.classes.set(container_div, 'arg-list-container');
+
   var args_div = goog.dom.createDom('div', {
     class: 'arg-list'
   });
   goog.dom.append(container_div, args_div);
+  this.arg_list_element_ = args_div;
 
-  this.dom_ = container_div;
+  goog.array.forEach(this.arg_list_.getArgs(), function(arg) {
+    this.addChild(new ArgUI(arg), true);
+  }, this);
 
-  var args = this.arg_list_.getArgs();
-  for(var ix = 0; ix < args.length; ix++) {
-    var arg_ui = new ArgUI(args[ix], ix);
-    this.addChild(arg_ui);
-    arg_ui.initializeDom(args_div);
-    goog.events.listen(arg_ui, ArgList.EventType.REMOVE_ARG_EVENT, this.onRemoveArg_, false, this);
-  }
-
-  var arg_add_button = new goog.ui.Button('+', goog.ui.FlatButtonRenderer.getInstance());
+  var arg_add_button = new Ray.UI.make_button('+');
+  this.arg_add_button_ = arg_add_button;
   arg_add_button.render(container_div);
   goog.style.setInlineBlock(arg_add_button.getContentElement());
-
-  goog.events.listen(arg_add_button.getContentElement(), goog.events.EventType.CLICK, function(e) {
-    this.addArg();
-  }, false, this);
-
-  if(elem) {
-    goog.dom.append(elem, container_div);
-  }
-  return container_div;
-
 };
-ArgListContainer.prototype.addArg = function(arg) {
+ArgListContainer.prototype.enterDocument = function() {
+  goog.base(this, 'enterDocument');
+  this.forEachChild(function(child) {
+    goog.events.listen(child,
+                       ArgList.EventType.REMOVE_ARG_EVENT,
+                       this.onRemoveArg_, true, this);
+  }, this);
+  goog.events.listen(this.arg_add_button_, goog.ui.Component.EventType.ACTION, this.addArg, true, this);
+};
+
+ArgListContainer.prototype.addArg = function(e, arg) {
   if(!arg) {
     arg = new Arg();
   }
   this.arg_list_.addArg(arg);
-  var arg_ui = new ArgUI(arg, this.getChildCount() - 1);
-  this.addChild(arg_ui);
-  if(this.dom_) {
-    arg_ui.initializeDom(goog.dom.getElementByClass('arg-list', this.dom_));
-  }
-  goog.events.listen(arg_ui, ArgList.EventType.REMOVE_ARG_EVENT, this.onRemoveArg_, false, this);
+  var arg_ui = new ArgUI(arg);
+  this.addChild(arg_ui, true);
+  goog.events.listen(arg_ui, ArgList.EventType.REMOVE_ARG_EVENT, this.onRemoveArg_, true, this);
 };
 ArgListContainer.prototype.onRemoveArg_ = function(e) {
   e.stopPropagation();
-  console.log("Arg at " + e.arg_index_ + " removed");
-  var ix = e.getArgIndex();
-  goog.dom.removeNode(e.currentTarget.getDom());
-  this.arg_list_.removeArgAt(ix);
-  this.removeChildAt(ix);
-  for(var i = ix; i < this.getChildCount(); i++) {
-    this.getChildAt(i).setArgIndex(i);
-  }
+  this.arg_list_.removeArgAt(this.indexOfChild(e.currentTarget));
+  this.removeChild(e.currentTarget, true);
 };
-ArgListContainer.prototype.getArgNamesAndTypes = function() {
-  var children = this.children_;
-  return goog.array.map(children, function(child) {
-    return {name: child.getName(), type: child.getType()};
+ArgListContainer.prototype.getArgs = function() {
+  var args = [];
+  this.forEachChild(function(child) {
+    args.push(child.getArg());
   });
+  return args;
+};
+
+Ray.UI.make_type_selector = function() {
+  var select = new goog.ui.Select(null, null);//, goog.ui.FlatMenuButtonRenderer.getInstance());
+  goog.array.forEach(goog.object.getKeys(Ray.Types.atomic_types), function(type) {
+    select.addItem(new goog.ui.Option(type.toLocaleUpperCase(), type));
+  });
+  return select;
+};
+
+Ray.UI.make_button = function(text) {
+  return new goog.ui.Button(text, goog.ui.CustomButtonRenderer.getInstance());
 };
 
 Ray.UI.make_function_definition_dialog = function() {
@@ -244,25 +230,24 @@ Ray.UI.make_function_definition_dialog = function() {
   dialog_buttons.setDefault('create');
   dialog.setButtonSet(dialog_buttons);
   dialog.setTitle("Define a new function");
-  //var ok_button = dialog.getButtonSet().getButton('ok');
-  /**goog.events.listen(ok_button, goog.events.EventType.CLICK, function(e) {
-    console.log('OK!');
-  }, false, this);*/
 
   var elem = dialog.getContentElement();
+
 
   goog.dom.append(elem, "What will you name the function?");
   goog.dom.append(elem, goog.dom.createElement('br'));
 
-  var f_name = new goog.ui.LabelInput('name');
-  dialog.addChild(f_name, true);
+  var func_name = new goog.ui.LabelInput('name');
+  dialog.func_name_ = func_name;
+  dialog.addChild(func_name, true);
 
   goog.dom.append(elem, goog.dom.createElement('br'));
 
   goog.dom.append(elem, "Describe the input to the function:");
   goog.dom.append(elem, goog.dom.createElement('br'));
-  var f_desc = new goog.ui.LabelInput('description');
-  dialog.addChild(f_desc, true);
+  var func_desc = new goog.ui.LabelInput('description');
+  dialog.func_desc_ = func_desc;
+  dialog.addChild(func_desc, true);
 
   goog.dom.append(elem, goog.dom.createElement('br'));
   goog.dom.append(elem, "This function consumes:");
@@ -270,43 +255,41 @@ Ray.UI.make_function_definition_dialog = function() {
 
   var arg_list = new ArgList();
   var arg_list_container = new ArgListContainer(arg_list);
-  arg_list_container.initializeDom(elem);
   dialog.arg_list_container_ = arg_list_container;
+  dialog.addChild(arg_list_container, true);
 
   goog.dom.append(elem, "This function produces:");
   goog.dom.append(elem, goog.dom.createElement('br'));
-  var return_type = new goog.ui.Select(null, null,
-                                       goog.ui.FlatMenuButtonRenderer.getInstance());
-  goog.array.forEach(goog.object.getKeys(Ray.Types.atomic_types), function(type) {
-    return_type.addItem(new goog.ui.Option(type.toLocaleUpperCase(), type));
-  });
+  var return_type = Ray.UI.make_type_selector();
+  dialog.return_type_ = return_type;
   return_type.setSelectedIndex(0);
   return_type.setDefaultCaption('Pick a return type for this function');
   dialog.addChild(return_type, true);
+  //dialog.render(document.body);
 
   return dialog;
 };
 
 Ray.UI.populate_dialog_w_test_data = function(dialog) {
-  dialog.getChildAt(0).setValue('double_if');
-  dialog.getChildAt(1).setValue('doubles x if y is true');
+  dialog.func_name_.setValue('double_if');
+  dialog.func_desc_.setValue('doubles x if y is true');
 
   dialog.arg_list_container_.addArg();
-  dialog.arg_list_container_.getChildAt(0).arg_type_.setSelectedIndex(1);
-  dialog.arg_list_container_.getChildAt(0).arg_name_.setValue('x');
+  dialog.arg_list_container_.getChildAt(0).setArgTypeIndex(1);
+  dialog.arg_list_container_.getChildAt(0).setArgName('x');
 
   dialog.arg_list_container_.addArg();
-  dialog.arg_list_container_.getChildAt(1).arg_type_.setSelectedIndex(0);
-  dialog.arg_list_container_.getChildAt(1).arg_name_.setValue('y');
+  dialog.arg_list_container_.getChildAt(1).setArgTypeIndex(0);
+  dialog.arg_list_container_.getChildAt(1).setArgName('y');
 
-  dialog.getChildAt(2).setSelectedIndex(1);
+  dialog.return_type_.setSelectedIndex(1);
 };
 
 Ray.UI.get_function_definition_dialog_values = function(dialog) {
-  var name = dialog.getChildAt(0).getValue();
-  var desc = dialog.getChildAt(1).getValue();
-  var args = dialog.arg_list_container_.getArgNamesAndTypes();
-  var return_type = dialog.getChildAt(2).getSelectedItem().getValue();
+  var name = dialog.func_name_.getValue();
+  var desc = dialog.func_desc_.getValue();
+  var args = dialog.arg_list_container_.getArgs();
+  var return_type = dialog.return_type_.getSelectedItem().getValue();
   return {name: name, desc: desc, args: args, return_type: return_type};
 };
 

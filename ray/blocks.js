@@ -184,8 +184,8 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
   }
 
   _.each(args, function(arg) {
-    var arg_block = new ArgumentBlock(arg.name, arg.type);
-    obj[Ray.Blocks.arg_block_name(arg.name)] = arg_block;
+    var arg_block = new ArgumentBlock(arg.name_, arg.type_);
+    obj[Ray.Blocks.arg_block_name(arg.name_)] = arg_block;
   });
   return obj;
 };

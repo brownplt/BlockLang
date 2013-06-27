@@ -84,12 +84,13 @@ Make it so that function blocks are associated with their
 definitions, and if the number of arguments changes, they change as
 well. 
 
-Order of priorities:
-1. Move defined functions to the shared set of blocks. 
-2. Separate out argument blocks. 
-3. Hook up defined function blocks to the definition, so we can
-   change things as needed. 
-4. Hook up definition expressions to functions so that we have the
-   right semantics. 
-5. Add a run button, and show output somehow!
-
+** TODO Order of priorities [2/5]:
+- [X] Move defined functions to the shared set of blocks. 
+- [X] Separate out argument blocks. 
+- [ ] Hook up defined function blocks to the definition, so we can change things as needed. 
+- [ ] Hook up definition expressions to functions so that we have the right semantics. 
+- [ ] Add a run button, and show output somehow!
+- [ ] Make it possible to remove and edit functions (their types)
+  once created
+Clean up documentation, add some documentation, JSDoc comment
+everything complicated. 

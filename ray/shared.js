@@ -28,8 +28,10 @@ Ray.Shared.load_block_xml = function(Blockly, workspace) {
   return block;
 };
 
+Ray.Shared.counter = 0;
 Ray.Shared.attach_to_blockly = function(Blockly) {
   Blockly.Ray_ = Ray;
+  Blockly.id_ = Ray.Shared.counter++;
 };
 
 Ray.Shared.set_blocks = function(blocks) {

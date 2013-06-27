@@ -67,7 +67,7 @@ Ray.Main.load_blockly = function(iframe, blocks, initial_blocks) {
   if(initial_blocks) {
     window.__initial_blocks__ = initial_blocks || null;
   }
-  goog.dom.setProperties(iframe, {src: 'ui/loader.html'});
+  goog.dom.setProperties(iframe, {src: 'loader.html'});
 };
 
 Ray.Main.block_to_workspace_xml = function(block_name, block) {
@@ -99,8 +99,8 @@ Ray.Main.make_function_application_block = function(r, function_spec) {
   var return_type_name = function_spec.return_type;
   var return_type = Ray.Types.get_atomic_type(return_type_name);
   var return_type_instance = new return_type();
-  var arg_types = goog.array.map(function_spec.args, function(a) { return a.type; });
-  var arg_names = goog.array.map(function_spec.args, function(a)  {return a.name; });
+  var arg_types = goog.array.map(function_spec.args, function(a) { return a.getType(); });
+  var arg_names = goog.array.map(function_spec.args, function(a)  {return a.getName(); });
   var arguments_type = new Ray.Types.ArgumentType(
     new Ray.Types.ListOfTypes(goog.array.map(arg_types,
                                              Ray.Main.atomic_type_to_type_instance)));
