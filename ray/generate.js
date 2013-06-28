@@ -32,7 +32,7 @@ var gen_form = function(block, r) {
       var pred = get_arg(block, 'PRED', r);
       var t_expr = get_arg(block, 'T_EXPR', r);
       var f_expr = get_arg(block, 'F_EXPR', r);
-      return r._if.apply(pred, t_expr, f_expr);
+      return r._if(pred, t_expr, f_expr);
       break;
     case('cond'):
       for(i = 0; i <= block.test_clause_count_; i++) {
@@ -77,15 +77,15 @@ var gen_datatype = function(block, r) {
       return r.bool(b === 'TRUE');
       break;
     case('num'):
-      var n = this.getTitleValue('N');
-      return r.num(n);
+      var n = block.getTitleValue('N');
+      return r.num(r.numbers.fromString(n));
       break;
     case('str'):
-      var s = this.getTitleValue('S');
+      var s = block.getTitleValue('S');
       return r.str(s);
       break;
     case('char'):
-      var c = this.getTitleValue('C');
+      var c = block.getTitleValue('C');
       return r.char(c);
       break;
     default:

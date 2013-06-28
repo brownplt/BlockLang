@@ -8,16 +8,26 @@
 @import url('menubutton.css');
 @import url('menuitem.css');
 @import url('roundedtab.css');
+@import url('splitpane.css');
 @import url('tab.css');
 @import url('tabbar.css');
+
 
 html, body {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
+  font: normal 13px "Trebuchet MS", Tahoma, Arial, sans-serif;
 }
+
+div {
+  margin: 0;
+  padding: 0;
+}
+
 iframe#blockly_main {
+  display: block;
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -26,6 +36,7 @@ iframe#blockly_main {
 }
 
 iframe {
+  display: block;
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -34,12 +45,44 @@ iframe {
 }
 
 div.container {
-  width: 100%;
-  height: 93%;
+  /*width: 100%;
+  height: 100%;*/
   overflow: auto;
   display: block;
 }
 
 div.hidden_container {
   display: none;
+}
+
+#workspace_content {
+  overflow: auto;
+}
+*/
+
+body { margin: 0 }
+.row, .col { overflow: hidden; position: absolute; }
+.row { left: 0; right: 0; }
+.col { top: 0; bottom: 0; }
+.scroll-x { overflow-x: auto; }
+.scroll-y { overflow-y: auto; }
+
+.header.row {
+  height: 25px;
+  top: 0;
+}
+
+.body.row {
+  top: 25px;
+  bottom: 0;
+}
+
+#evaluation_results {
+  border: 2px solid black;
+  margin: 2px;
+  padding: 2px;
+  left: 400px;
+  right: 0;
+  height: 15px;
+
 }

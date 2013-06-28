@@ -34,6 +34,15 @@ Ray.Shared.attach_to_blockly = function(Blockly) {
   Blockly.id_ = Ray.Shared.counter++;
 };
 
+Ray.Shared.set_main_blockly = function(Blockly) {
+  Ray.Shared.MainBlockly = Blockly;
+};
+
+Ray.Shared.FuncDefBlocklys = []
+Ray.Shared.register_func_def_blockly = function(Blockly) {
+  Ray.Shared.FuncDefBlocklys.push(Blockly);
+};
+
 Ray.Shared.set_blocks = function(blocks) {
   Ray.Shared.saved_blocks_ = blocks;
   Ray.Shared.block_dir_ = Ray.Blocks.generate_block_directory(blocks);

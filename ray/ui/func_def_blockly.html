@@ -43,9 +43,11 @@
 
             var Ray = window.parent.Ray;
             Ray.Shared.attach_to_blockly(Blockly);
+            Ray.Shared.register_func_def_blockly(Blockly);
             var func_def_info = window.parent.__function_definition_info__;
             Blockly.FunctionDefinitionBlocks = func_def_info.args;
             Blockly.FunctionName = func_def_info.func_name;
+            Blockly.FunctionSpec = func_def_info.func_spec;
 
             Blockly.inject(document.body,
                            {path: "../../blockly/", toolbox:

@@ -43,6 +43,8 @@
 
             var Ray = window.parent.Ray;
             Ray.Shared.attach_to_blockly(Blockly);
+            Ray.Shared.set_main_blockly(Blockly);
+
 
             Blockly.inject(document.body,
                            {path: "../../blockly/", toolbox:

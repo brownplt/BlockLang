@@ -103,3 +103,5 @@ Make sure to email every day with results
 
 Make it so you can't steal function argument blocks from a function
 definition and use them elsewhere
+
+Get function description associated with function usage blocks

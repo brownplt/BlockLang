@@ -15,35 +15,56 @@
         goog.require('goog.events.EventType');
         goog.require('goog.ui.Button');
         goog.require('goog.ui.FlatButtonRenderer');
-        goog.require('goog.ui.RoundedTabRenderer');
+        goog.require('goog.ui.LabelInput');
         goog.require('goog.ui.Tab');
         goog.require('goog.ui.TabBar');
+        goog.require('goog.ui.Textarea');
+        goog.require('goog.ui.TextareaRenderer');
+        goog.require('goog.ui.SplitPane');
+        goog.require('goog.ui.SplitPane.Orientation');
     </script>
 </head>
 <body>
-<div id="create_function_button"
-     class="goog-flat-button goog-inline-block"
-     title="Define a new function to use in your program">
-Create a new function
+<div id="header" class="header row">
+    <div id="create_function_button"
+         class="goog-flat-button goog-inline-block"
+         title="Define a new function to use in your program">
+        Create a new function
+    </div>
+    <div id="evaluate_expression_button"
+         class="goog-flat-button goog-inline-block"
+         title="Evaluate the program in the main workspace">
+        Evaluate expression in Main Workspace
+    </div>
+    <div id="evaluation_results" class="col"></div>
+    <!--<textarea id="evaluation_results"></textarea>-->
 </div>
-<br />
+<div class="body row">
 <!--<div id="outer-container">-->
-    <div id="workspace_tabs" class="goog-tab-bar goog-tab-bar-top">
-        <div id="tab_blockly_main" class="goog-tab goog-tab-selected">Main Workspace</div>
+<div id="workspace_tabs" class="goog-tab-bar goog-tab-bar-top">
+    <div id="tab_blockly_main" class="goog-tab goog-tab-selected">Main Workspace</div>
+</div>
+<div id="workspace_content" class="goog-tab-content">
+    <div class="container">
+        <!--<table style="margin: 0; padding: 0; height: 100%; width: 100%;">
+                        <tr style="height: 90%; width: 100%">
+                            <td style="height: 90%; width: 100%;"> -->
+        <iframe id="blockly_main" src="Javascript:''"></iframe>
+        <!-- </td>
+                        </tr>
+                    </table>   -->
     </div>
-    <div id="workspace_content" class="goog-tab-content">
-        <div class="container">
-            <iframe id="blockly_main" src="Javascript:''"></iframe>
-        </div>
-    </div>
-    <div class="goog-tab-bar-clear"></div>
-<!--</div>-->
+</div>
+<div class="goog-tab-bar-clear"></div>
+</div>
 <script>
     var r = Ray.Main.create_ray();
     var blocks = Ray.Main.create_ray_blocks(r);
+    Ray.Shared.set_ray_instance(r);
     Ray.Shared.set_blocks(blocks);
     var dialog = Ray.UI.make_function_definition_dialog();
     Ray.UI.populate_dialog_w_test_data(dialog);
+
     var workspace_content = goog.dom.getElement('workspace_content');
     var tabbar = new goog.ui.TabBar();
     tabbar.decorate(goog.dom.getElement('workspace_tabs'));
@@ -54,10 +75,21 @@ Create a new function
         var content_element = goog.dom.getElement('workspace_content');
     })
 
-    var button = new goog.ui.Button('Open up a function definition dialog', goog.ui.FlatButtonRenderer.getInstance());
-    button.decorate(goog.dom.getElement('create_function_button'));
-    goog.events.listen(button.getContentElement(), goog.events.EventType.CLICK, function(e) {
+    var create_function_button = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
+    create_function_button.decorate(goog.dom.getElement('create_function_button'));
+    goog.events.listen(create_function_button, goog.ui.Component.EventType.ACTION, function(e) {
         dialog.setVisible(true);
+    });
+
+    var evaluate_button = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
+    evaluate_button.decorate(goog.dom.getElement('evaluate_expression_button'));
+
+    var evaluation_results = goog.dom.getElement('evaluation_results');
+    goog.dom.setTextContent(evaluation_results, 'Results of last evaluation...');
+
+    goog.events.listen(evaluate_button, goog.ui.Component.EventType.ACTION, function(e) {
+        var result = Ray.Main.go();
+        goog.dom.setTextContent(evaluation_results, result);
     });
 
     goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
@@ -74,7 +106,9 @@ Create a new function
         Ray.Main.load_func_def_blockly(func_def_workspace,
                                        func_arg_blocks,
                                        func_specs.name,
-                                       [func_block_name]);
+                                       func_specs,
+                                       [func_block_name],
+                                       func_specs.return_type);
 
         tabbar.setSelectedTab(func_def_tab);
         Ray.UI.show_workspace_from_tab(func_def_tab, workspace_content);
