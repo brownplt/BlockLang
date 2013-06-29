@@ -175,8 +175,9 @@ Ray.Lib = function() {
     }, Types.bool()));
 
     /**
-     * Generic Numerics
-     */
+     * Generic Numerics, for the time being I'm going to get rid of variable arity versions, and just stick with
+     * the binary ones, but I'll keep the varargs around in case I want to switch back later.
+
     Lib.add_builtin("+", r.prim(r.rest_spec('ls', Types.num()), function(ls) {
       var sum = _.reduce(ls, function(a, b) { return r.numbers.add(a, b.n); }, 0);
       return new r.Value.Num(sum);
@@ -202,6 +203,36 @@ Ray.Lib = function() {
       }
     }, Types.num()));
 
+    */
+
+    Lib.add_builtin('+', r.prim(r.p_spec(['x', Types.num()],
+                                         ['y', Types.num()]),
+                                function(x, y) {
+                                  var z = r.numbers.add(x.n, y.n);
+                                  return new r.Value.Num(z);
+                                }, Types.num()));
+    Lib.add_builtin('*', r.prim(r.p_spec(['x', Types.num()],
+                                         ['y', Types.num()]),
+                                function(x, y) {
+                                  var z = r.numbers.multiply(x.n, y.n);
+                                  return new r.Value.Num(z);
+                                }, Types.num()));
+    Lib.add_builtin('-', r.prim(r.p_spec(['x', Types.num()],
+                                         ['y', Types.num()]),
+                                function(x, y) {
+                                  var z = r.numbers.subtract(x.n, y.n);
+                                  return new r.Value.Num(z);
+                                }, Types.num()));
+    Lib.add_builtin('/', r.prim(r.p_spec(['x', Types.num()],
+                                         ['y', Types.num()]),
+                                function(x, y) {
+                                  var z = r.numbers.divide(x.n, y.n);
+                                  return new r.Value.Num(z);
+                                }, Types.num()));
+
+    /**
+     * Numeric comparisons and other binary operations
+     */
     Lib.make_numeric_comparison('>', 'greaterThan');
     Lib.make_numeric_comparison('<', 'lessThan');
     Lib.make_numeric_comparison('>=', 'greaterThanOrEqual');
