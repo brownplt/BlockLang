@@ -79,13 +79,13 @@ Lib.make_numeric_binop = function(name, numbers_name) {
 
 Lib.make_numeric_comparison = function(name, numbers_name) {
   var r = Lib.r;
-  /**
-   * Unused binary version
+
   Lib.add_builtin(name, r.prim(r.p_spec(['x', Types.num()], ['y', Types.num()]), function(x,y) {
     var result = Lib.r.numbers[numbers_name](x.n, y.n);
     return new r.Value.Boolean(result);
   }));
-   */
+  /**
+   * Unused variable arity version
   Lib.add_builtin(name, r.prim(r.spec([['x', Types.num()],['y', Types.num()]],{},['ls', Types.num()]), function(x, y, ls) {
     var args = [x, y].concat(ls);
     var lefts = args.slice(0, -1);
@@ -95,6 +95,7 @@ Lib.make_numeric_comparison = function(name, numbers_name) {
     }, true);
     return new r.Value.Boolean(result);
   }, Types.bool()));
+   */
 };
 
 Lib.make_string_comparison = function(name, f) {
