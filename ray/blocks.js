@@ -13,9 +13,13 @@
 
 goog.provide('Ray.Blocks');
 goog.require('Ray._');
+goog.require('Ray.Runtime');
 
 goog.require('goog.dom');
 goog.require('goog.dom.xml');
+
+
+var R = Ray.Runtime;
 
 //Ray.Blocks.BLOCK_COLOUR = 173;
 Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
@@ -25,7 +29,6 @@ Ray.Blocks.CONDITIONAL_PREFIX = "ray_conditional_";
 Ray.Blocks.ARG_PREFIX = "ray_function_arg_";
 Ray.Blocks.FUNCTION_DEF_PREFIX = "ray_user_function_";
 Ray.Blocks.HELP_URL = "#";
-
 
 Ray.Blocks.block_name = function(name) {
   window._ = Ray._;
@@ -96,7 +99,7 @@ Ray.Blocks.get_drawers = function(block) {
   var drawers = [];
   if(block.__value__) {
     var value = block.__value__;
-    var output_types = (value.R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
+    var output_types = (R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
     var input_types = value.arg_spec.arguments_type.get_all_base_types();
     _.each(input_types, function(type) {
       drawers.push(type + '_input');
@@ -523,7 +526,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
   var is_user_function = !!opt_user_function;
   var block_name = is_user_function ? Ray.Blocks.user_function_block_name(name) : Ray.Blocks.block_name(name);
   var block = {};
-  switch(value.R.node_type(value)) {
+  switch(R.node_type(value)) {
     case 'pair':
     case 'number':
     case 'empty':
@@ -536,7 +539,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       break;
     case 'primitive':
     case 'closure':
-      var output_types = (value.R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
+      var output_types = (R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
       var block_colour = Ray.Blocks.get_colour(output_types);
       var arg_spec = value.arg_spec;
       // Ignoring rest and keyword arguments
