@@ -5,10 +5,9 @@
 
 goog.provide('Ray.Ray');
 
-goog.require('Ray.Kernel');
+goog.require('Ray.Runtime');
+goog.require('Ray.R');
 goog.require('Ray.RayNumbers');
 
-Ray.Ray = function() {
-  var ray_w_numbers = Ray.RayNumbers(Ray.Kernel());
-  return ray_w_numbers;
-};
+Ray.R = Ray.RayNumbers(Ray.R);
+

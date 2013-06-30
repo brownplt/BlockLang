@@ -96,7 +96,7 @@ Ray.Types.NArityType = NArityType;
  * @constructor
  */
 var ArgumentType = function(list_of_types, n_arity_type) {
-  this.__type__ = 'input';
+  this.__type__ = 'args';
   this.p_arg_types = list_of_types || new ListOfTypes([]);
   this.rest_arg_type = n_arity_type || null;
 };
@@ -174,4 +174,41 @@ Ray.Types.args = function(ls, n_arity) {
 };
 Ray.Types.fn = function(args, body) {
   return new Ray.Types.FunctionType(args, body);
+};
+
+Ray.Types.is_match= function(ty1, ty2) {
+  if(ty2.__type__ === 'bottom' ||
+     ty1.__type__ === 'bottom') {
+    return true;
+  }
+  switch(ty1.__type__) {
+    case 'boolean':
+      return ty2.__type__ === 'boolean';
+    case 'num':
+      return ty2.__type__ === 'num';
+    case 'str':
+      return ty2.__type__ === 'str';
+    case 'char':
+      return ty2.__type__ === 'char';
+    case 'list':
+      return ty2.__type__ === 'list' &&
+        Ray.Types.is_match(ty1.element_type, ty2.element_type);
+    case 'list_of_types':
+      return ty2.__type__ === 'list_of_types' &&
+        _.every(_.zip(ty1.list, ty2.list), Ray.Types.is_match);
+    case 'n_arity':
+      return ty2.__type__ === 'n_arity' &&
+        Ray.Types.is_match(ty1.base_type, ty2.base_type);
+    case 'args':
+      return ty2.__type__ === 'args' &&
+        Ray.Types.is_match(ty1.p_arg_types, ty2.p_arg_types) &&
+        Ray.Types.is_match(ty1.rest_arg_type && ty2.rest_arg_type);
+    case 'function':
+      return ty2.__type__ === 'function' &&
+        Ray.Types.is_match(ty1.argument_type, ty2.argument_types) &&
+        Ray.Types.is_match(ty1.return_type, ty2.return_type);
+    default:
+      return false;
+      break;
+  }
 };

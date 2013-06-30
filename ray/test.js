@@ -103,14 +103,14 @@ var create_testing_environment = function(R, lib) {
   $("#tests").append("<dl></dl>");
   $("#tests").prepend("<H2>Test results:</H2>")
   $("#lib").append("<dl></dl>");
-  return lib.initialize(new R());
+  return lib.initialize(R);
 }
 
 Ray.Test = function() {
   window.$ = Ray.JQuery;
   window._ = Ray._
-  var R = Ray.Ray();
-  var lib = Ray.Lib();
+  var R = Ray.Runtime;
+  var lib = Ray.Lib;
   var r = create_testing_environment(R, lib);
   window.r = r;
   print_lib(r);

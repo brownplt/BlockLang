@@ -47,9 +47,9 @@ Ray.Main.run_test = function() {
 };
 
 Ray.Main.create_ray = function() {
-  var R = Ray.Ray();
+  var R = Ray.R;
   var lib = Ray.Lib();
-  var r = lib.initialize(new R());
+  var r = lib.initialize(R);
   window.$ = Ray.JQuery;
   return r;
 };

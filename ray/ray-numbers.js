@@ -4,16 +4,16 @@ goog.provide('Ray.RayNumbers');
 
 goog.require('Ray.JSNumbers');
 
+var jsnums = Ray.JSNumbers;
+
 Ray.RayNumbers = (function() {
     // Numbers.
     /*global jsnums*/
   return function(R) {
 
-    var jsnums = Ray.JSNumbers;
-
     'use strict';
     var exports = {};
-    R.prototype.numbers = exports;
+    R.numbers = exports;
 
     var isNumber = jsnums.isSchemeNumber;
     var isReal = jsnums.isReal;
