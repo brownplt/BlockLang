@@ -5,10 +5,10 @@
  * @desc Various global constants and enums
  */
 
-goog.provide('Ray.Enums');
+goog.provide('Ray.Globals');
 
-Ray.Enums.Expressions = {};
-var Expressions = Ray.Enums.Expressions;
+Ray.Globals.Expressions = {};
+var Expressions = Ray.Globals.Expressions;
 Expressions.Pair = 0;
 Expressions.Empty = 1;
 Expressions.Num = 2;
@@ -25,3 +25,16 @@ Expressions.Or = 11;
 Expressions.App = 12;
 Expressions.Arguments = 13;
 Expressions.ArgumentSpec = 14;
+
+Ray.Globals.Values = {};
+var Values = Ray.Globals.Values;
+Values.Pair = 0;
+Values.Empty = 1;
+Values.Boolean = 2;
+Values.Num = 3;
+Values.Str = 4;
+Values.Char = 5;
+Values.Primitive = 6;
+Values.Closure = 7;
+Values.ArgumentSpec = 8;
+Values.Arguments = 9;

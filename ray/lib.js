@@ -70,6 +70,13 @@ Lib.make_predicate = function(type) {
   }, Types.bool()));
 };
 
+Lib.make_numeric_unary_op = function(name, numbers_name) {
+  var internal_name = numbers_name || name;
+  Lib.add_builtin(name, Lib.r.prim(Lib.r.p_spec(['x', Types.num()]), function(x) {
+    return new r.Value.Num(Lib.r.numbers[internal_name](x.n));
+  }, Types.num()));
+};
+
 Lib.make_numeric_binop = function(name, numbers_name) {
   var internal_name = numbers_name || name;
   Lib.add_builtin(name, Lib.r.prim(Lib.r.p_spec(['x', Types.num()],['y', Types.num()]), function(x,y) {
@@ -252,6 +259,18 @@ Lib.initialize = function(r) {
   Lib.make_numeric_binop('quotient');
   Lib.make_numeric_binop('remainder');
   Lib.make_numeric_binop('modulo');
+
+  Lib.make_numeric_unary_op('abs');
+  Lib.make_numeric_unary_op('sqrt');
+  Lib.make_numeric_unary_op('exp');
+  Lib.make_numeric_unary_op('log');
+  Lib.make_numeric_unary_op('magnitude');
+  Lib.make_numeric_unary_op('numerator');
+  Lib.make_numeric_unary_op('sgn');
+  Lib.make_numeric_unary_op('sqr');
+  Lib.make_numeric_unary_op('ceiling');
+  Lib.make_numeric_unary_op('floor');
+  Lib.make_numeric_unary_op('round');
 
   /**
    * Strings

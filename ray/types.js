@@ -1,6 +1,7 @@
 goog.provide('Ray.Types');
 
 goog.require('Ray._');
+goog.require('goog.string');
 
 var _ = Ray._;
 
@@ -20,13 +21,16 @@ var AtomicType = function (type_name) {
   AtomicTypeConstructor.prototype.clone = function() {
     return new AtomicTypeConstructor();
   };
+  AtomicTypeConstructor.prototype.display = function() {
+    return goog.string.toTitleCase(type_name);
+  };
 
   Ray.Types.atomic_types[type_name] = AtomicTypeConstructor;
   return AtomicTypeConstructor;
 };
 
 // Atomic Types
-Ray.Types.Bool = AtomicType('boolean');
+Ray.Types.Boolean = AtomicType('boolean');
 Ray.Types.Num = AtomicType('num');
 Ray.Types.Str = AtomicType('str');
 Ray.Types.Char = AtomicType('char');
@@ -49,6 +53,9 @@ ListType.prototype.get_all_base_types = function() {
 ListType.prototype.clone = function() {
   return new ListType(this.element_type.clone());
 };
+ListType.prototype.display = function() {
+  return '(Listof ' + this.element_type.display() + ')';
+};
 Ray.Types.List = ListType;
 
 /**
@@ -69,6 +76,9 @@ ListOfTypes.prototype.get_all_base_types = function() {
 ListOfTypes.prototype.clone = function() {
   return new ListOfTypes(_.map(this.list, function(ty) { return ty.clone(); }));
 };
+ListOfTypes.prototype.display = function() {
+  return '(' + _.map(this.list, function(ty) { return ty.display(); }).join(' * ') + ')';
+};
 Ray.Types.ListOfTypes = ListOfTypes;
 
 /**
@@ -85,7 +95,10 @@ NArityType.prototype.get_all_base_types = function() {
 };
 NArityType.prototype.clone = function() {
   return new NArityType(this.base_type.clone());
-}
+};
+NArityType.prototype.display = function() {
+  return '(' + this.base_type.display() + ' ...)';
+};
 Ray.Types.NArityType = NArityType;
 
 /**
@@ -115,6 +128,9 @@ ArgumentType.prototype.get_all_base_types = function() {
 ArgumentType.prototype.clone = function() {
   return new ArgumentType(this.p_arg_types.clone(), this.rest_arg_type.clone());
 };
+ArgumentType.prototype.display = function() {
+  return '{' + this.p_arg_types.display() + (this.rest_arg_type ? (' ' + this.rest_arg_type.display()) : '') + '}';
+};
 Ray.Types.ArgumentType = ArgumentType;
 
 /**
@@ -135,10 +151,13 @@ FunctionType.prototype.get_all_base_types = function() {
 FunctionType.prototype.clone = function() {
   return new FunctionType(this.argument_type.clone(), this.return_type.clone());
 };
+FunctionType.prototype.display = function() {
+  return '(' + this.argument_type.display() + ' -> ' + this.return_type.display() + ')';
+};
 Ray.Types.FunctionType = FunctionType;
 
 Ray.Types.bool = function() {
-  return new Ray.Types.Bool();
+  return new Ray.Types.Boolean();
 };
 Ray.Types.num = function() {
   return new Ray.Types.Num();
@@ -195,17 +214,25 @@ Ray.Types.is_match= function(ty1, ty2) {
         Ray.Types.is_match(ty1.element_type, ty2.element_type);
     case 'list_of_types':
       return ty2.__type__ === 'list_of_types' &&
-        _.every(_.zip(ty1.list, ty2.list), Ray.Types.is_match);
+        _.every(_.zip(ty1.list, ty2.list), function(pair) {
+          return Ray.Types.is_match(pair[0], pair[1]);
+        });
     case 'n_arity':
       return ty2.__type__ === 'n_arity' &&
         Ray.Types.is_match(ty1.base_type, ty2.base_type);
     case 'args':
-      return ty2.__type__ === 'args' &&
-        Ray.Types.is_match(ty1.p_arg_types, ty2.p_arg_types) &&
-        Ray.Types.is_match(ty1.rest_arg_type && ty2.rest_arg_type);
+      if(ty2.__type__ === 'args' &&
+         Ray.Types.is_match(ty1.p_arg_types, ty2.p_arg_types)) {
+
+          return (ty1.rest_arg_type && ty2.rest_arg_type) ?
+            Ray.Types.is_match(ty1.rest_arg_type, ty2.rest_arg_type) :
+            (!ty1.rest_arg_type && !ty2.rest_arg_type);
+      } else {
+        return false;
+      }
     case 'function':
       return ty2.__type__ === 'function' &&
-        Ray.Types.is_match(ty1.argument_type, ty2.argument_types) &&
+        Ray.Types.is_match(ty1.argument_type, ty2.argument_type) &&
         Ray.Types.is_match(ty1.return_type, ty2.return_type);
     default:
       return false;

@@ -64,10 +64,15 @@
 </style>
     <script src="../closure-library-read-only/closure/goog/base.js"></script>
     <script src="ray-deps.js"></script>
-    <script src="main.js"></script>
+    <script>
+        goog.require('Ray.Main');
+    </script>
 </head>
-<body onload=Ray.Main.run_test()>
+<body>
 <div id="tests"></div>
 <div id="lib"></div>
+<script>
+    Ray.Main.run_test()
+</script>
 </body>
 </html>

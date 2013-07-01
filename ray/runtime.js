@@ -6,7 +6,7 @@
 goog.provide('Ray.Runtime');
 goog.provide('Ray.R');
 
-goog.require('Ray.Enums');
+goog.require('Ray.Globals');
 goog.require('Ray._');
 goog.require('Ray.Util');
 goog.require('Ray.Env');
@@ -32,7 +32,7 @@ var make_expr = function(type,obj) {
   _.extend(proto, obj);
   proto.toString = function() { return type + 'E'; };
   proto.__node_type__ = type.toLowerCase() + 'E';
-  proto.__expr_type__ = Ray.Enums.Expressions[type];
+  proto.__expr_type__ = Ray.Globals.Expressions[type];
   proto.expr = true;
   return proto;
 };
@@ -42,6 +42,7 @@ var make_value = function(type,obj) {
   _.extend(proto, obj);
   proto.toString = function() { return type; };
   proto.__node_type__ = type.toLowerCase();
+  proto.__value_type__ = Ray.Globals.Values[type];
   proto.interp = function() {
     throw new Error(type + " has no interp method!!!");
   };
@@ -658,6 +659,14 @@ Ray.Runtime.node_type = function(node) {
  */
 Ray.Runtime.expr_type = function(expr) {
   return expr.__expr_type__;
+};
+
+/** Allows for dispatch on values by constructor
+ * @param value
+ * @returns {*}
+ */
+Ray.Runtime.value_type = function(value) {
+  return value.__value_type__;
 };
 
 /**
