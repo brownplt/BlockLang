@@ -36,6 +36,8 @@ Blockly.BlockSvg = function(block) {
   this.block_ = block;
   // Create core elements for the block.
   this.svgGroup_ = Blockly.createSvgElement('g', {}, null);
+  this.svgSlotsGroup_ = Blockly.createSvgElement('g', {'class': 'blocklySlotsGroup'}, this.svgGroup_);
+  this.svgSlots_ = [];
   this.svgPathDark_ = Blockly.createSvgElement('path',
       {'class': 'blocklyPathDark', 'transform': 'translate(1, 1)'},
       this.svgGroup_);
@@ -43,6 +45,7 @@ Blockly.BlockSvg = function(block) {
       this.svgGroup_);
   this.svgPathLight_ = Blockly.createSvgElement('path',
       {'class': 'blocklyPathLight'}, this.svgGroup_);
+
   this.svgPath_.tooltip = this.block_;
   Blockly.Tooltip && Blockly.Tooltip.bindMouseEvents(this.svgPath_);
   if (block.editable) {
@@ -79,6 +82,14 @@ Blockly.BlockSvg.prototype.init = function() {
  */
 Blockly.BlockSvg.prototype.getRootElement = function() {
   return this.svgGroup_;
+};
+
+/**
+ * Get the root SVG group into which we will put the SVG slot colors
+ * @returns {!Element} the SVG slot group
+ */
+Blockly.BlockSvg.prototype.getRootSlotsElement = function() {
+  return this.svgSlotsGroup_;
 };
 
 // UI constants for rendering blocks.
@@ -272,6 +283,7 @@ Blockly.BlockSvg.prototype.dispose = function() {
   goog.dom.removeNode(this.svgGroup_);
   // Sever JavaScript to DOM connections.
   this.svgGroup_ = null;
+  this.svgSlotsGroup_ = null;
   this.svgPath_ = null;
   this.svgPathLight_ = null;
   this.svgPathDark_ = null;
@@ -702,6 +714,10 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
   // Assemble the block's path.
   var steps = [];
   var inlineSteps = [];
+
+  // Get rid of current slot paths!
+  goog.dom.removeChildren(this.svgSlotsGroup_);
+  var slots = [];
   // The highlighting applies to edges facing the upper-left corner.
   // Since highlighting is a two-pixel wide border, it would normally overhang
   // the edge of the block by a pixel. So undersize all measurements by a pixel.
@@ -711,7 +727,7 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
   this.renderDrawTop_(steps, highlightSteps, connectionsXY,
       inputRows.rightEdge);
   var cursorY = this.renderDrawRight_(steps, highlightSteps, inlineSteps,
-      highlightInlineSteps, connectionsXY, inputRows, iconWidth);
+      highlightInlineSteps, slots, connectionsXY, inputRows, iconWidth);
   this.renderDrawBottom_(steps, highlightSteps, connectionsXY, cursorY);
   this.renderDrawLeft_(steps, highlightSteps, connectionsXY, cursorY);
 
@@ -775,6 +791,7 @@ Blockly.BlockSvg.prototype.renderDrawTop_ =
  * @param {!Array.<string>} highlightSteps Path of block highlights.
  * @param {!Array.<string>} inlineSteps Inline block outlines.
  * @param {!Array.<string>} highlightInlineSteps Inline block highlights.
+ * @param {!Array.<!Array.<string>>} slots paths for each slot's svg
  * @param {!Object} connectionsXY Location of block.
  * @param {!Array.<!Array.<!Object>>} inputRows 2D array of objects, each
  *     containing position information.
@@ -783,9 +800,10 @@ Blockly.BlockSvg.prototype.renderDrawTop_ =
  * @private
  */
 Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
-    inlineSteps, highlightInlineSteps, connectionsXY, inputRows, iconWidth) {
+    inlineSteps, highlightInlineSteps, slots, connectionsXY, inputRows, iconWidth) {
   var cursorX;
   var cursorY = 0;
+  var slot;
   var connectionX, connectionY;
   for (var y = 0, row; row = inputRows[y]; y++) {
     cursorX = Blockly.BlockSvg.SEP_SPACE_X;
@@ -808,14 +826,26 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           cursorX += input.renderWidth + Blockly.BlockSvg.SEP_SPACE_X;
         }
         if (input.type == Blockly.INPUT_VALUE) {
-          inlineSteps.push('M', (cursorX - Blockly.BlockSvg.SEP_SPACE_X) +
+          var inlinePath = [];
+          inlinePath.push('M', (cursorX - Blockly.BlockSvg.SEP_SPACE_X) +
                            ',' + (cursorY + Blockly.BlockSvg.SEP_SPACE_Y));
-          inlineSteps.push('h', Blockly.BlockSvg.TAB_WIDTH - input.renderWidth);
-          inlineSteps.push(Blockly.BlockSvg.TAB_PATH_DOWN);
-          inlineSteps.push('v', input.renderHeight -
+          inlinePath.push('h', Blockly.BlockSvg.TAB_WIDTH - input.renderWidth);
+          inlinePath.push(Blockly.BlockSvg.TAB_PATH_DOWN);
+          inlinePath.push('v', input.renderHeight -
                                 Blockly.BlockSvg.TAB_HEIGHT);
-          inlineSteps.push('h', input.renderWidth - Blockly.BlockSvg.TAB_WIDTH);
-          inlineSteps.push('z');
+          inlinePath.push('h', input.renderWidth - Blockly.BlockSvg.TAB_WIDTH);
+          inlinePath.push('z');
+          goog.array.forEach(inlinePath, function(step) {
+            inlineSteps.push(step);
+          });
+          //Array.prototype.push.call(inlineSteps, inlinePath);
+          slot = Blockly.createSvgElement('path', {
+            fill: 'pink',
+            d: inlinePath.join(' '),
+            class: 'blocklyInputSlot'
+          }, this.svgSlotsGroup_);
+          this.svgSlots_.push(slot);
+
           if (Blockly.RTL) {
             // Highlight right edge, around back of tab, and bottom.
             highlightInlineSteps.push('M',

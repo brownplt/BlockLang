@@ -84,7 +84,18 @@ Priorities:
 2. Add in big bang
 3. Type checking
 
-Thoughts on getting function definitions working:
 
-I need to build some abstractions to communicate across blockly
-instances! I want to be able to say 'make an instance from this
+* Thoughts on TypeChecking * 
+There are two ways in which information about types can propagate
+across nodes. Consider the function 'first': It has the type
+signature: (Listof Bottom -> Bottom), since we don't have polymorphic types. Let's say we put 
+'first' in a context that requires a number. Then we should change the argument type to be a 
+(Listof Num) as well. 
+
+Similarly, if we give 'first' a (Listof Num) as an argument, then 
+we should expect it to be put in a context of type Num and not anything else. 
+
+We can recursively pass type information down the AST, and back up, and adjust the required types (in context) so that everything fits.
+
+Also, consider If and Cond!!!
+
