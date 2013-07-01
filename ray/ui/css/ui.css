@@ -45,8 +45,6 @@ iframe {
 }
 
 div.container {
-  /*width: 100%;
-  height: 100%;*/
   overflow: auto;
   display: block;
 }
@@ -58,9 +56,7 @@ div.hidden_container {
 #workspace_content {
   overflow: auto;
 }
-*/
 
-body { margin: 0 }
 .row, .col { overflow: hidden; position: absolute; }
 .row { left: 0; right: 0; }
 .col { top: 0; bottom: 0; }
@@ -73,16 +69,24 @@ body { margin: 0 }
 }
 
 .body.row {
-  top: 25px;
+  top: 27px;
   bottom: 0;
 }
 
+#create_function_button {
+  float: left;
+}
+
+#evaluate_expression_button {
+  float: left;
+}
+
 #evaluation_results {
+  /* float: right; */
+  background-color: lightpink;
   border: 2px solid black;
   margin: 2px;
   padding: 2px;
-  left: 400px;
-  right: 0;
   height: 15px;
 
 }

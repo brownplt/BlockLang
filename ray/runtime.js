@@ -128,7 +128,7 @@ Char.proto = {
   }
 }
 
-var Primitive = product(['arg_spec', 'f'], ['f_type']);
+var Primitive = product(['arg_spec', 'f'], ['body_type']);
 Primitive.proto = {
   clone: clone_constructor,
   bind_arguments: function(args) {
@@ -314,11 +314,11 @@ CharExpr.proto = {
   }
 };
 
-var PrimitiveExpr = product(['arg_spec', 'f'], ['f_type']);
+var PrimitiveExpr = product(['arg_spec', 'f'], ['body_type']);
 PrimitiveExpr.proto = {
   clone: clone_constructor,
   interp: function() {
-    return new R.Value.Primitive(R.interp(this.arg_spec), this.f, this.f_type);
+    return new R.Value.Primitive(R.interp(this.arg_spec), this.f, this.body_type);
   },
   display: function() {
     return '(primitive ' + R.display(this.arg_spec) + ' ...)';
@@ -778,8 +778,8 @@ Ray.Runtime.quote = function(str) {
 Ray.Runtime.app = function(f, args) {
   return new R.Expr.App(f, args);
 };
-Ray.Runtime.prim = function(arg_spec, f, f_type) {
-  return new R.Expr.Primitive(arg_spec, f, f_type);
+Ray.Runtime.prim = function(arg_spec, f, body_type) {
+  return new R.Expr.Primitive(arg_spec, f, body_type);
 };
 Ray.Runtime.args = function(p_args, kw_args) {
   return new R.Expr.Arguments(p_args, kw_args);

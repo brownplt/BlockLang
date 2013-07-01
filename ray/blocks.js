@@ -539,7 +539,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       break;
     case 'primitive':
     case 'closure':
-      var output_types = (R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
+      var output_types = value.body_type.get_all_base_types();
       var block_colour = Ray.Blocks.get_colour(output_types);
       var arg_spec = value.arg_spec;
       // Ignoring rest and keyword arguments

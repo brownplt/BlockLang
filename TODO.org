@@ -84,24 +84,35 @@ Make it so that function blocks are associated with their
 definitions, and if the number of arguments changes, they change as
 well. 
 
-** TODO Order of priorities [2/5]:
+** TODO Order of priorities [6/9]:
 - [X] Move defined functions to the shared set of blocks. 
 - [X] Separate out argument blocks. 
-- [ ] Hook up defined function blocks to the definition, so we can change things as needed. 
-- [ ] Hook up definition expressions to functions so that we have the right semantics. 
-- [ ] Add a run button, and show output somehow!
+- [X] Hook up defined function blocks to the definition, so we can change things as needed. 
+- [X] Hook up definition expressions to functions so that we have the right semantics. 
+- [X] Add a run button, and show output somehow!
 - [ ] Make it possible to remove and edit functions (their types)
   once created
 Clean up documentation, add some documentation, JSDoc comment
 everything complicated. 
 
-When you go to tab, flyout should refresh
+- [ ] When you go to tab, flyout should refresh
 
-See if I can get mixed layouts
+- [ ] See if I can get mixed layouts
 
 Make sure to email every day with results
 
 Make it so you can't steal function argument blocks from a function
 definition and use them elsewhere
 
-Get function description associated with function usage blocks
+- [X] Get function description associated with function usage blocks
+
+Things that I need to fix:
+
+Bottom block gets cut off in layout
+
+TESTS ARE NOW BROKEN, BECAUSE THEY DEPEND ON VARIABLE ARITY
+COMPARISONS, and BINOPS. Fix this!
+
+Do I actually pass extra arguments bound to rest arg to the function
+body when I have a closure and not just a primitive? I don't think
+this is tested anywhere...
