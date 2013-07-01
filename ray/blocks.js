@@ -99,7 +99,7 @@ Ray.Blocks.get_drawers = function(block) {
   var drawers = [];
   if(block.__value__) {
     var value = block.__value__;
-    var output_types = (R.node_type(value) === 'primitive' ? value.f_type : value.body_type).get_all_base_types();
+    var output_types = value.body_type.get_all_base_types();
     var input_types = value.arg_spec.arguments_type.get_all_base_types();
     _.each(input_types, function(type) {
       drawers.push(type + '_input');
