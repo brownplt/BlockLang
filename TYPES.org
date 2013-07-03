@@ -113,3 +113,7 @@ Example: is-even and is-odd can be defined in terms of each other!
 
 Fix weird tab issue!
 Fix weird dropdown type menu issue!
+
+Look into building a minimal test case that can solve this stupid
+select issue. Just see if you can make a dialog where it works fine
+without random junk, and then expand.

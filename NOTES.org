@@ -9,7 +9,7 @@
    functions provided by the Blockly core. 
 
    If you do want to recompile the core, you then need the Closure
-   Library dependency, located at '/closure-library-read-only'. This
+   Library dependency, located at '/closure-library'. This
    contains all the UI shared by all of Google's web applications, as
    well as some dependency management for organizing the codebase and
    Google's events library. 

@@ -1,6 +1,6 @@
 <html>
 <head>
-    <script type="text/javascript" src="../../closure-library-read-only/closure/goog/base.js"></script>
+    <script type="text/javascript" src="../../closure-library/closure/goog/base.js"></script>
     <script type="text/javascript" src="../ray-deps.js"></script>
     <title>UI Demo</title>
     <link rel="stylesheet" type="text/css" href="css/ui.css">
@@ -60,13 +60,7 @@
     var workspace_content = goog.dom.getElement('workspace_content');
     var tabbar = new goog.ui.TabBar();
     tabbar.decorate(goog.dom.getElement('workspace_tabs'));
-    //tabbar.setSelectedTabIndex(0);
     tabbar.getSelectedTab().workspace_id_ = 'blockly_main';
-
-    goog.events.listen(tabbar, goog.ui.Component.EventType.SELECT, function(e) {
-        var tab_selected = e.target;
-        var content_element = goog.dom.getElement('workspace_content');
-    })
 
     var create_function_button = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
     create_function_button.decorate(goog.dom.getElement('create_function_button'));

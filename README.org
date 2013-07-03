@@ -7,7 +7,7 @@ in 'ray/') that have dependencies on anything else in ray, you can
 recompile with: 
 
 #+BEGIN_SRC sh
-  closure-library-read-only/closure/bin/build/depswriter.py --root_with_prefix="ray ../../../ray" > ray/ray-deps.js
+  closure-library/closure/bin/build/depswriter.py --root_with_prefix="ray ../../../ray" > ray/ray-deps.js
 #+END_SRC
 
 This will generate 'ray/ray-deps.js' which is loaded in 'ray/ray.html'
@@ -23,7 +23,7 @@ page). In order for this to run correctly the dependencies file
 be updated by running 
 
 #+BEGIN_SRC sh
-  closure-library-read-only/closure/bin/build/depswriter.py --root_with_prefix="blockly ../../../blockly" --root_with_prefix="ray ../../../ray" > ray/ray-deps.js
+  closure-library/closure/bin/build/depswriter.py --root_with_prefix="blockly ../../../blockly" --root_with_prefix="ray ../../../ray" > ray/ray-deps.js
 #+END_SRC
 
 This is now in a makefile in the top-level directory so you can update the file by simply
@@ -58,7 +58,7 @@ regenerate them later if desired.)
 
 I've modified 'blockly/build.py' to compile locally using
 'compiler.jar', and the local copy of Google's Closure Library (in
-'closure-library-read-only'), and to only compile if any of the
+'closure-library'), and to only compile if any of the
 dependencies of the compilation targets have been modified since the
 last time the target was compiled.  
 

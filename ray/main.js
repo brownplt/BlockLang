@@ -154,7 +154,7 @@ Ray.Main.make_function_application_and_argument_blocks = function(r, function_sp
   var function_parts = Ray.Main.make_function_parts_from_spec(r, function_spec, true);
   var arg_blocks = Ray.Main.make_function_argument_blocks(r, block_dir, function_parts);
   var app_block = Ray.Main.make_function_application_block(r, {}, function_parts);
-  var func_block_name = _.keys(app_block)[0];
+  var func_block_name = Ray.Main.get_function_block_name(function_spec.name);
   return [arg_blocks, app_block, func_block_name];
 };
 

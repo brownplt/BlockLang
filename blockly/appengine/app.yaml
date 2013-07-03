@@ -24,8 +24,8 @@ handlers:
   static_dir: static
 
 # Closure library for uncompiled Blockly.
-- url: /closure-library-read-only
-  static_dir: closure-library-read-only
+- url: /closure-library
+  static_dir: closure-library
 
 # Redirect for root directory.
 - url: /

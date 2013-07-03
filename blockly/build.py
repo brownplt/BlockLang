@@ -140,7 +140,7 @@ delete window.BLOCKLY_BOOT;
 };
 
 document.write('<script type="text/javascript" src="' + window.BLOCKLY_DIR +
-    '/../closure-library-read-only/closure/goog/base.js"></script>');
+    '/../closure-library/closure/goog/base.js"></script>');
 document.write('<script type="text/javascript">window.BLOCKLY_BOOT()</script>');
 """)
     f.close()
@@ -214,13 +214,13 @@ class Gen_compressed():
 if __name__ == '__main__':
   try:
     calcdeps = import_path(
-          '../closure-library-read-only/closure/bin/calcdeps.py')
+          '../closure-library/closure/bin/calcdeps.py')
   except ImportError:
     print """Error: Closure not found.  Read this:
 http://code.google.com/p/blockly/wiki/Closure"""
     sys.exit(1)
   search_paths = calcdeps.ExpandDirectories(
-      ['core/', '../closure-library-read-only/'])  
+      ['core/', '../closure-library/'])
 
   Gen_uncompressed(search_paths).run()
   Gen_compressed(search_paths).run()
