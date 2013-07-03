@@ -121,7 +121,7 @@ Blockly.createDom_ = function(container) {
   </defs>
   */
   var defs = Blockly.createSvgElement('defs', {}, svg);
-  var filter, feSpecularLighting, feMerge, pattern;
+  var filter, feSpecularLighting, feMerge, disabled_pattern, slot_pattern;
   /*
     <filter id="blocklyEmboss">
       <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur"/>
@@ -185,16 +185,22 @@ Blockly.createDom_ = function(container) {
       <path d="M 0 0 L 10 10 M 10 0 L 0 10" stroke="#cc0" />
     </pattern>
   */
-  pattern = Blockly.createSvgElement('pattern',
+  disabled_pattern = Blockly.createSvgElement('pattern',
       {'id': 'blocklyDisabledPattern', 'patternUnits': 'userSpaceOnUse',
        'width': 10, 'height': 10}, defs);
   Blockly.createSvgElement('rect',
-      {'width': 10, 'height': 10, 'fill': '#aaa'}, pattern);
+      {'width': 10, 'height': 10, 'fill': '#aaa'}, disabled_pattern);
   Blockly.createSvgElement('path',
-      {'d': 'M 0 0 L 10 10 M 10 0 L 0 10', 'stroke': '#cc0'}, pattern);
+      {'d': 'M 0 0 L 10 10 M 10 0 L 0 10', 'stroke': '#cc0'}, disabled_pattern);
   Blockly.mainWorkspace = new Blockly.Workspace(Blockly.editable);
   svg.appendChild(Blockly.mainWorkspace.createDom());
   Blockly.mainWorkspace.maxBlocks = Blockly.maxBlocks;
+
+  slot_pattern = Blockly.createSvgElement('pattern',
+      {'id': 'blocklySlotPattern', 'patternUnits': 'userSpaceOnUse',
+       'width': 4, 'height': 4}, defs);
+  Blockly.createSvgElement('path',
+      {'d': 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2', 'stroke': '#fff', 'fill': 'transparent'}, slot_pattern);
 
   if (Blockly.editable) {
     // Determine if there needs to be a category tree, or a simple list of

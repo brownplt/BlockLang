@@ -26,6 +26,9 @@
 goog.provide('Blockly.BlockSvg');
 
 goog.require('goog.userAgent');
+goog.require('goog.color');
+
+Blockly.BlockSvg.DEFAULT_INPUT_COLOR = '#999999';
 
 /**
  * Class for a block's SVG representation.
@@ -717,7 +720,6 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
 
   // Get rid of current slot paths!
   goog.dom.removeChildren(this.svgSlotsGroup_);
-  var slots = [];
   // The highlighting applies to edges facing the upper-left corner.
   // Since highlighting is a two-pixel wide border, it would normally overhang
   // the edge of the block by a pixel. So undersize all measurements by a pixel.
@@ -727,7 +729,7 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
   this.renderDrawTop_(steps, highlightSteps, connectionsXY,
       inputRows.rightEdge);
   var cursorY = this.renderDrawRight_(steps, highlightSteps, inlineSteps,
-      highlightInlineSteps, slots, connectionsXY, inputRows, iconWidth);
+      highlightInlineSteps, connectionsXY, inputRows, iconWidth);
   this.renderDrawBottom_(steps, highlightSteps, connectionsXY, cursorY);
   this.renderDrawLeft_(steps, highlightSteps, connectionsXY, cursorY);
 
@@ -791,7 +793,6 @@ Blockly.BlockSvg.prototype.renderDrawTop_ =
  * @param {!Array.<string>} highlightSteps Path of block highlights.
  * @param {!Array.<string>} inlineSteps Inline block outlines.
  * @param {!Array.<string>} highlightInlineSteps Inline block highlights.
- * @param {!Array.<!Array.<string>>} slots paths for each slot's svg
  * @param {!Object} connectionsXY Location of block.
  * @param {!Array.<!Array.<!Object>>} inputRows 2D array of objects, each
  *     containing position information.
@@ -800,10 +801,9 @@ Blockly.BlockSvg.prototype.renderDrawTop_ =
  * @private
  */
 Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
-    inlineSteps, highlightInlineSteps, slots, connectionsXY, inputRows, iconWidth) {
+    inlineSteps, highlightInlineSteps, connectionsXY, inputRows, iconWidth) {
   var cursorX;
   var cursorY = 0;
-  var slot;
   var connectionX, connectionY;
   for (var y = 0, row; row = inputRows[y]; y++) {
     cursorX = Blockly.BlockSvg.SEP_SPACE_X;
@@ -826,6 +826,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           cursorX += input.renderWidth + Blockly.BlockSvg.SEP_SPACE_X;
         }
         if (input.type == Blockly.INPUT_VALUE) {
+          // Make a slot in the block for an input to go
           var inlinePath = [];
           inlinePath.push('M', (cursorX - Blockly.BlockSvg.SEP_SPACE_X) +
                            ',' + (cursorY + Blockly.BlockSvg.SEP_SPACE_Y));
@@ -835,16 +836,31 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
                                 Blockly.BlockSvg.TAB_HEIGHT);
           inlinePath.push('h', input.renderWidth - Blockly.BlockSvg.TAB_WIDTH);
           inlinePath.push('z');
-          goog.array.forEach(inlinePath, function(step) {
-            inlineSteps.push(step);
-          });
-          //Array.prototype.push.call(inlineSteps, inlinePath);
-          slot = Blockly.createSvgElement('path', {
-            fill: 'pink',
-            d: inlinePath.join(' '),
-            class: 'blocklyInputSlot'
+
+          var fill_value;
+          Array.prototype.push.apply(inlineSteps, inlinePath);
+          if(input.__type__) {
+            var input_type = input.__type__.get_all_base_types()[0];
+            var input_type_hue = Blockly.Ray_.Shared.get_type_colour(input_type);
+            fill_value = Blockly.makeColour(input_type_hue);
+          } else {
+            fill_value = Blockly.BlockSvg.DEFAULT_INPUT_COLOR;
+          }
+
+          // Add the backing color panel to the slot group element
+          var slot = Blockly.createSvgElement('path', {
+            'fill': fill_value,
+            'fill-opacity': '1',
+            'd': inlinePath.join(' '),
+            'class': 'blocklyInputSlot'
           }, this.svgSlotsGroup_);
           this.svgSlots_.push(slot);
+          var slot_pattern = Blockly.createSvgElement('path', {
+            'fill': 'url(#blocklySlotPattern)',
+            'd': inlinePath.join(' '),
+            'class': 'blocklyInputSlotPattern'
+          }, this.svgSlotsGroup_);
+          this.svgSlots_.push(slot_pattern);
 
           if (Blockly.RTL) {
             // Highlight right edge, around back of tab, and bottom.

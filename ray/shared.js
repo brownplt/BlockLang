@@ -118,3 +118,7 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
     gaps.push(margin * 2);
   });
 };
+
+Ray.Shared.get_type_colour = function(type) {
+  return Ray.Blocks.get_colour(type);
+};

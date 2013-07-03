@@ -95,7 +95,13 @@ signature: (Listof Bottom -> Bottom), since we don't have polymorphic types. Let
 Similarly, if we give 'first' a (Listof Num) as an argument, then 
 we should expect it to be put in a context of type Num and not anything else. 
 
-We can recursively pass type information down the AST, and back up, and adjust the required types (in context) so that everything fits.
+We can recursively pass type information down the AST, and back up,
+ and adjust the required types (in context) so that everything fits.
 
 Also, consider If and Cond!!!
 
+* Thoughts on coloring input slots * 
+
+When I change the type of a connection, b/c for example Bottom connects to Num, so 
+we can replace Bottom with Num, I need to make sure that I mark that somewhere, or I need 
+to explicitly change that back once the connection which forced that change is broken!
