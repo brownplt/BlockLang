@@ -67,7 +67,7 @@ Blockly.Block = function(workspace, prototypeName) {
   this.nextConnection = null;
   this.previousConnection = null;
   this.inputList = [];
-  this.inputsInline = false;
+  this.inputsInline = true;
   this.rendered = false;
   this.collapsed = false;
   this.disabled = false;
@@ -98,6 +98,13 @@ Blockly.Block = function(workspace, prototypeName) {
     }
     goog.mixin(this, prototype);
   }
+
+  if(this.__rest_arg__ || this.__statement__) {
+    this.makeRestArg();
+  } else {
+    this.setOutputType(this.__type__);
+  }
+
   // Call an initialization function, if it exists.
   if (goog.isFunction(this.init)) {
     this.init();
@@ -528,7 +535,7 @@ Blockly.Block.prototype.saveToClipboard_ = function() {
   Blockly.Ray_.Shared.save_block_xml(this);
 };
 
-Blockly.Block.prototype.loadFromClipboard = function() {
+Blockly.Block.prototype.loadFromClipboard_ = function() {
   Blockly.Ray_.Shared.load_block_xml(Blockly, Blockly.mainWorkspace);
 };
 
@@ -1064,108 +1071,25 @@ Blockly.Block.prototype.setTooltip = function(newTip) {
   this.tooltip = newTip;
 };
 
-/**
- * Set whether this block can chain onto the bottom of another block.
- * @param {boolean} newBoolean True if there can be a previous statement.
- * @param {string|Array.<string>|null} opt_check Statement type or list of
- *     statement types.  Null or undefined if any type could be connected.
- */
-Blockly.Block.prototype.setPreviousStatement = function(newBoolean, opt_check) {
-  if (this.previousConnection) {
-    if (this.previousConnection.targetConnection) {
-      throw 'Must disconnect previous statement before removing connection.';
-    }
-    this.previousConnection.dispose();
-    this.previousConnection = null;
-  }
-  if (newBoolean) {
-    if (this.outputConnection) {
-      throw 'Remove output connection prior to adding previous connection.';
-    }
-    if (opt_check === undefined) {
-      opt_check = null;
-    }
-    this.previousConnection =
-        new Blockly.Connection(this, Blockly.PREVIOUS_STATEMENT);
-    this.previousConnection.setCheck(opt_check);
-  }
-  if (this.rendered) {
-    this.render();
-    this.bumpNeighbours_();
-  }
-};
+Blockly.Block.prototype.makeRestArg = function() {
+  this.nextConnection = new Blockly.Connection(this, Blockly.NEXT_STATEMENT);
+  this.previousConnection = new Blockly.Connection(this, Blockly.PREVIOUS_STATEMENT);
 
-/**
- * Set whether another block can chain onto the bottom of this block.
- * @param {boolean} newBoolean True if there can be a next statement.
- * @param {string|Array.<string>|null} opt_check Statement type or list of
- *     statement types.  Null or undefined if any type could be connected.
- */
-Blockly.Block.prototype.setNextStatement = function(newBoolean, opt_check) {
-  if (this.nextConnection) {
-    if (this.nextConnection.targetConnection) {
-      throw 'Must disconnect next statement before removing connection.';
-    }
-    this.nextConnection.dispose();
-    this.nextConnection = null;
-  }
-  if (newBoolean) {
-    if (opt_check === undefined) {
-      opt_check = null;
-    }
-    this.nextConnection =
-        new Blockly.Connection(this, Blockly.NEXT_STATEMENT);
-    this.nextConnection.setCheck(opt_check);
-  }
-  if (this.rendered) {
-    this.render();
-    this.bumpNeighbours_();
-  }
-};
-
-/**
- * Set whether this block returns a value.
- * @param {boolean} newBoolean True if there is an output.
- * @param {string|Array.<string>|null} opt_check Returned type or list of
- *     returned types.  Null or undefined if any type could be returned
- *     (e.g. variable get).
- */
-Blockly.Block.prototype.setOutput = function(newBoolean, opt_check) {
-  if (this.outputConnection) {
-    if (this.outputConnection.targetConnection) {
-      throw 'Must disconnect output value before removing connection.';
-    }
+  if(this.outputConnection) {
     this.outputConnection.dispose();
     this.outputConnection = null;
   }
-  if (newBoolean) {
-    if (this.previousConnection) {
-      throw 'Remove previous connection prior to adding output connection.';
-    }
-    if (opt_check === undefined) {
-      opt_check = null;
-    }
-    this.outputConnection =
-        new Blockly.Connection(this, Blockly.OUTPUT_VALUE);
-    this.outputConnection.setCheck(opt_check);
-  }
-  if (this.rendered) {
-    this.render();
-    this.bumpNeighbours_();
-  }
+
 };
 
 /**
- * Set whether value inputs are arranged horizontally or vertically.
- * @param {boolean} newBoolean True if inputs are horizontal.
+ * Sets the output type for this block
+ * @param {*} type Type returned by this block
  */
-Blockly.Block.prototype.setInputsInline = function(newBoolean) {
-  this.inputsInline = newBoolean;
-  if (this.rendered) {
-    this.render();
-    this.bumpNeighbours_();
-    this.workspace.fireChangeEvent();
-  }
+Blockly.Block.prototype.setOutputType = function(type) {
+  this.outputConnection =
+    new Blockly.Connection(this, Blockly.OUTPUT_VALUE);
+  this.outputConnection.setType(type);
 };
 
 /**

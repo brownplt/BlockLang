@@ -91,15 +91,15 @@ Blockly.Input.prototype.appendTitle = function(title, opt_name) {
 
 /**
  * Change a connection's compatibility.
- * @param {string|Array.<string>|null} check Compatible value type or
- *     list of value types.  Null if all types are compatible.
+ * @param {*} type Type of input slot
  * @return {!Blockly.Input} The input being modified (to allow chaining).
  */
-Blockly.Input.prototype.setCheck = function(check) {
+Blockly.Input.prototype.setType = function(type) {
   if (!this.connection) {
     throw 'This input does not have a connection.';
   }
-  this.connection.setCheck(check);
+  this.__type__ = type;
+  this.connection.setType(type);
   return this;
 };
 

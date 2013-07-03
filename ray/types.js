@@ -24,6 +24,9 @@ var AtomicType = function (type_name) {
   AtomicTypeConstructor.prototype.display = function() {
     return goog.string.toTitleCase(type_name);
   };
+  AtomicTypeConstructor.prototype.key = function() {
+    return type_name;
+  };
 
   Ray.Types.atomic_types[type_name] = AtomicTypeConstructor;
   return AtomicTypeConstructor;

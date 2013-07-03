@@ -78,11 +78,10 @@ Ray.Blocks.rest_arg_arg_block = {
   init: function() {
     this.setColour(Ray.Blocks.BLOCK_COLOUR);
     this.appendDummyInput()
-        .appendTitle('arg');
-    this.setPreviousStatement(true);
-    this.setNextStatement(true);
+      .appendTitle('arg');
     this.contextMenu = false;
-  }
+  },
+  __rest_arg__: true
 };
 Ray.Blocks.cond_test_body_block_name = "ray_conditional_cond_test_body";
 Ray.Blocks.cond_else_block_name = "ray_conditional_cond_else";
@@ -148,10 +147,7 @@ Ray.Blocks.define_function_def_block = function(r, obj, name, desc, return_type)
       .appendTitle(this.__name__)
       .setAlign(this.Blockly.ALIGN_CENTRE);
     this.appendValueInput('BODY');
-    this.setInputsInline(true);
-    this.setNextStatement(false);
-    this.setPreviousStatement(false);
-    this.setTooltip(this.__desc__);
+            this.setTooltip(this.__desc__);
     this.setOutput(false);
   };
 
@@ -166,15 +162,12 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
     this.__datatype__ = null;
     this.__form__ = null;
     this.__name__ = name;
-    this.__arg_type__ = type;
+    this.__type__ = type;
     this.__arguments__ = true;
     this.init = function() {
-      this.setColour(Ray.Blocks.get_colour(this.__arg_type__));
+      this.setColour(Ray.Blocks.get_colour(this.__type__.key()));
       this.appendDummyInput()
         .appendTitle(this.__name__);
-      this.setOutput(true);
-      this.setNextStatement(false);
-      this.setPreviousStatement(false);
     };
   }
 
@@ -186,48 +179,46 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
 };
 
 Ray.Blocks.define_conditional_blocks = function(r, obj) {
-  function ConditionalBlock(name) {
+  function ConditionalBlock(name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
     this.__value__ = null;
     this.__datatype__ = null;
     this.__form__ = name;
     this.__name__ = name;
+    this.__type__ = type || new Ray.Types.Bottom();
   }
 
   // If
   var if_block = new ConditionalBlock('if');
   if_block.init = function() {
     this.setColour(Ray.Blocks.get_colour('forms'));
-    var pred_input = this.appendValueInput('PRED')
-      .appendTitle("if");
-    pred_input.__type__ = new Ray.Types.Boolean();
-    var then_input = this.appendValueInput('T_EXPR')
-      .appendTitle('then');
-    then_input.__type__ = new Ray.Types.Bottom();
-    var else_input = this.appendValueInput('F_EXPR')
-        .appendTitle('else');
-    else_input.__type__ = new Ray.Types.Bottom();
-    this.setOutput(true);
-    this.setInputsInline(true);
+    this.appendValueInput('PRED')
+      .appendTitle("if")
+      .setType(new Ray.Types.Boolean());
+
+    this.appendValueInput('T_EXPR')
+      .appendTitle('then')
+      .setType(new Ray.Types.Bottom());
+
+    this.appendValueInput('F_EXPR')
+      .appendTitle('else')
+      .setType(new Ray.Types.Bottom());
+
   };
 
   obj[Ray.Blocks.conditional_block_name('if')] = if_block;
 
   // And
-  var and_block = new ConditionalBlock('and');
+  var and_block = new ConditionalBlock('and', new Ray.Types.Boolean());
   and_block.init = function() {
-    this.setInputsInline(true);
     this.setColour(Ray.Blocks.get_colour('forms'));
-    this.setPreviousStatement(false);
-    this.setNextStatement(false);
-    this.setOutput(true);
 
     this.appendDummyInput()
-        .setAlign(this.Blockly.ALIGN_CENTRE)
-        .appendTitle('and');
+      .setAlign(this.Blockly.ALIGN_CENTRE)
+      .appendTitle('and');
 
     this.appendDummyInput('NO_REST_ARGS')
-        .appendTitle('...');
+      .appendTitle('...');
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
     this.rest_arg_count_ = 0;
   };
@@ -236,20 +227,16 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   obj[Ray.Blocks.conditional_block_name('and')] = and_block;
 
   // Or
-  var or_block = new ConditionalBlock('or');
+  var or_block = new ConditionalBlock('or', new Ray.Types.Boolean());
   or_block.init = function() {
-    this.setInputsInline(true);
     this.setColour(Ray.Blocks.get_colour('forms'));
-    this.setPreviousStatement(false);
-    this.setNextStatement(false);
-    this.setOutput(true);
 
     this.appendDummyInput()
-        .setAlign(this.Blockly.ALIGN_CENTRE)
-        .appendTitle('or');
+      .setAlign(this.Blockly.ALIGN_CENTRE)
+      .appendTitle('or');
 
     this.appendDummyInput('NO_REST_ARGS')
-        .appendTitle('...');
+      .appendTitle('...');
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
     this.rest_arg_count_ = 0;
   };
@@ -260,17 +247,14 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   // Cond
   var cond_block = new ConditionalBlock('cond');
   cond_block.init = function() {
-    this.setInputsInline(true);
     this.setColour(Ray.Blocks.get_colour('forms'));
-    this.setPreviousStatement(false);
-    this.setNextStatement(false);
-
+        
     this.appendDummyInput()
-        .setAlign(this.Blockly.ALIGN_CENTRE)
-        .appendTitle('cond');
+      .setAlign(this.Blockly.ALIGN_CENTRE)
+      .appendTitle('cond');
 
     this.appendValueInput('CONDITION0')
-        .appendTitle('when');
+      .appendTitle('when');
     this.appendValueInput('BODY0');
 
 
@@ -278,7 +262,6 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.test_clause_count_ = 0;
     this.else_clause_ = false;
 
-    this.setOutput(true);
   };
   cond_block.mutationToDom = function(workspace) {
     var container = document.createElement('mutation');
@@ -298,13 +281,13 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.test_clause_count_ = window.parseInt(container.getAttribute('test_clauses'));
     for(var i = 1; i <= this.test_clause_count_; i++) {
       this.addValueInput('CONDITION' + String(i))
-          .addTitle('when');
+        .addTitle('when');
     }
 
     this.else_clause_ = Boolean(window.parseInt(container.getAttribute('else_clause')));
     if(this.else_clause_) {
       this.addValueInput('ELSE')
-          .addTitle('otherwise');
+        .addTitle('otherwise');
     }
   };
   cond_block.decompose = function(workspace) {
@@ -344,20 +327,20 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
         case Ray.Blocks.cond_test_body_block_name:
           this.test_clause_count_++;
           this.appendValueInput('CONDITION' + String(this.test_clause_count_))
-              .appendTitle('when');
+            .appendTitle('when');
           this.appendValueInput('BODY' + String(this.test_clause_count_));
           break;
         case Ray.Blocks.cond_else_block_name:
           this.else_clause_ = true;
           this.appendValueInput('ELSE')
-              .appendTitle('otherwise');
+            .appendTitle('otherwise');
           break;
         default:
           throw "Unknown block type inside ray_conditional_cond_cond!";
           break;
       }
       clause_block = clause_block.nextConnection &&
-          clause_block.nextConnection.targetBlock();
+        clause_block.nextConnection.targetBlock();
     }
   };
 
@@ -367,7 +350,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
-          .appendTitle('cond');
+        .appendTitle('cond');
       this.appendStatementInput('STACK');
       this.contextMenu = false;
     }
@@ -377,10 +360,11 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   var cond_test_body_block = {
     __type__: Ray.Blocks.cond_test_body_block_name,
+    __statement__: true,
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
-          .appendTitle('test/body');
+        .appendTitle('test/body');
       this.setPreviousStatement(true);
       this.setNextStatement(true);
       this.contextMenu = false;
@@ -391,13 +375,13 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   var cond_else_block = {
     __type__: Ray.Blocks.cond_else_block_name,
+    __statement__: true,
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
-          .appendTitle('otherwise');
+        .appendTitle('otherwise');
       this.setPreviousStatement(true);
-      this.setNextStatement(false);
-      this.contextMenu = false;
+            this.contextMenu = false;
     }
   };
 
@@ -413,52 +397,50 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
  * @param obj
  */
 Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
-  function PrimitiveDataBlock(type) {
+  function PrimitiveDataBlock(type_name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
     this.__value__ = null;
-    this.__datatype__ = type;
+    this.__datatype__ = type_name;
+    this.__type__ = type;
   }
 
   // Boolean
-  var boolean_block = new PrimitiveDataBlock('boolean');
+  var boolean_block = new PrimitiveDataBlock('boolean', new Ray.Types.Boolean());
   boolean_block.init = function() {
     this.setColour(Ray.Blocks.get_colour(this.__datatype__));
     var dropdown = new this.Blockly.FieldDropdown([['#t', 'TRUE'],['#f', 'FALSE']]);
     this.appendDummyInput()
-        .appendTitle(dropdown, 'B');
-    this.setOutput(true);
+      .appendTitle(dropdown, 'B');
   };
 
   obj[Ray.Blocks.primitive_data_block_name('boolean')] = boolean_block;
 
   // Number
-  var number_block = new PrimitiveDataBlock('num');
+  var number_block = new PrimitiveDataBlock('num', new Ray.Types.Num());
   number_block.init = function() {
     this.setColour(Ray.Blocks.get_colour(this.__datatype__));
     var textfield = new this.Blockly.FieldTextInput('0', this.Blockly.FieldTextInput.numberValidator);
     this.appendDummyInput()
-        .appendTitle(textfield, 'N');
-    this.setOutput(true);
+      .appendTitle(textfield, 'N');
   };
 
   obj[Ray.Blocks.primitive_data_block_name('num')] = number_block;
 
   //String
-  var string_block = new PrimitiveDataBlock('str');
+  var string_block = new PrimitiveDataBlock('str', new Ray.Types.Str());
   string_block.init = function() {
     this.setColour(Ray.Blocks.get_colour(this.__datatype__));
     var textfield = new this.Blockly.FieldTextInput('Hello, World!');
     this.appendDummyInput()
-        .appendTitle('"')
-        .appendTitle(textfield, 'S')
-        .appendTitle('"');
-    this.setOutput(true);
+      .appendTitle('"')
+      .appendTitle(textfield, 'S')
+      .appendTitle('"');
   };
 
   obj[Ray.Blocks.primitive_data_block_name('str')] = string_block;
 
   //Chars
-  var char_block = new PrimitiveDataBlock('char');
+  var char_block = new PrimitiveDataBlock('char', new Ray.Types.Char());
   char_block.init = function() {
     this.setColour(Ray.Blocks.get_colour(this.__datatype__));
     var char_validator = function(text) {
@@ -466,10 +448,9 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
     };
     var textfield = new this.Blockly.FieldTextInput('a', char_validator);
     this.appendDummyInput()
-        .appendTitle('#\\')
-        .appendTitle(textfield, 'C')
-    this.setOutput(true);
-  }
+      .appendTitle('#\\')
+      .appendTitle(textfield, 'C')
+  };
 
   obj[Ray.Blocks.primitive_data_block_name('char')] = char_block;
 };
@@ -512,15 +493,15 @@ Ray.Blocks.define_builtin_blocks = function(r, obj) {
  *   an ArgumentSpec, <-- Should never be passed in directly
  *   an Arguments. <-- Should never be passed in directly, not really a Value either.
  * @param r
- * @param name, the name of the block, will be used in looking it up, and as title on block.
- * @param value, the value from which we are creating the block
+ * @param name the name of the block, will be used in looking it up, and as title on block.
+ * @param value the value from which we are creating the block
  * @param obj
- * @param {?boolean=} opt_mark_functions
+ * @param {?boolean=} opt_user_function
  */
 Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
   var is_user_function = !!opt_user_function;
   var block_name = is_user_function ? Ray.Blocks.user_function_block_name(name) : Ray.Blocks.block_name(name);
-  var block = {};
+  var block = null;
   switch(R.node_type(value)) {
     case 'pair':
     case 'number':
@@ -528,12 +509,10 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
     case 'boolean':
     case 'str':
     case 'char':
-      return;
-      //throw new r.Error("Not yet implemented!");
-      //block = null;
       break;
     case 'primitive':
     case 'closure':
+      block = {};
       var output_types = value.body_type.get_all_base_types();
       var block_colour = Ray.Blocks.get_colour(output_types[0]);
       var arg_spec = value.arg_spec;
@@ -541,34 +520,28 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       var arity = arg_spec.p_args.length;
       var rest_arg = arg_spec.rest_arg || null;
 
-      var block = {};
       block.__name__ = name;
       block.__value__ = value;
+      block.__type__ = value.body_type;
       if(is_user_function) {
         block.__user_function__ = true;
       }
       block.helpUrl = Ray.Blocks.HELP_URL;
       block.init = function() {
-        this.setInputsInline(true);
         this.setColour(block_colour);
-        this.setPreviousStatement(false);
-        this.setNextStatement(false);
-        this.setOutput(true);
 
         this.appendDummyInput()
-            .setAlign(this.Blockly.ALIGN_CENTRE)
-            .appendTitle(name);
+          .setAlign(this.Blockly.ALIGN_CENTRE)
+          .appendTitle(name);
 
-        var input;
         for(var i = 0; i < arity; i++) {
-          input = this.appendValueInput(arg_spec.p_args[i]);
-            //.appendTitle(arg_spec.p_args[i]);
-          input.__type__ = arg_spec.arguments_type.p_arg_types.list[i];
+          this.appendValueInput(arg_spec.p_args[i])
+            .setType(arg_spec.arguments_type.p_arg_types.list[i])
         }
 
         if(rest_arg) {
           this.appendDummyInput('NO_REST_ARGS')
-              .appendTitle('...');
+            .appendTitle('...');
           this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
           this.rest_arg_count_ = 0;
         }
@@ -680,9 +653,9 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
   var rest_arg_container = {};
   rest_arg_container.helpUrl = Ray.Blocks.HELP_URL;
   rest_arg_container.init = function() {
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.get_type_colour('bottom'));
     this.appendDummyInput()
-        .appendTitle(rest_arg);
+      .appendTitle(rest_arg);
     this.appendStatementInput('STACK');
     this.contextMenu = false;
   };
@@ -692,7 +665,7 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
 
   block.decompose = function(workspace) {
     var container_block = new this.Blockly.Block(workspace,
-                                            container_block_name);
+                                                 container_block_name);
     container_block.initSvg();
     if(container_block.getInput('STACK')) {
       var connection = container_block.getInput('STACK').connection;
@@ -723,11 +696,11 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
       }
       this.rest_arg_count_++;
       arg_block = arg_block.nextConnection &&
-          arg_block.nextConnection.targetBlock();
+        arg_block.nextConnection.targetBlock();
     }
     if(this.rest_arg_count_ === 0) {
       this.appendDummyInput('NO_REST_ARGS')
-          .appendTitle("...");
+        .appendTitle("...");
 
     }
 
@@ -746,9 +719,9 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
       this.appendValueInput('REST_ARG' + String(x));
     }
     if(this.rest_arg_count_ === 0
-        && (!this.getInput('NO_REST_ARGS'))) {
+      && (!this.getInput('NO_REST_ARGS'))) {
       this.appendDummyInput('NO_REST_ARGS')
-          .appendTitle('...');
+        .appendTitle('...');
     }
   };
 };

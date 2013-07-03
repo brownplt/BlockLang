@@ -303,11 +303,6 @@ Blockly.Xml.domToBlock_ = function(workspace, xmlBlock) {
     }
   }
 
-  var inline = xmlBlock.getAttribute('inline');
-  if (inline) {
-    block.setInputsInline(inline == 'true');
-  }
-
   var collapsed = xmlBlock.getAttribute('collapsed');
   if (collapsed) {
     block.setCollapsed(collapsed == 'true');

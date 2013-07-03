@@ -485,34 +485,23 @@ Blockly.Connection.prototype.closest = function(maxLimit, dx, dy) {
  * @private
  */
 Blockly.Connection.prototype.checkType_ = function(otherConnection) {
-  if (!this.check_ || !otherConnection.check_) {
+  if (!this.__type__ || !otherConnection.__type__) {
     // One or both sides are promiscuous enough that anything will fit.
     return true;
   }
-  // Find any intersection in the check lists.
-  for (var x = 0; x < this.check_.length; x++) {
-    if (otherConnection.check_.indexOf(this.check_[x]) != -1) {
-      return true;
-    }
-  }
-  // No intersection.
-  return false;
+  return Blockly.Ray_.Shared.types_match(this.__type__, otherConnection.__type__);
 };
 
 /**
  * Change a connection's compatibility.
- * @param {*} check Compatible value type or list of value types.
+ * @param {*} type Type of compatible connections
  *     Null if all types are compatible.
  * @return {!Blockly.Connection} The connection being modified
  *     (to allow chaining).
  */
-Blockly.Connection.prototype.setCheck = function(check) {
-  if (check) {
-    // Ensure that check is in an array.
-    if (!(check instanceof Array)) {
-      check = [check];
-    }
-    this.check_ = check;
+Blockly.Connection.prototype.setType = function(type) {
+  if(type) {
+    this.__type__ = type;
     // The new value type may not be compatible with the existing connection.
     if (this.targetConnection && !this.checkType_(this.targetConnection)) {
       if (this.isSuperior()) {
@@ -524,7 +513,7 @@ Blockly.Connection.prototype.setCheck = function(check) {
       this.sourceBlock_.bumpNeighbours_();
     }
   } else {
-    this.check_ = null;
+    this.__type__ = null;
   }
   return this;
 };

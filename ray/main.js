@@ -98,8 +98,18 @@ Ray.Main.atomic_type_to_type_instance = function(type_name) {
   return new type();
 };
 
-Ray.Main.make_function_argument_blocks = function(r, function_spec) {
-  return Ray.Blocks.define_arg_blocks(r, {}, function_spec.args);
+Ray.Main.make_function_argument_blocks = function(r, block_dir, function_parts) {
+  return Ray.Blocks.define_arg_blocks(r, block_dir, function_parts.args);
+};
+
+Ray.Main.make_function_application_block = function(r, block_dir, function_parts) {
+  var return_type_instance = function_parts.return_type;
+  var arg_spec = function_parts.arg_spec;
+  var f_value = new r.Value.Closure(arg_spec,
+                                    null,
+                                    null,
+                                    return_type_instance);
+  return Ray.Blocks.generate_block(r, function_parts.name, f_value, block_dir, true);
 };
 
 /**
@@ -113,29 +123,39 @@ Ray.Main.make_function_parts_from_spec = function(r, function_spec, opt_as_value
   var return_type_name = function_spec.return_type;
   var return_type = Ray.Types.get_atomic_type(return_type_name);
   var return_type_instance = new return_type();
-  var arg_types = goog.array.map(function_spec.args, function(a) { return a.getType(); });
+  var arg_type_names = goog.array.map(function_spec.args, function(a) { return a.getType(); });
+  var arg_types = goog.array.map(arg_type_names, Ray.Main.atomic_type_to_type_instance);
+
   var arg_names = goog.array.map(function_spec.args, function(a)  {return a.getName(); });
+  var arg_types_and_names = goog.array.zip(arg_types, arg_names);
+  var final_args = goog.array.map(arg_types_and_names, function(arg_type_and_name) {
+    return {
+      type_: arg_type_and_name[0],
+      name_: arg_type_and_name[1]
+    };
+  });
+
   var arguments_type = new Ray.Types.ArgumentType(
-    new Ray.Types.ListOfTypes(goog.array.map(arg_types,
-                                             Ray.Main.atomic_type_to_type_instance)));
+    new Ray.Types.ListOfTypes(arg_types));
   var arg_spec = as_value ?
     new r.Value.ArgumentSpec(arg_names, {}, null, arguments_type) :
     new r.Expr.ArgumentSpec(arg_names, {}, null, arguments_type);
   return {
+    args: final_args,
     arg_spec: arg_spec,
-    return_type: return_type_instance
+    return_type: return_type_instance,
+    name: function_spec.name
   };
 };
 
-Ray.Main.make_function_application_block = function(r, function_spec) {
+
+Ray.Main.make_function_application_and_argument_blocks = function(r, function_spec) {
+  var block_dir = {};
   var function_parts = Ray.Main.make_function_parts_from_spec(r, function_spec, true);
-  var return_type_instance = function_parts.return_type;
-  var arg_spec = function_parts.arg_spec;
-  var f_value = new r.Value.Closure(arg_spec,
-                                    null,
-                                    null,
-                                    return_type_instance);
-  return Ray.Blocks.generate_block(r, function_spec.name, f_value, {}, true);
+  var arg_blocks = Ray.Main.make_function_argument_blocks(r, block_dir, function_parts);
+  var app_block = Ray.Main.make_function_application_block(r, {}, function_parts);
+  var func_block_name = _.keys(app_block)[0];
+  return [arg_blocks, app_block, func_block_name];
 };
 
 Ray.Main.get_function_body_expression_block = function(Blockly) {
@@ -214,7 +234,7 @@ Ray.Main.Block = function(block_name, block, editable) {
   this.nextConnection = null;
   this.previousConnection = null;
   this.inputList = [];
-  this.inputsInline = false;
+  this.inputsInline = true;
   this.rendered = false;
   this.collapsed = false;
   this.disabled = false;

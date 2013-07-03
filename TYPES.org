@@ -105,3 +105,11 @@ Also, consider If and Cond!!!
 When I change the type of a connection, b/c for example Bottom connects to Num, so 
 we can replace Bottom with Num, I need to make sure that I mark that somewhere, or I need 
 to explicitly change that back once the connection which forced that change is broken!
+
+* More things to do *
+
+Make sure that mutually recursive functions work.
+Example: is-even and is-odd can be defined in terms of each other!
+
+Fix weird tab issue!
+Fix weird dropdown type menu issue!

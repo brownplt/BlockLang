@@ -88,9 +88,10 @@
 
     goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
         var func_specs = Ray.UI.get_function_definition_dialog_values(dialog);
-        var func_arg_blocks = Ray.Main.make_function_argument_blocks(r, func_specs);
-        var func_use_block = Ray.Main.make_function_application_block(r, func_specs);
-        var func_block_name = Ray.Main.get_function_block_name(func_specs.name);
+        var results = Ray.Main.make_function_application_and_argument_blocks(r, func_specs);
+        var func_arg_blocks = results[0];
+        var func_use_block = results[1];
+        var func_block_name = results[2];
         Ray.Shared.add_to_saved_blocks(func_block_name, func_use_block);
 
         var func_def_workspace = Ray.UI.add_function_definition_workspace_dom(func_specs.name,

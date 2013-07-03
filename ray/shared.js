@@ -1,6 +1,7 @@
 goog.provide('Ray.Shared');
 
 goog.require('Ray.Blocks');
+goog.require('Ray.Types');
 
 goog.require('Blockly');
 
@@ -68,6 +69,7 @@ Ray.Shared.add_to_saved_blocks = function(block_name, block) {
 /**
  * A single key can have multiple words separated by underscores, in which case they are used in turn during the lookup
  * @param key
+ * @param block_dir
  * @returns {*}
  */
 Ray.Shared.lookup_in_block_dir_ = function(key, block_dir) {
@@ -121,4 +123,8 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
 
 Ray.Shared.get_type_colour = function(type) {
   return Ray.Blocks.get_colour(type);
+};
+
+Ray.Shared.types_match = function(ty1, ty2) {
+  return Ray.Types.is_match(ty1, ty2);
 };
