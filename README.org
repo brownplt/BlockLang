@@ -1,73 +1,33 @@
 * How to get started:
 
-** Ray Tests
-The test suite for Ray can be run and viewed by opening up
-'ray/ray.html' in a web browser. If you add new modules (new js files
-in 'ray/') that have dependencies on anything else in ray, you can
-recompile with: 
+** Ray
 
-#+BEGIN_SRC sh
-  closure-library/closure/bin/build/depswriter.py --root_with_prefix="ray ../../../ray" > ray/ray-deps.js
-#+END_SRC
-
-This will generate 'ray/ray-deps.js' which is loaded in 'ray/ray.html'
-so that future calls to 'goog.require' will know where to find the
-various modules.  
+Ray is the top-level namespace for everything I've written. I chose the name because it was short, matched the Marine Wildlife theme established by Whalesong,
+and also was close to Racket.
 
 ** Application
 
-First, you can run the demo application by opening up
-'ray/fixed.html' (this is the fixed-size injection of Blockly into a
-page). In order for this to run correctly the dependencies file
-('ray/ray-deps.js') must be up to date. If it is out-of-date, it can
-be updated by running 
+You have to start up a server to run the application.
+I'm just using python's builtin HTTP server, so as long as you have some python installation in your PATH, this should work.
 
-#+BEGIN_SRC sh
-  closure-library/closure/bin/build/depswriter.py --root_with_prefix="blockly ../../../blockly" --root_with_prefix="ray ../../../ray" > ray/ray-deps.js
-#+END_SRC
+You can do so with the following command:
 
-This is now in a makefile in the top-level directory so you can update the file by simply
-running 'make deps'.
+./start-server
 
-*** Resizable 
-The resizable version of Blockly now works as well, but due to chrome
-prohibiting the loading of files using the file:/// protocol in one
-html frame, I have to start a server to actually get this working. 
+Run that from the root directory of the repository, and then navigate to
 
-I can do that by just running 'start-server', which is just an alias
-for the python SimpleHTTPServer. Once the server is running, I can go
-ahead and view the application at 'ray/app.html'.
+http://localhost:8000/ray/ui/ui_demo.html
+
+to run the application.
+
+** Tests
+The test suite for Ray can be run and viewed by opening up
+'ray/tests.html' in a web browser. No server is required.
+
+ If not using a server, you do need to provide the full path to the file in order to view it in the browser.
+
+ If you'd like, you can run a server, with './start-server', and then view the page at
+
+ http://localhost:8000/ray/tests.html
 
 
-** Compilation
- 
-Currently everything runs in uncompiled form, without being minimized
-at all. I'll add instructions to compile everything together for the
-application once I start actually testing it in compiled form. 
-
-** Blockly
-To use Blockly, currently you must start up a server, since browsers
-won't allow Blockly to be run in an iframe off the local filesystem. I
-set up a command to do this, './start-server', which also recompiles
-Blockly, using 'blockly/build.py'. 'blockly/build.py' is a build
-script that came with blockly that invokes Google's Closure compiler
-on the Blockly core, and generators, and language files. (I've removed
-all the language files, except for english, just to pare everything
-down to the bare minimum actually required to run Blockly. We can
-regenerate them later if desired.)  
-
-I've modified 'blockly/build.py' to compile locally using
-'compiler.jar', and the local copy of Google's Closure Library (in
-'closure-library'), and to only compile if any of the
-dependencies of the compilation targets have been modified since the
-last time the target was compiled.  
-
-I've been testing my code generation using the demo in
-'blockly/apps/code', and adding Whalesong (and now Ray) backends to
-it, and inspecting the generated code. If you ever make changes to
-'blockly/apps/code/template.soy', you should make sure to recompile
-'template.html' from 'blockly/apps/code' using this command:
-
-#+BEGIN_SRC sh 
-  java -jar ../_soy/SoyToJsSrcCompiler.jar --outputPathFormat template.js --srcs template.soy 
-#+END_SRC
