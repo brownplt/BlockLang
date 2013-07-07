@@ -849,18 +849,13 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
 
           // Add the backing color panel to the slot group element
           var slot = Blockly.createSvgElement('path', {
+            'mask': 'url(#blocklySlotMask)',
             'fill': fill_value,
-            'fill-opacity': '1',
+            'fill-opacity': 1,
             'd': inlinePath.join(' '),
             'class': 'blocklyInputSlot'
           }, this.svgSlotsGroup_);
           this.svgSlots_.push(slot);
-          var slot_pattern = Blockly.createSvgElement('path', {
-            'fill': 'url(#blocklySlotPattern)',
-            'd': inlinePath.join(' '),
-            'class': 'blocklyInputSlotPattern'
-          }, this.svgSlotsGroup_);
-          this.svgSlots_.push(slot_pattern);
 
           if (Blockly.RTL) {
             // Highlight right edge, around back of tab, and bottom.

@@ -121,7 +121,7 @@ Blockly.createDom_ = function(container) {
   </defs>
   */
   var defs = Blockly.createSvgElement('defs', {}, svg);
-  var filter, feSpecularLighting, feMerge, disabled_pattern, slot_pattern;
+  var filter, feSpecularLighting, feMerge, disabled_pattern, slot_pattern, slot_mask;
   /*
     <filter id="blocklyEmboss">
       <feGaussianBlur in="SourceAlpha" stdDeviation="1" result="blur"/>
@@ -199,8 +199,20 @@ Blockly.createDom_ = function(container) {
   slot_pattern = Blockly.createSvgElement('pattern',
       {'id': 'blocklySlotPattern', 'patternUnits': 'userSpaceOnUse',
        'width': 4, 'height': 4}, defs);
+  Blockly.createSvgElement('rect',
+      {'width': 4, 'height': 4, 'fill': '#fff'}, slot_pattern);
   Blockly.createSvgElement('path',
-      {'d': 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2', 'stroke': '#fff', 'fill': 'transparent'}, slot_pattern);
+      {'d': 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2',
+       'stroke': '#000', 'fill': 'transparent'}, slot_pattern);
+
+  slot_mask = Blockly.createSvgElement('mask',
+      {'id': 'blocklySlotMask', 'maskContentUnits': 'userSpaceOnUse',
+       'maskUnits': 'objectBoundingBox',
+       'x': 0, 'y': 0, 'width': 1.0, 'height': 1.0}, defs);
+  Blockly.createSvgElement('rect',
+      {'x': 0, 'y': 0, 'width': '100%', 'height': '100%',
+       'fill': 'url(#blocklySlotPattern)'}, slot_mask);
+
 
   if (Blockly.editable) {
     // Determine if there needs to be a category tree, or a simple list of
