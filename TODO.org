@@ -117,3 +117,4 @@ Do I actually pass extra arguments bound to rest arg to the function
 body when I have a closure and not just a primitive? I don't think
 this is tested anywhere...
 
+Next up, ACTUALLY DO THE TYPE INFERENCE

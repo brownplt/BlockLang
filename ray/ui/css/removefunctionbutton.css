@@ -1,0 +1,15 @@
+.remove_function_button {
+    position: relative;
+    width: 15px;
+    height: 15px;
+    background: url(close_button_transparent_no_border.png) no-repeat center;
+    cursor: hand;
+}
+
+.remove_function_button-hover {
+    position: relative;
+    width: 15px;
+    height: 15px;
+    background: #fff url(close_button_transparent_no_border.png) no-repeat center;
+    cursor: hand;
+}

@@ -333,8 +333,17 @@ Ray.UI.add_function_definition_workspace_dom = function(function_name, container
 };
 
 Ray.UI.add_function_definition_workspace_tab = function(function_name, tabbar) {
-  var func_def_tab = new goog.ui.Tab('Edit ' + function_name); //goog.ui.RoundedTabRenderer.getInstance());
+  /*var remove_func_button = goog.dom.createDom('span', 'remove_function_button');
+  goog.style.setInlineBlock(remove_func_button);
+  goog.events.listen(remove_func_button, goog.events.EventType.CLICK, function(e) {
+    // TODO(fill in here)
+  });*/
+  var func_def_content = goog.dom.createDom('div', 'goog-inline-block',
+    [goog.dom.createTextNode('Edit ' + function_name + ' ')]);//,
+     //remove_func_button]);
+  var func_def_tab = new goog.ui.Tab(func_def_content);
   func_def_tab.workspace_id_ = 'blockly_function_definition_' + function_name;
+  //func_def_tab.remove_func_button = remove_func_button;
   tabbar.addChild(func_def_tab, true);
   return func_def_tab;
 };
