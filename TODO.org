@@ -84,7 +84,7 @@ Make it so that function blocks are associated with their
 definitions, and if the number of arguments changes, they change as
 well. 
 
-** TODO Order of priorities [6/9]:
+** TODO Order of priorities [7/10]:
 - [X] Move defined functions to the shared set of blocks. 
 - [X] Separate out argument blocks. 
 - [X] Hook up defined function blocks to the definition, so we can change things as needed. 
@@ -110,9 +110,10 @@ Things that I need to fix:
 
 Bottom block gets cut off in layout
 
-TESTS ARE NOW BROKEN, BECAUSE THEY DEPEND ON VARIABLE ARITY
+- [X] TESTS ARE NOW BROKEN, BECAUSE THEY DEPEND ON VARIABLE ARITY
 COMPARISONS, and BINOPS. Fix this!
 
 Do I actually pass extra arguments bound to rest arg to the function
 body when I have a closure and not just a primitive? I don't think
 this is tested anywhere...
+
