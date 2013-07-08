@@ -128,3 +128,11 @@ Ray.Shared.get_type_colour = function(type) {
 Ray.Shared.types_match = function(ty1, ty2) {
   return Ray.Types.is_match(ty1, ty2);
 };
+
+Ray.Shared.are_same_types = function(ty1, ty2) {
+  return Ray.Types.is_same(ty1, ty2);
+};
+
+Ray.Shared.principal_type = function(types) {
+  return Ray.Types.principal_type(types);
+};

@@ -118,3 +118,20 @@ body when I have a closure and not just a primitive? I don't think
 this is tested anywhere...
 
 Next up, ACTUALLY DO THE TYPE INFERENCE
+
+Actually, first just get If working. Have the block, when it makes a
+connection, call Block.prototype.updateTypes if it exists! That way,
+you can test it with just 'if' first.
+
+Then, try getting it working with 'Cond'. Then you just gotta do
+'first', and 'rest'. Then the hard part, which is function types!
+
+Make a version of the typechecker that works on blocks!
+
+
+
+Ok, in the process of figuring out how this is all going to work for
+If and Cond, I realize the following:
+
+I want to have each connection know it's current type, it's starting
+type, and the type forced upon it by the connected block.

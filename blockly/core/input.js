@@ -98,9 +98,40 @@ Blockly.Input.prototype.setType = function(type) {
   if (!this.connection) {
     throw 'This input does not have a connection.';
   }
-  this.__type__ = type;
   this.connection.setType(type);
   return this;
+};
+
+Blockly.Input.prototype.getForcedType = function() {
+  if(!this.connection) {
+    throw 'This input does not have a connection.';
+  }
+  return this.connection.getForcedType();
+};
+
+Blockly.Input.prototype.getType = function() {
+  if(!this.connection) {
+    throw 'This input does not have a connection.';
+  }
+  return this.connection.getType();
+};
+
+/**
+ * Update the input's type with something more specific.
+ * @param type
+ */
+Blockly.Input.prototype.inferType = function(type) {
+  if (!this.connection) {
+    throw 'This input does not have a connection.';
+  }
+  this.connection.inferType(type);
+};
+
+Blockly.Input.prototype.clearInferredType = function() {
+  if(!this.connection) {
+    throw 'This input does not have a connection.';
+  }
+  this.connection.clearInferredType();
 };
 
 /**

@@ -18,6 +18,7 @@ goog.require('Ray.Types');
 
 goog.require('goog.dom');
 goog.require('goog.dom.xml');
+goog.require('goog.array');
 
 
 var R = Ray.Runtime;
@@ -79,7 +80,6 @@ Ray.Blocks.rest_arg_arg_block = {
     this.setColour(Ray.Blocks.BLOCK_COLOUR);
     this.appendDummyInput()
       .appendTitle('arg');
-    this.contextMenu = false;
   },
   __rest_arg__: true
 };
@@ -179,19 +179,18 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
 };
 
 Ray.Blocks.define_conditional_blocks = function(r, obj) {
-  function ConditionalBlock(name, type) {
+  function ConditionalBlock(name) {
     this.helpUrl = Ray.Blocks.HELP_URL;
     this.__value__ = null;
     this.__datatype__ = null;
     this.__form__ = name;
     this.__name__ = name;
-    this.__type__ = type || new Ray.Types.Bottom();
   }
 
   // If
   var if_block = new ConditionalBlock('if');
   if_block.init = function() {
-    this.setColour(Ray.Blocks.get_colour('forms'));
+    this.setOutputType(new Ray.Types.Bottom());
     this.appendValueInput('PRED')
       .appendTitle("if")
       .setType(new Ray.Types.Boolean());
@@ -206,12 +205,40 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   };
 
+  if_block.updateTypes = function(ty) {
+    var connections = [this.outputConnection,
+                       this.getInput('T_EXPR'),
+                       this.getInput('F_EXPR')];
+    if(ty) {
+      goog.array.forEach(connections, function(conn) {
+        conn.inferType(ty);
+      });
+    } else {
+      goog.array.forEach(connections, function(conn) {
+        conn.clearInferredType();
+      });
+
+      var types = goog.array.map(connections, function(conn) {
+        return conn.getForcedType();
+      });
+      var principal_type = Ray.Types.principal_type(types);
+
+      goog.array.forEach(connections, function(conn) {
+        conn.inferType(principal_type);
+      });
+    }
+  };
+
+  if_block.updateInferredTypes = function(connection, ty) {
+    this.updateTypes(ty);
+  };
+
   obj[Ray.Blocks.conditional_block_name('if')] = if_block;
 
   // And
   var and_block = new ConditionalBlock('and', new Ray.Types.Boolean());
   and_block.init = function() {
-    this.setColour(Ray.Blocks.get_colour('forms'));
+    this.setOutputType(new Ray.Types.Boolean());
 
     this.appendDummyInput()
       .setAlign(this.Blockly.ALIGN_CENTRE)
@@ -229,7 +256,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   // Or
   var or_block = new ConditionalBlock('or', new Ray.Types.Boolean());
   or_block.init = function() {
-    this.setColour(Ray.Blocks.get_colour('forms'));
+    this.setOutputType(new Ray.Types.Boolean());
 
     this.appendDummyInput()
       .setAlign(this.Blockly.ALIGN_CENTRE)
@@ -247,22 +274,50 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   // Cond
   var cond_block = new ConditionalBlock('cond');
   cond_block.init = function() {
-    this.setColour(Ray.Blocks.get_colour('forms'));
-        
+    this.setOutputType(new Ray.Types.Bottom());
     this.appendDummyInput()
       .setAlign(this.Blockly.ALIGN_CENTRE)
       .appendTitle('cond');
-
     this.appendValueInput('CONDITION0')
-      .appendTitle('when');
-    this.appendValueInput('BODY0');
-
-
+      .appendTitle('when')
+      .setType(new Ray.Types.Boolean());
+    this.appendValueInput('BODY0')
+      .setType(new Ray.Types.Bottom());
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.cond_test_body_block_name, Ray.Blocks.cond_else_block_name]));
-    this.test_clause_count_ = 0;
+    this.test_clause_count_ = 1;
     this.else_clause_ = false;
-
   };
+
+  cond_block.updateTypes = function(ty) {
+    var connections = [this.outputConnection];
+    goog.array.forEach(goog.array.range(this.test_clause_count_), function(i) {
+      connections.push(this.getInput('BODY' + String(i)));
+    }, this);
+
+    if(ty) {
+      goog.array.forEach(connections, function(conn) {
+        conn.inferType(ty);
+      });
+    } else {
+      goog.array.forEach(connections, function(conn) {
+        conn.clearInferredType();
+      });
+
+      var types = goog.array.map(connections, function(conn) {
+        return conn.getForcedType();
+      });
+      var principal_type = Ray.Types.principal_type(types);
+
+      goog.array.forEach(connections, function(conn) {
+        conn.inferType(principal_type);
+      });
+    }
+  };
+
+  cond_block.updateInferredTypes = function(connection, ty) {
+    this.updateTypes(ty);
+  };
+
   cond_block.mutationToDom = function(workspace) {
     var container = document.createElement('mutation');
     container.setAttribute('test_clauses', String(this.test_clause_count_));
@@ -270,7 +325,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     return container;
   };
   cond_block.domToMutation = function(container) {
-    for(var i = 1; i <= this.test_clause_count_; i++) {
+    for(var i = 0; i < this.test_clause_count_; i++) {
       this.removeInput('CONDITION' + String(i));
       this.removeInput('BODY' + String(i));
     }
@@ -279,61 +334,85 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
       this.removeInput('ELSE');
     }
     this.test_clause_count_ = window.parseInt(container.getAttribute('test_clauses'));
-    for(var i = 1; i <= this.test_clause_count_; i++) {
-      this.addValueInput('CONDITION' + String(i))
-        .addTitle('when');
+    for(var i = 0; i < this.test_clause_count_; i++) {
+      this.appendValueInput('CONDITION' + String(i))
+        .appendTitle('when')
+        .setType(new Ray.Types.Boolean());
+      this.appendValueInput('BODY' + String(i))
+        .setType(new Ray.Types.Bottom());
     }
 
     this.else_clause_ = Boolean(window.parseInt(container.getAttribute('else_clause')));
     if(this.else_clause_) {
-      this.addValueInput('ELSE')
-        .addTitle('otherwise');
+      this.appendValueInput('ELSE')
+        .appendTitle('otherwise')
+        .setType(new Ray.Types.Bottom());
     }
   };
   cond_block.decompose = function(workspace) {
     var container_block = new this.Blockly.Block(workspace, Ray.Blocks.conditional_block_name('cond_cond'));
     container_block.initSvg();
     var connection = container_block.getInput('STACK').connection;
-    for(var x = 1; x <= this.test_clause_count_; x++) {
+    for(var x = 0; x < this.test_clause_count_; x++) {
+      var conditionConnection = this.getInput('CONDITION' + String(x)).connection;
+      var bodyConnection = this.getInput('BODY' + String(x)).connection;
       var test_body_block = new this.Blockly.Block(workspace, Ray.Blocks.cond_test_body_block_name);
       test_body_block.initSvg();
+      test_body_block.conditionConnection_ = conditionConnection.targetConnection;
+      test_body_block.bodyConnection_ = bodyConnection.targetConnection;
       connection.connect(test_body_block.previousConnection);
       connection = test_body_block.nextConnection;
     }
 
     if(this.else_clause_) {
+      var elseConnection = this.getInput('ELSE').connection;
       var else_block = new this.Blockly.Block(workspace, Ray.Blocks.cond_else_block_name);
       else_block.initSvg();
+      else_block.elseConnection_ = elseConnection.targetConnection;
       connection.connect(else_block.previousConnection);
+
     }
     return container_block;
 
   };
   cond_block.compose = function(container_block) {
     if(this.else_clause_) {
+      this.else_clause_ = false;
       this.removeInput('ELSE');
     }
-    this.else_clause_ = false;
 
-    for(var x = this.test_clause_count_; x > 0; x--) {
+    for(var x = this.test_clause_count_ - 1; x >= 0; x--) {
+      this.test_clause_count_--;
       this.removeInput('CONDITION' + String(x));
       this.removeInput('BODY' + String(x));
     }
-    this.test_clause_count_ = 0;
 
     var clause_block = container_block.getInputTargetBlock('STACK');
     while(clause_block) {
       switch(clause_block.__type__) {
         case Ray.Blocks.cond_test_body_block_name:
+          var condition_input = this.appendValueInput('CONDITION' + String(this.test_clause_count_))
+            .appendTitle('when')
+            .setType(new Ray.Types.Boolean());
+          if(clause_block.conditionConnection_) {
+            condition_input.connection.connect(clause_block.conditionConnection_);
+          }
+
+          var body_input = this.appendValueInput('BODY' + String(this.test_clause_count_))
+            .setType(new Ray.Types.Bottom());
+          if(clause_block.bodyConnection_) {
+            body_input.connection.connect(clause_block.bodyConnection_);
+          }
           this.test_clause_count_++;
-          this.appendValueInput('CONDITION' + String(this.test_clause_count_))
-            .appendTitle('when');
-          this.appendValueInput('BODY' + String(this.test_clause_count_));
           break;
         case Ray.Blocks.cond_else_block_name:
           this.else_clause_ = true;
-          this.appendValueInput('ELSE')
-            .appendTitle('otherwise');
+          var else_input = this.appendValueInput('ELSE')
+            .appendTitle('otherwise')
+            .setType(new Ray.Types.Bottom());
+          if(clause_block.elseConnection_) {
+            else_input.connection.connect(clause_block.elseConnection_);
+          }
           break;
         default:
           throw "Unknown block type inside ray_conditional_cond_cond!";
@@ -342,6 +421,9 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
       clause_block = clause_block.nextConnection &&
         clause_block.nextConnection.targetBlock();
     }
+
+    this.updateTypes(null);
+
   };
 
   obj[Ray.Blocks.conditional_block_name('cond')] = cond_block;
@@ -365,9 +447,6 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
         .appendTitle('test/body');
-      this.setPreviousStatement(true);
-      this.setNextStatement(true);
-      this.contextMenu = false;
     }
   };
 
@@ -380,8 +459,8 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
         .appendTitle('otherwise');
-      this.setPreviousStatement(true);
-            this.contextMenu = false;
+      this.nextConnection.dispose();
+      this.nextConnection = null;
     }
   };
 

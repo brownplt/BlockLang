@@ -986,15 +986,13 @@ Blockly.Block.prototype.getDescendants = function() {
  * @return {number} HSV hue value.
  */
 Blockly.Block.prototype.getColour = function() {
-  return this.colourHue_;
+  return this.colourHue_ ?
+         this.colourHue_ :
+         Blockly.Ray_.Shared.get_type_colour(this.outputConnection.getType().get_all_base_types()[0]);
+
 };
 
-/**
- * Change the colour of a block.
- * @param {number} colourHue HSV hue value.
- */
-Blockly.Block.prototype.setColour = function(colourHue) {
-  this.colourHue_ = colourHue;
+Blockly.Block.prototype.updateColour = function() {
   if (this.svg_) {
     this.svg_.updateColour();
   }
@@ -1016,6 +1014,15 @@ Blockly.Block.prototype.setColour = function(colourHue) {
     }
     this.render();
   }
+};
+
+/**
+ * Change the colour of a block.
+ * @param {number} colourHue HSV hue value.
+ */
+Blockly.Block.prototype.setColour = function(colourHue) {
+  this.colourHue_ = colourHue;
+  this.updateColour();
 };
 
 /**
@@ -1074,6 +1081,7 @@ Blockly.Block.prototype.setTooltip = function(newTip) {
 Blockly.Block.prototype.makeRestArg = function() {
   this.nextConnection = new Blockly.Connection(this, Blockly.NEXT_STATEMENT);
   this.previousConnection = new Blockly.Connection(this, Blockly.PREVIOUS_STATEMENT);
+  this.contextMenu = false;
 
   if(this.outputConnection) {
     this.outputConnection.dispose();

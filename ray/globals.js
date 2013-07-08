@@ -38,3 +38,16 @@ Values.Primitive = 6;
 Values.Closure = 7;
 Values.ArgumentSpec = 8;
 Values.Arguments = 9;
+
+Ray.Globals.Types = {};
+var Types = Ray.Globals.Types;
+Types.Bottom = 0;
+Types.Num = 1;
+Types.Str = 2;
+Types.Char = 3;
+Types.Boolean = 4;
+Types.ListType = 5;
+Types.ListOfTypes = 6;
+Types.NArityType = 7;
+Types.ArgumentType = 8;
+Types.FunctionType = 9;

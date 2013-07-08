@@ -158,20 +158,27 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
   }
 
   // Determine which block is superior (higher in the source stack).
-  var parentBlock, childBlock;
+  var parentBlock, childBlock, parentConnection, childConnection;
   if (this.isSuperior()) {
     // Superior block.
     parentBlock = this.sourceBlock_;
     childBlock = otherConnection.sourceBlock_;
+    parentConnection = this;
+    childConnection = otherConnection;
   } else {
     // Inferior block.
     parentBlock = otherConnection.sourceBlock_;
     childBlock = this.sourceBlock_;
+    parentConnection = otherConnection;
+    childConnection = this;
   }
 
   // Establish the connections.
-  this.targetConnection = otherConnection;
-  otherConnection.targetConnection = this;
+  childConnection.targetConnection = parentConnection;
+  parentConnection.targetConnection = childConnection;
+
+  parentBlock.updateInferredTypes && parentBlock.updateInferredTypes(parentConnection, childConnection.getType());
+  childBlock.updateInferredTypes && childBlock.updateInferredTypes(childConnection, parentConnection.getType());
 
   // Demote the inferior block so that one is a child of the superior one.
   childBlock.setParent(parentBlock);
@@ -225,16 +232,28 @@ Blockly.Connection.prototype.disconnect = function() {
   this.targetConnection = null;
 
   // Rerender the parent so that it may reflow.
-  var parentBlock, childBlock;
+  var parentBlock, childBlock, parentConnection, childConnection;
   if (this.isSuperior()) {
     // Superior block.
     parentBlock = this.sourceBlock_;
     childBlock = otherConnection.sourceBlock_;
+    parentConnection = this;
+    childConnection = otherConnection;
   } else {
     // Inferior block.
     parentBlock = otherConnection.sourceBlock_;
     childBlock = this.sourceBlock_;
+    parentConnection = otherConnection;
+    childConnection = this;
   }
+
+  parentConnection.clearInferredType();
+  childConnection.clearInferredType();
+
+  parentBlock.updateInferredTypes && parentBlock.updateInferredTypes(parentConnection, null);
+  childBlock.updateInferredTypes && childBlock.updateInferredTypes(childConnection, null);
+
+
   if (parentBlock.rendered) {
     parentBlock.render();
   }
@@ -485,11 +504,23 @@ Blockly.Connection.prototype.closest = function(maxLimit, dx, dy) {
  * @private
  */
 Blockly.Connection.prototype.checkType_ = function(otherConnection) {
-  if (!this.__type__ || !otherConnection.__type__) {
+  if (!this.getType() || !otherConnection.getType()) {
     // One or both sides are promiscuous enough that anything will fit.
     return true;
   }
-  return Blockly.Ray_.Shared.types_match(this.__type__, otherConnection.__type__);
+  return Blockly.Ray_.Shared.types_match(this.getType(), otherConnection.getType());
+};
+
+Blockly.Connection.prototype.validateType = function() {
+  if (this.targetConnection && !this.checkType_(this.targetConnection)) {
+    if (this.isSuperior()) {
+      this.targetBlock().setParent(null);
+    } else {
+      this.sourceBlock_.setParent(null);
+    }
+    // Bump away.
+    this.sourceBlock_.bumpNeighbours_();
+  }
 };
 
 /**
@@ -503,18 +534,39 @@ Blockly.Connection.prototype.setType = function(type) {
   if(type) {
     this.__type__ = type;
     // The new value type may not be compatible with the existing connection.
-    if (this.targetConnection && !this.checkType_(this.targetConnection)) {
-      if (this.isSuperior()) {
-        this.targetBlock().setParent(null);
-      } else {
-        this.sourceBlock_.setParent(null);
-      }
-      // Bump away.
-      this.sourceBlock_.bumpNeighbours_();
-    }
+    this.validateType();
   } else {
     this.__type__ = null;
   }
+  return this;
+};
+
+Blockly.Connection.prototype.getForcedType = function() {
+  if(this.targetConnection) {
+    return this.targetConnection.getType();
+  } else {
+    return this.__type__;
+  }
+};
+
+Blockly.Connection.prototype.getType = function(type) {
+  return this.__inferred_type__ || this.__type__;
+};
+
+Blockly.Connection.prototype.inferType = function(type) {
+  if(type && !Blockly.Ray_.Shared.are_same_types(this.__type__, type)) {
+    this.__inferred_type__ = type;
+    this.validateType();
+    if(this.type === Blockly.OUTPUT_VALUE) {
+      this.sourceBlock_.updateColour();
+    }
+  }
+  return this;
+};
+
+Blockly.Connection.prototype.clearInferredType = function() {
+  this.__inferred_type__ = null;
+  this.sourceBlock_.updateColour();
   return this;
 };
 

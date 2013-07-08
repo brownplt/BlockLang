@@ -839,8 +839,8 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
 
           var fill_value;
           Array.prototype.push.apply(inlineSteps, inlinePath);
-          if(input.__type__) {
-            var input_type = input.__type__.get_all_base_types()[0];
+          if(input.getType()) {
+            var input_type = input.getType().get_all_base_types()[0];
             var input_type_hue = Blockly.Ray_.Shared.get_type_colour(input_type);
             fill_value = Blockly.makeColour(input_type_hue);
           } else {

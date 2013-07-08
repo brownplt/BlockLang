@@ -40,6 +40,11 @@ Ray.Types.Char = AtomicType('char');
 // Used to capture expressions which we don't know anything about
 Ray.Types.Bottom = AtomicType('bottom');
 
+Ray.Types.is_atomic_type = function(ty) {
+  return !!Ray.Types.get_atomic_type(ty.__type__);
+};
+
+
 // Compound Types
 /**
  * ListType, the type of list with elem_type elements
@@ -198,7 +203,7 @@ Ray.Types.fn = function(args, body) {
   return new Ray.Types.FunctionType(args, body);
 };
 
-Ray.Types.is_match= function(ty1, ty2) {
+Ray.Types.is_match = function(ty1, ty2) {
   if(ty2.__type__ === 'bottom' ||
      ty1.__type__ === 'bottom') {
     return true;
@@ -241,4 +246,105 @@ Ray.Types.is_match= function(ty1, ty2) {
       return false;
       break;
   }
+};
+
+Ray.Types.is_same = function(ty1, ty2) {  
+  switch(ty1.__type__) {
+    case 'bottom':
+      return ty2.__type__ === 'bottom';
+    case 'boolean':
+      return ty2.__type__ === 'boolean';
+    case 'num':
+      return ty2.__type__ === 'num';
+    case 'str':
+      return ty2.__type__ === 'str';
+    case 'char':
+      return ty2.__type__ === 'char';
+    case 'list':
+      return ty2.__type__ === 'list' &&
+             Ray.Types.is_same(ty1.element_type, ty2.element_type);
+    case 'list_of_types':
+      return ty2.__type__ === 'list_of_types' &&
+             _.every(_.zip(ty1.list, ty2.list), function(pair) {
+               return Ray.Types.is_same(pair[0], pair[1]);
+             });
+    case 'n_arity':
+      return ty2.__type__ === 'n_arity' &&
+             Ray.Types.is_same(ty1.base_type, ty2.base_type);
+    case 'args':
+      if(ty2.__type__ === 'args' &&
+         Ray.Types.is_same(ty1.p_arg_types, ty2.p_arg_types)) {
+
+        return (ty1.rest_arg_type && ty2.rest_arg_type) ?
+               Ray.Types.is_same(ty1.rest_arg_type, ty2.rest_arg_type) :
+               (!ty1.rest_arg_type && !ty2.rest_arg_type);
+      } else {
+        return false;
+      }
+    case 'function':
+      return ty2.__type__ === 'function' &&
+             Ray.Types.is_same(ty1.argument_type, ty2.argument_type) &&
+             Ray.Types.is_same(ty1.return_type, ty2.return_type);
+    default:
+      return false;
+      break;
+  }
+};
+
+
+
+/**
+ * Picks the more specific type of the pair.
+ * This will only work correctly if ty1 and ty2 match!!!
+ * @param ty1
+ * @param ty2
+ * @returns {*}
+ */
+Ray.Types.principal_type_ = function(ty1, ty2) {
+  if(ty1.__type__ === 'bottom') {
+    return ty2;
+  } else if(ty2.__type__ === 'bottom') {
+    return ty1;
+  } else {
+    switch(ty1.__type__) {
+      case 'boolean':
+      case 'num':
+      case 'str':
+      case 'char':
+        return ty1;
+
+      case 'list':
+        return new Ray.Types.ListType(Ray.Types.principal_type_(ty1.element_type, ty2.element_type));
+
+      case 'list_of_types':
+        return new Ray.Types.ListOfTypes(_.map(_.zip(ty1.list, ty2.list), function(pair) {
+          return Ray.Types.principal_type_(pair[0], pair[1]);
+        }));
+
+      case 'n_arity':
+        return new Ray.Types.NArityType(Ray.Types.principal_type_(ty1.base_type, ty2.base_type));
+
+      case 'args':
+        var p_arg_types = _.map(_.zip(ty1.p_arg_types, ty2.p_arg_types), function(pair) {
+          return Ray.Types.principal_type_(pair[0], pair[1]);
+        });
+        var rest_arg_type = ty1.rest_arg_type ?
+                            Ray.Types.principal_type_(ty1.rest_arg_type, ty2.rest_arg_type) :
+                            null;
+        return new Ray.Types.ArgumentType(p_arg_types, rest_arg_type);
+
+      case 'function':
+        return new Ray.Types.FunctionType(Ray.Types.principal_type_(ty1.argument_type, ty2.argument_type),
+                                          Ray.Types.principal_type_(ty1.return_type, ty2.return_type));
+
+      default:
+        throw 'Unknown type for ty1!';
+    }
+  }
+};
+
+Ray.Types.principal_type = function(types) {
+  return _.reduce(types, function(curr, ty) {
+    return Ray.Types.principal_type_(curr, ty);
+  });
 };
