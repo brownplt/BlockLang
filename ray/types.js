@@ -10,7 +10,7 @@ Ray.Types.get_atomic_type = function(type_name) {
 };
 
 Ray.Types.atomic_types = {};
-var AtomicType = function (type_name) {
+var AtomicType = function (type_name, opt_no_register) {
   function AtomicTypeConstructor() {
     this.__type__ = type_name;
   }
@@ -28,7 +28,9 @@ var AtomicType = function (type_name) {
     return type_name;
   };
 
-  Ray.Types.atomic_types[type_name] = AtomicTypeConstructor;
+  if(!opt_no_register) {
+    Ray.Types.atomic_types[type_name] = AtomicTypeConstructor;
+  }
   return AtomicTypeConstructor;
 };
 
@@ -38,12 +40,15 @@ Ray.Types.Num = AtomicType('num');
 Ray.Types.Str = AtomicType('str');
 Ray.Types.Char = AtomicType('char');
 // Used to capture expressions which we don't know anything about
-Ray.Types.Bottom = AtomicType('bottom');
+Ray.Types.Bottom = AtomicType('bottom', true);
 
 Ray.Types.is_atomic_type = function(ty) {
   return !!Ray.Types.get_atomic_type(ty.__type__);
 };
 
+Ray.Types.is_bottom = function(ty) {
+  return ty.__type__ === 'bottom';
+};
 
 // Compound Types
 /**

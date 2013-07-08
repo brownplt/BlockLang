@@ -177,8 +177,10 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
   childConnection.targetConnection = parentConnection;
   parentConnection.targetConnection = childConnection;
 
-  parentBlock.updateInferredTypes && parentBlock.updateInferredTypes(parentConnection, childConnection.getType());
-  childBlock.updateInferredTypes && childBlock.updateInferredTypes(childConnection, parentConnection.getType());
+  if(!Blockly.Ray_.Shared.are_same_types(childConnection.getType(), parentConnection.getType())) {
+    parentBlock.updateInferredTypes && parentBlock.updateInferredTypes(parentConnection, childConnection.getType());
+    childBlock.updateInferredTypes && childBlock.updateInferredTypes(childConnection, parentConnection.getType());
+  }
 
   // Demote the inferior block so that one is a child of the superior one.
   childBlock.setParent(parentBlock);

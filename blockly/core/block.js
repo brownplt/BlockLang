@@ -986,9 +986,9 @@ Blockly.Block.prototype.getDescendants = function() {
  * @return {number} HSV hue value.
  */
 Blockly.Block.prototype.getColour = function() {
-  return this.colourHue_ ?
+  return goog.isDef(this.colourHue_) ?
          this.colourHue_ :
-         Blockly.Ray_.Shared.get_type_colour(this.outputConnection.getType().get_all_base_types()[0]);
+         Blockly.Ray_.Shared.get_type_colour(this.outputConnection.getType());
 
 };
 

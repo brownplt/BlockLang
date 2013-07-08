@@ -57,7 +57,7 @@ Ray.Blocks.user_function_block_name = function(name) {
 };
 
 Ray.Blocks.TypeColourTable = {};
-var base_types = _.keys(Ray.Types.atomic_types).concat(['forms']);
+var base_types = _.keys(Ray.Types.atomic_types);
 var hue_distance = 270 / base_types.length;
 var current_hue = 0;
 _.each(base_types, function(ty) {
@@ -66,9 +66,15 @@ _.each(base_types, function(ty) {
 });
 
 Ray.Blocks.get_colour = function(type) {
-  var c = Ray.Blocks.TypeColourTable[type];
-  if(_.isNull(c)) {
-    throw new Ray.Error("Unknown type, no colour found!!");
+  var key = type.__type__;
+  var c = Ray.Blocks.TypeColourTable[key];
+  if(_.isUndefined(c)) {
+    if(Ray.Types.is_bottom(type)) {
+      return '#666666';
+    } else {
+      //throw 'Unknown type!';
+      return '#bbbbbb';
+    }
   } else {
     return c;
   }
@@ -486,7 +492,6 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   // Boolean
   var boolean_block = new PrimitiveDataBlock('boolean', new Ray.Types.Boolean());
   boolean_block.init = function() {
-    this.setColour(Ray.Blocks.get_colour(this.__datatype__));
     var dropdown = new this.Blockly.FieldDropdown([['#t', 'TRUE'],['#f', 'FALSE']]);
     this.appendDummyInput()
       .appendTitle(dropdown, 'B');
@@ -497,7 +502,6 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   // Number
   var number_block = new PrimitiveDataBlock('num', new Ray.Types.Num());
   number_block.init = function() {
-    this.setColour(Ray.Blocks.get_colour(this.__datatype__));
     var textfield = new this.Blockly.FieldTextInput('0', this.Blockly.FieldTextInput.numberValidator);
     this.appendDummyInput()
       .appendTitle(textfield, 'N');
@@ -508,7 +512,6 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   //String
   var string_block = new PrimitiveDataBlock('str', new Ray.Types.Str());
   string_block.init = function() {
-    this.setColour(Ray.Blocks.get_colour(this.__datatype__));
     var textfield = new this.Blockly.FieldTextInput('Hello, World!');
     this.appendDummyInput()
       .appendTitle('"')
@@ -521,7 +524,6 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
   //Chars
   var char_block = new PrimitiveDataBlock('char', new Ray.Types.Char());
   char_block.init = function() {
-    this.setColour(Ray.Blocks.get_colour(this.__datatype__));
     var char_validator = function(text) {
       return text.length === 1 ? text : null;
     };
@@ -592,8 +594,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
     case 'primitive':
     case 'closure':
       block = {};
-      var output_types = value.body_type.get_all_base_types();
-      var block_colour = Ray.Blocks.get_colour(output_types[0]);
+      var block_colour = Ray.Blocks.get_colour(value.body_type);
       var arg_spec = value.arg_spec;
       // Ignoring rest and keyword arguments
       var arity = arg_spec.p_args.length;

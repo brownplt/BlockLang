@@ -148,10 +148,10 @@ Lib.initialize = function(r) {
    */
   Lib.add_builtin("empty", r.empty());
 
-  Lib.add_builtin("car", r.prim(r.p_spec(['x', Types.list(Types.bottom())]), function(x) {
+  Lib.add_builtin("first", r.prim(r.p_spec(['x', Types.list(Types.bottom())]), function(x) {
     return x.car;
   }, Types.bottom()));
-  Lib.add_builtin("cdr", r.prim(r.p_spec(['x', Types.list(Types.bottom())]), function(x) {
+  Lib.add_builtin("rest", r.prim(r.p_spec(['x', Types.list(Types.bottom())]), function(x) {
     return x.cdr;
   }, Types.list(Types.bottom())));
   Lib.add_builtin("cons", r.prim(r.p_spec(['car', Types.bottom()], ['cdr', Types.list(Types.bottom())]), function(car, cdr) {
