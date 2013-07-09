@@ -319,7 +319,7 @@ Ray.Types.principal_type_ = function(ty1, ty2) {
         return ty1;
 
       case 'list':
-        return new Ray.Types.ListType(Ray.Types.principal_type_(ty1.element_type, ty2.element_type));
+        return new Ray.Types.List(Ray.Types.principal_type_(ty1.element_type, ty2.element_type));
 
       case 'list_of_types':
         return new Ray.Types.ListOfTypes(_.map(_.zip(ty1.list, ty2.list), function(pair) {

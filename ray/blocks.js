@@ -15,10 +15,14 @@ goog.provide('Ray.Blocks');
 goog.require('Ray._');
 goog.require('Ray.Runtime');
 goog.require('Ray.Types');
+goog.require('Ray.Inference');
 
+goog.require('Blockly');
+
+goog.require('goog.array');
+goog.require('goog.color');
 goog.require('goog.dom');
 goog.require('goog.dom.xml');
-goog.require('goog.array');
 
 
 var R = Ray.Runtime;
@@ -65,18 +69,33 @@ _.each(base_types, function(ty) {
   current_hue += hue_distance;
 });
 
+Ray.Blocks.DEFAULT_BLOCK_COLOR = { R: 187, G: 187, B: 187 };
+Ray.Blocks.BOTTOM_BLOCK_COLOR = {  R: 102, G: 102, B: 102 };
+Ray.Blocks.LIGHTEN_FACTOR = 0.4;
+
 Ray.Blocks.get_colour = function(type) {
   var key = type.__type__;
   var c = Ray.Blocks.TypeColourTable[key];
-  if(_.isUndefined(c)) {
-    if(Ray.Types.is_bottom(type)) {
-      return '#666666';
+  if(goog.isDef(c)) {
+    var rgb = goog.color.hsvToRgb(c, Blockly.HSV_SATURATION, Blockly.HSV_VALUE * 256);
+    return { R: rgb[0], G: rgb[1], B: rgb[2] };
+
+  } else if(key === 'list') {
+      var orig_c = Ray.Blocks.get_colour(type.element_type);
+      if(orig_c.R) {
+        var new_c = goog.color.lighten([orig_c.R, orig_c.G, orig_c.B], Ray.Blocks.LIGHTEN_FACTOR);
+        return { R: new_c[0], G: new_c[1], B: new_c[2] };
     } else {
-      //throw 'Unknown type!';
-      return '#bbbbbb';
+      throw 'Element type color wasn\'t an R G B object';
     }
+
+  } else if(Ray.Types.is_bottom(type)) {
+      return Ray.Blocks.BOTTOM_BLOCK_COLOR;
+
   } else {
-    return c;
+    //throw 'Unknown type!';
+    return Ray.Blocks.DEFAULT_BLOCK_COLOR;
+
   }
 };
 
@@ -96,17 +115,24 @@ Ray.Blocks.get_drawers = function(block) {
   var drawers = [];
   if(block.__value__) {
     var value = block.__value__;
-    var output_types = value.body_type.get_all_base_types();
-    var input_types = value.arg_spec.arguments_type.get_all_base_types();
-    _.each(input_types, function(type) {
-      drawers.push(type + '_input');
-    });
-    _.each(output_types, function(type) {
-      drawers.push(type + '_output');
-    });
-    if(block.__user_function__) {
-      drawers.push('functions');
+    if(R.node_type(block.__value__) === 'primitive' || R.node_type(block.__value__) === 'closure') {
+      var output_types = value.body_type.get_all_base_types();
+      var input_types = value.arg_spec.arguments_type.get_all_base_types();
+      _.each(input_types, function(type) {
+        drawers.push(type + '_input');
+      });
+      _.each(output_types, function(type) {
+        drawers.push(type + '_output');
+      });
+      if(block.__user_function__) {
+        drawers.push('functions');
+      }
+    } else {
+      _.each(block.__type__.get_all_base_types(), function(type)  {
+        drawers.push(type + '_input');
+      });
     }
+
   } else if(block.__form__) {
     drawers.push('forms');
   } else if(block.__datatype__) {
@@ -129,9 +155,67 @@ Ray.Blocks.get_drawers = function(block) {
 Ray.Blocks.generate_all_blocks = function(r) {
   var obj = {};
   Ray.Blocks.define_primitive_data_blocks(r, obj);
+  Ray.Blocks.define_list_blocks(r, obj);
   Ray.Blocks.define_builtin_blocks(r, obj);
   Ray.Blocks.define_conditional_blocks(r, obj);
   return obj;
+};
+
+// Cons, first, rest, empty
+Ray.Blocks.define_list_blocks = function(r, obj) {
+  var cons_block = {
+    helpUrl: Ray.Blocks.HELP_URL,
+    __value__: r.builtins.lookup('cons'),
+    __name__: 'cons',
+    __type__: new Ray.Types.List(new Ray.Types.Bottom())
+  };
+
+  cons_block.init = function() {
+    this.setOutputType(new Ray.Types.List(new Ray.Types.Bottom()));
+    this.outputConnection.inferTypeFromConstraint = Ray.Inference.inferListTypeFromElementConstraint;
+    this.outputConnection.getTypeForConstraint = Ray.Inference.getElementTypeForListConstraint;
+    this.appendDummyInput()
+      .appendTitle(this.__name__)
+      .setAlign(this.Blockly.ALIGN_CENTRE);
+    var car_input = this.appendValueInput('car')
+      .setType(new Ray.Types.Bottom());
+    var cdr_input = this.appendValueInput('cdr')
+      .setType(new Ray.Types.List(new Ray.Types.Bottom()));
+    cdr_input.inferTypeFromConstraint = Ray.Inference.inferListTypeFromElementConstraint;
+    cdr_input.getTypeForConstraint = Ray.Inference.getElementTypeForListConstraint;
+  };
+
+  cons_block.getConstraintConnections = function() {
+    return [this.outputConnection,
+            this.getInput('car'),
+            this.getInput('cdr')];
+  };
+  cons_block.updateInferredTypes = Ray.Inference.updateInferredTypes;
+  cons_block.updateTypes = Ray.Inference.updateTypes;
+
+  obj[Ray.Blocks.block_name('cons')] = cons_block;
+
+  var empty_block = {
+    helpUrl: Ray.Blocks.HELP_URL,
+    __value__: r.builtins.lookup('cons'),
+    __name__: 'empty',
+    __type__: new Ray.Types.List(new Ray.Types.Bottom())
+  };
+
+  empty_block.init = function() {
+    this.setOutputType(new Ray.Types.List(new Ray.Types.Bottom()));
+    this.appendDummyInput()
+      .appendTitle(this.__name__)
+      .setAlign(Blockly.ALIGN_CENTRE);
+  };
+
+  empty_block.getConstraintConnections = function() {
+    return [this.outputConnection];
+  };
+  empty_block.updateInferredTypes = Ray.Inference.updateInferredTypes;
+  empty_block.updateTypes = Ray.Inference.updateTypes;
+
+  obj[Ray.Blocks.block_name('empty')] = empty_block;
 };
 
 Ray.Blocks.define_function_def_block = function(r, obj, name, desc, return_type) {
@@ -171,7 +255,6 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
     this.__type__ = type;
     this.__arguments__ = true;
     this.init = function() {
-      this.setColour(Ray.Blocks.get_colour(this.__type__.key()));
       this.appendDummyInput()
         .appendTitle(this.__name__);
     };
@@ -211,33 +294,13 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   };
 
-  if_block.updateTypes = function(ty) {
-    var connections = [this.outputConnection,
-                       this.getInput('T_EXPR'),
-                       this.getInput('F_EXPR')];
-    if(ty) {
-      goog.array.forEach(connections, function(conn) {
-        conn.inferType(ty);
-      });
-    } else {
-      goog.array.forEach(connections, function(conn) {
-        conn.clearInferredType();
-      });
-
-      var types = goog.array.map(connections, function(conn) {
-        return conn.getForcedType();
-      });
-      var principal_type = Ray.Types.principal_type(types);
-
-      goog.array.forEach(connections, function(conn) {
-        conn.inferType(principal_type);
-      });
-    }
+  if_block.getConstraintConnections = function() {
+    return [this.outputConnection,
+            this.getInput('T_EXPR'),
+            this.getInput('F_EXPR')];
   };
-
-  if_block.updateInferredTypes = function(connection, ty) {
-    this.updateTypes(ty);
-  };
+  if_block.updateTypes = Ray.Inference.updateTypes;
+  if_block.updateInferredTypes = Ray.Inference.updateInferredTypes;
 
   obj[Ray.Blocks.conditional_block_name('if')] = if_block;
 
@@ -294,35 +357,16 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.else_clause_ = false;
   };
 
-  cond_block.updateTypes = function(ty) {
+
+  cond_block.getConstraintConnections = function() {
     var connections = [this.outputConnection];
     goog.array.forEach(goog.array.range(this.test_clause_count_), function(i) {
       connections.push(this.getInput('BODY' + String(i)));
     }, this);
-
-    if(ty) {
-      goog.array.forEach(connections, function(conn) {
-        conn.inferType(ty);
-      });
-    } else {
-      goog.array.forEach(connections, function(conn) {
-        conn.clearInferredType();
-      });
-
-      var types = goog.array.map(connections, function(conn) {
-        return conn.getForcedType();
-      });
-      var principal_type = Ray.Types.principal_type(types);
-
-      goog.array.forEach(connections, function(conn) {
-        conn.inferType(principal_type);
-      });
-    }
+    return connections;
   };
-
-  cond_block.updateInferredTypes = function(connection, ty) {
-    this.updateTypes(ty);
-  };
+  cond_block.updateTypes = Ray.Inference.updateTypes;
+  cond_block.updateInferredTypes = Ray.Inference.updateInferredTypes;
 
   cond_block.mutationToDom = function(workspace) {
     var container = document.createElement('mutation');
@@ -431,7 +475,6 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.updateTypes(null);
 
   };
-
   obj[Ray.Blocks.conditional_block_name('cond')] = cond_block;
 
   var cond_cond_block = {
@@ -443,7 +486,6 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
       this.contextMenu = false;
     }
   };
-
   obj[Ray.Blocks.conditional_block_name('cond_cond')] = cond_cond_block;
 
   var cond_test_body_block = {
@@ -455,7 +497,6 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
         .appendTitle('test/body');
     }
   };
-
   obj[Ray.Blocks.cond_test_body_block_name] = cond_test_body_block;
 
   var cond_else_block = {
@@ -469,7 +510,6 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
       this.nextConnection = null;
     }
   };
-
   obj[Ray.Blocks.cond_else_block_name] = cond_else_block;
 
   return obj;
@@ -594,7 +634,6 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
     case 'primitive':
     case 'closure':
       block = {};
-      var block_colour = Ray.Blocks.get_colour(value.body_type);
       var arg_spec = value.arg_spec;
       // Ignoring rest and keyword arguments
       var arity = arg_spec.p_args.length;
@@ -608,7 +647,6 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       }
       block.helpUrl = Ray.Blocks.HELP_URL;
       block.init = function() {
-        this.setColour(block_colour);
 
         this.appendDummyInput()
           .setAlign(this.Blockly.ALIGN_CENTRE)

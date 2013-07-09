@@ -33,10 +33,11 @@ goog.addDependency('../../../blockly/core/variables.js', ['Blockly.Variables'], 
 goog.addDependency('../../../blockly/core/warning.js', ['Blockly.Warning'], []);
 goog.addDependency('../../../blockly/core/workspace.js', ['Blockly.Workspace'], ['Blockly.ScrollbarPair', 'Blockly.Trashcan', 'Blockly.Xml']);
 goog.addDependency('../../../blockly/core/xml.js', ['Blockly.Xml'], []);
-goog.addDependency('../../../ray/blocks.js', ['Ray.Blocks'], ['Ray.Runtime', 'Ray.Types', 'Ray._', 'goog.dom', 'goog.dom.xml']);
+goog.addDependency('../../../ray/blocks.js', ['Ray.Blocks'], ['Blockly', 'Ray.Inference', 'Ray.Runtime', 'Ray.Types', 'Ray._', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml']);
 goog.addDependency('../../../ray/env.js', ['Ray.Env'], ['Ray.Util', 'Ray._']);
 goog.addDependency('../../../ray/generate.js', ['Ray.Generator'], ['Ray.Blocks']);
 goog.addDependency('../../../ray/globals.js', ['Ray.Globals'], []);
+goog.addDependency('../../../ray/inference.js', ['Ray.Inference'], ['Ray.Types', 'goog.array']);
 goog.addDependency('../../../ray/jquery.js', ['Ray.JQuery'], []);
 goog.addDependency('../../../ray/js-numbers.js', ['Ray.JSNumbers'], []);
 goog.addDependency('../../../ray/lib.js', ['Ray.Lib'], ['Ray.Ray', 'Ray.Types', 'Ray._']);

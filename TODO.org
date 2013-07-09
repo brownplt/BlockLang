@@ -135,3 +135,31 @@ If and Cond, I realize the following:
 
 I want to have each connection know it's current type, it's starting
 type, and the type forced upon it by the connected block.
+
+At the moment, the behavior is different if you put empty inside cons
+after a boolean, and before a boolean!
+
+Also, if I remove the boolean from the cons, the empty retains the
+inferred type incorrectly. Only when I remove it, and then put it
+back in again, do I end up with the expected principal type.
+
+Rename #f -> false, #t -> true
+
+Make it so you can rename function arguments
+
+Make type rejection more violent, be faster, have it shake
+
+Add a constants/values drawer for primitive datatypes
+
+Have unfinished function definitions trigger errors when they are
+used during evaluation
+
+If you have partially defined functions, you can still use what you
+have defined, and throw an error if you explore unfinished branches
+
+Fix error with (+ 0 4)
+
+Make constants always available
+
+Think about making it possible to just type in a value in a slot, and
+then have it fill in the appropriate literal.

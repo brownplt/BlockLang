@@ -86,12 +86,28 @@ Blockly.HSV_VALUE = 0.9;
  * @return {string} RGB code, e.g. '#5ba65b'.
  */
 Blockly.makeColour = function(color) {
-  if(goog.isString(color)) {
+  if(goog.isString(color)) { // Preformatted hex string
     return color;
-  } else {
-    var hue = color;
-    return goog.color.hsvToHex(hue, Blockly.HSV_SATURATION,
+  } else if(goog.isObject(color)) { // Object with attributes for different color components
+    if(goog.isDef(color.H)) { // color is in HSV format
+      var hue = color.H;
+      var saturation = color.S;
+      var value = color.V;
+      return goog.color.hsvToHex(hue, saturation, value * 256);
+    } else if(goog.isDef(color.R)) { // color is in RGB format
+      var red = color.R;
+      var green = color.G;
+      var blue = color.B;
+      return goog.color.rgbToHex(red, green, blue);
+    } else {
+      throw 'Unknown format!';
+    }
+  } else if (goog.isNumber(color)) { // Single number, hue value
+    var h = color;
+    return goog.color.hsvToHex(h, Blockly.HSV_SATURATION,
                                Blockly.HSV_VALUE * 256);
+  } else {
+    throw 'Argument must be string, object, or number!';
   }
 };
 

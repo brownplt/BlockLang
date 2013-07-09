@@ -177,7 +177,9 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
   childConnection.targetConnection = parentConnection;
   parentConnection.targetConnection = childConnection;
 
-  if(!Blockly.Ray_.Shared.are_same_types(childConnection.getType(), parentConnection.getType())) {
+  if(childConnection.getType() &&
+     parentConnection.getType() &&
+     !Blockly.Ray_.Shared.are_same_types(childConnection.getType(), parentConnection.getType())) {
     parentBlock.updateInferredTypes && parentBlock.updateInferredTypes(parentConnection, childConnection.getType());
     childBlock.updateInferredTypes && childBlock.updateInferredTypes(childConnection, parentConnection.getType());
   }
@@ -556,8 +558,9 @@ Blockly.Connection.prototype.getType = function(type) {
 };
 
 Blockly.Connection.prototype.inferType = function(type) {
-  if(type && !Blockly.Ray_.Shared.are_same_types(this.__type__, type)) {
-    this.__inferred_type__ = type;
+  var principal_type = Blockly.Ray_.Shared.principal_type_(this.getType(), type);
+  if(type && !Blockly.Ray_.Shared.are_same_types(this.getType(), principal_type)) {
+    this.__inferred_type__ = principal_type;
     this.validateType();
     if(this.type === Blockly.OUTPUT_VALUE) {
       this.sourceBlock_.updateColour();

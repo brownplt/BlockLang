@@ -136,3 +136,7 @@ Ray.Shared.are_same_types = function(ty1, ty2) {
 Ray.Shared.principal_type = function(types) {
   return Ray.Types.principal_type(types);
 };
+
+Ray.Shared.principal_type_ = function(ty1, ty2) {
+  return Ray.Types.principal_type_(ty1, ty2);
+};
