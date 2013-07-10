@@ -111,6 +111,10 @@
     //Ray.Main.initialize_main_blockly_dom();
     Ray.Main.initialize_function_definition_blockly_dom();
     Ray.Main.load_main_blockly(Ray.Main.main_blockly());
+
+    goog.events.listen(window, goog.events.EventType.BEFOREUNLOAD, function(e) {
+        return 'If you leave the page, any unsaved programs will be lost!';
+    });
 </script>
 </body>
 
