@@ -41,13 +41,28 @@ Values.Arguments = 9;
 
 Ray.Globals.Types = {};
 var Types = Ray.Globals.Types;
-Types.Bottom = 0;
+Types.Unknown = 0;
 Types.Num = 1;
 Types.Str = 2;
 Types.Char = 3;
 Types.Boolean = 4;
-Types.ListType = 5;
+Types.List = 5;
 Types.ListOfTypes = 6;
 Types.NArityType = 7;
 Types.ArgumentType = 8;
 Types.FunctionType = 9;
+
+Ray.Globals.Blocks = {};
+var Blocks = Ray.Globals.Blocks;
+Blocks.Num = 0;
+Blocks.Char = 1;
+Blocks.Str = 2;
+Blocks.Boolean = 3;
+Blocks.Cond = 4;
+Blocks.If = 5;
+Blocks.Cons = 6;
+Blocks.First = 7;
+Blocks.Rest = 8;
+Blocks.Empty = 9;
+Blocks.App = 10;
+

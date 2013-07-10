@@ -99,8 +99,10 @@ Blockly.Block = function(workspace, prototypeName) {
     goog.mixin(this, prototype);
   }
 
-  if(this.__rest_arg__ || this.__statement__) {
+  if(this.__rest_arg__) {
     this.makeRestArg();
+  } else if(this.__rest_arg_container__) {
+    this.makeRestArgContainer();
   } else {
     this.setOutputType(this.__type__);
   }
@@ -1090,6 +1092,16 @@ Blockly.Block.prototype.makeRestArg = function() {
 
 };
 
+Blockly.Block.prototype.makeRestArgContainer = function() {
+  this.nextConnection = null;
+  this.previousConnection = null;
+  this.contextMenu = false;
+  if(this.outputConnection) {
+    this.outputConnection.dispose();
+    this.outputConnection = null;
+  }
+};
+
 /**
  * Sets the output type for this block
  * @param {*} type Type returned by this block
@@ -1098,6 +1110,10 @@ Blockly.Block.prototype.setOutputType = function(type) {
   this.outputConnection =
     new Blockly.Connection(this, Blockly.OUTPUT_VALUE);
   this.outputConnection.setType(type);
+};
+
+Blockly.Block.prototype.getOutputType = function(opt_initial) {
+  return this.outputConnection.getType(opt_initial);
 };
 
 /**

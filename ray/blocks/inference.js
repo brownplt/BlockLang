@@ -42,9 +42,9 @@ Ray.Inference.clearInferredType = function(conns) {
   goog.array.map(conns, function(c) { c.clearInferredType(); });
 };
 
-Ray.Inference.getForcedType = function(conns) {
+Ray.Inference.getInitialType = function(conns) {
   return goog.array.map(conns, function(c) {
-    var ty = c.getForcedType();
+    var ty = c.getInitialType();
     return c.getTypeForConstraint ? c.getTypeForConstraint(ty) : ty;
   });
 };
@@ -61,7 +61,7 @@ Ray.Inference.updateTypes = function(ty) {
     Ray.Inference.inferType(connections, ty);
   } else {
     Ray.Inference.clearInferredType(connections)
-    var types = Ray.Inference.getForcedType(connections);
+    var types = Ray.Inference.getInitialType(connections);
     var principal_type = Ray.Types.principal_type(types);
     Ray.Inference.inferType(connections, principal_type);
   }

@@ -21,7 +21,7 @@ var Values = Ray.Globals.Values;
 var typecheck_list = function(list, ty, ty_env) {
   switch(R.expr_type(list)) {
     case Expressions.Empty:
-      var list_ty = new Ray.Types.List(new Ray.Types.Bottom());
+      var list_ty = new Ray.Types.List(new Ray.Types.Unknown());
       return Ray.Types.is_match(ty, list_ty) && list_ty;
     case Expressions.Pair:
       if(ty.__type__ !== 'list') {

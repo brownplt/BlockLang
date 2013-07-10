@@ -29,7 +29,7 @@ since we don't know how to typecheck the arguments.
 TypeCheck :: (Expr * TyEnv) -> Boolean
 TypeCheck' :: (Expr * TyEnv) -> Type
 TypeCheck'' :: (Expr * TyEnv * Type) -> Type
-TypeCheck''' :: (Expr * TyEnv * (Type U bottom)) -> (Type U bottom)
+TypeCheck''' :: (Expr * TyEnv * (Type U unknown)) -> (Type U unknown)
 
 * First, hang types on stuff,
 * Then, set up drawers and colors, 
@@ -88,7 +88,7 @@ Priorities:
 * Thoughts on TypeChecking * 
 There are two ways in which information about types can propagate
 across nodes. Consider the function 'first': It has the type
-signature: (Listof Bottom -> Bottom), since we don't have polymorphic types. Let's say we put 
+signature: (Listof Unknown -> Unknown), since we don't have polymorphic types. Let's say we put
 'first' in a context that requires a number. Then we should change the argument type to be a 
 (Listof Num) as well. 
 
@@ -102,8 +102,8 @@ Also, consider If and Cond!!!
 
 * Thoughts on coloring input slots * 
 
-When I change the type of a connection, b/c for example Bottom connects to Num, so 
-we can replace Bottom with Num, I need to make sure that I mark that somewhere, or I need 
+When I change the type of a connection, b/c for example Unknown connects to Num, so
+we can replace Unknown with Num, I need to make sure that I mark that somewhere, or I need
 to explicitly change that back once the connection which forced that change is broken!
 
 * More things to do *
@@ -117,3 +117,32 @@ Fix weird dropdown type menu issue!
 Look into building a minimal test case that can solve this stupid
 select issue. Just see if you can make a dialog where it works fine
 without random junk, and then expand.
+
+* Type Inference * 
+** Making a connection
+There are 5 cases to consider here:
+*** Both connections have the exact same type
+In this case, neither the parent nor the child has to update anything
+*** The child is known, but the parent is not (and the parent is special)
+The parent should update their types accordingly
+The child can do nothing
+*** The parent is known, but the child is not (and the child is special)
+The child should update their types accordingly
+The parent can do nothing
+
+** Breaking a connection
+If the child has an inferred type, they should clear it and propagate
+downwards. Otherwise, they shouldn't do anything.
+
+If the parent has an inferred type, they should run the constraint
+checker / typechecker, and propagate it down to 
+
+  propagate that downward
+through the typechecker, or constraint checker. 
+
+
+* New Idea * 
+
+When I add something, run the typechecker downwards from the root of
+the AST to which something was added, and the return type you get
+tells you what to set the block output type to!

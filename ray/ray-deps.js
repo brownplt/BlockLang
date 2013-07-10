@@ -33,11 +33,12 @@ goog.addDependency('../../../blockly/core/variables.js', ['Blockly.Variables'], 
 goog.addDependency('../../../blockly/core/warning.js', ['Blockly.Warning'], []);
 goog.addDependency('../../../blockly/core/workspace.js', ['Blockly.Workspace'], ['Blockly.ScrollbarPair', 'Blockly.Trashcan', 'Blockly.Xml']);
 goog.addDependency('../../../blockly/core/xml.js', ['Blockly.Xml'], []);
-goog.addDependency('../../../ray/blocks.js', ['Ray.Blocks'], ['Blockly', 'Ray.Inference', 'Ray.Runtime', 'Ray.Types', 'Ray._', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml']);
+goog.addDependency('../../../ray/blocks/block-typechecker.js', ['Ray.Blocks.TypeChecker'], ['Ray.Env', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types', 'Ray._']);
+goog.addDependency('../../../ray/blocks/blocks.js', ['Ray.Blocks'], ['Blockly', 'Ray.Globals', 'Ray.Inference', 'Ray.Runtime', 'Ray.Types', 'Ray._', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml', 'goog.string']);
+goog.addDependency('../../../ray/blocks/inference.js', ['Ray.Inference'], ['Ray.Types', 'goog.array']);
 goog.addDependency('../../../ray/env.js', ['Ray.Env'], ['Ray.Util', 'Ray._']);
 goog.addDependency('../../../ray/generate.js', ['Ray.Generator'], ['Ray.Blocks']);
 goog.addDependency('../../../ray/globals.js', ['Ray.Globals'], []);
-goog.addDependency('../../../ray/inference.js', ['Ray.Inference'], ['Ray.Types', 'goog.array']);
 goog.addDependency('../../../ray/jquery.js', ['Ray.JQuery'], []);
 goog.addDependency('../../../ray/js-numbers.js', ['Ray.JSNumbers'], []);
 goog.addDependency('../../../ray/lib.js', ['Ray.Lib'], ['Ray.Ray', 'Ray.Types', 'Ray._']);
@@ -45,7 +46,7 @@ goog.addDependency('../../../ray/main.js', ['Ray.Main'], ['Blockly.Xml', 'Ray.Bl
 goog.addDependency('../../../ray/ray-numbers.js', ['Ray.RayNumbers'], ['Ray.JSNumbers']);
 goog.addDependency('../../../ray/ray.js', ['Ray.Ray'], ['Ray.R', 'Ray.RayNumbers', 'Ray.Runtime']);
 goog.addDependency('../../../ray/runtime.js', ['Ray.R', 'Ray.Runtime'], ['Ray.Env', 'Ray.Globals', 'Ray.Types', 'Ray.Util', 'Ray._']);
-goog.addDependency('../../../ray/shared.js', ['Ray.Shared'], ['Blockly', 'Ray.Blocks', 'Ray.Types']);
+goog.addDependency('../../../ray/shared.js', ['Ray.Shared'], ['Blockly', 'Ray.Blocks', 'Ray.Blocks.TypeChecker', 'Ray.Types']);
 goog.addDependency('../../../ray/test.js', ['Ray.Test'], ['Ray.JQuery', 'Ray.Lib', 'Ray.Ray', 'Ray.TypeChecker', 'Ray.Types', 'Ray._']);
 goog.addDependency('../../../ray/typechecker.js', ['Ray.TypeChecker'], ['Ray.Env', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types', 'Ray._']);
 goog.addDependency('../../../ray/types.js', ['Ray.Types'], ['Ray._', 'goog.string']);

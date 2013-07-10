@@ -40,14 +40,14 @@ Ray.Types.Num = AtomicType('num');
 Ray.Types.Str = AtomicType('str');
 Ray.Types.Char = AtomicType('char');
 // Used to capture expressions which we don't know anything about
-Ray.Types.Bottom = AtomicType('bottom', true);
+Ray.Types.Unknown = AtomicType('unknown', true);
 
 Ray.Types.is_atomic_type = function(ty) {
   return !!Ray.Types.get_atomic_type(ty.__type__);
 };
 
-Ray.Types.is_bottom = function(ty) {
-  return ty.__type__ === 'bottom';
+Ray.Types.is_unknown = function(ty) {
+  return ty.__type__ === 'unknown';
 };
 
 // Compound Types
@@ -181,8 +181,8 @@ Ray.Types.str = function() {
 Ray.Types.char = function() {
   return new Ray.Types.Char();
 };
-Ray.Types.bottom = function() {
-  return new Ray.Types.Bottom();
+Ray.Types.unknown = function() {
+  return new Ray.Types.Unknown();
 };
 Ray.Types.list = function(ty) {
   return new Ray.Types.List(ty);
@@ -209,8 +209,8 @@ Ray.Types.fn = function(args, body) {
 };
 
 Ray.Types.is_match = function(ty1, ty2) {
-  if(ty2.__type__ === 'bottom' ||
-     ty1.__type__ === 'bottom') {
+  if(ty2.__type__ === 'unknown' ||
+     ty1.__type__ === 'unknown') {
     return true;
   }
   switch(ty1.__type__) {
@@ -255,8 +255,8 @@ Ray.Types.is_match = function(ty1, ty2) {
 
 Ray.Types.is_same = function(ty1, ty2) {  
   switch(ty1.__type__) {
-    case 'bottom':
-      return ty2.__type__ === 'bottom';
+    case 'unknown':
+      return ty2.__type__ === 'unknown';
     case 'boolean':
       return ty2.__type__ === 'boolean';
     case 'num':
@@ -306,9 +306,9 @@ Ray.Types.is_same = function(ty1, ty2) {
  * @returns {*}
  */
 Ray.Types.principal_type_ = function(ty1, ty2) {
-  if(ty1.__type__ === 'bottom') {
+  if(ty1.__type__ === 'unknown') {
     return ty2;
-  } else if(ty2.__type__ === 'bottom') {
+  } else if(ty2.__type__ === 'unknown') {
     return ty1;
   } else {
     switch(ty1.__type__) {
@@ -351,5 +351,5 @@ Ray.Types.principal_type_ = function(ty1, ty2) {
 Ray.Types.principal_type = function(types) {
   return _.reduce(types, function(curr, ty) {
     return Ray.Types.principal_type_(curr, ty);
-  });
+  }, new Ray.Types.Unknown());
 };

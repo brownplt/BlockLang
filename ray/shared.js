@@ -1,6 +1,7 @@
 goog.provide('Ray.Shared');
 
 goog.require('Ray.Blocks');
+goog.require('Ray.Blocks.TypeChecker');
 goog.require('Ray.Types');
 
 goog.require('Blockly');
@@ -139,4 +140,8 @@ Ray.Shared.principal_type = function(types) {
 
 Ray.Shared.principal_type_ = function(ty1, ty2) {
   return Ray.Types.principal_type_(ty1, ty2);
+};
+
+Ray.Shared.typecheck_block = function(block) {
+  return Ray.Blocks.TypeChecker.typecheck_block(block);
 };

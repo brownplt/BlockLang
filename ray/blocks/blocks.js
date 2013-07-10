@@ -16,6 +16,7 @@ goog.require('Ray._');
 goog.require('Ray.Runtime');
 goog.require('Ray.Types');
 goog.require('Ray.Inference');
+goog.require('Ray.Globals');
 
 goog.require('Blockly');
 
@@ -23,8 +24,9 @@ goog.require('goog.array');
 goog.require('goog.color');
 goog.require('goog.dom');
 goog.require('goog.dom.xml');
+goog.require('goog.string');
 
-
+var Blocks = Ray.Globals.Blocks;
 var R = Ray.Runtime;
 
 //Ray.Blocks.BLOCK_COLOUR = 173;
@@ -70,7 +72,7 @@ _.each(base_types, function(ty) {
 });
 
 Ray.Blocks.DEFAULT_BLOCK_COLOR = { R: 187, G: 187, B: 187 };
-Ray.Blocks.BOTTOM_BLOCK_COLOR = {  R: 102, G: 102, B: 102 };
+Ray.Blocks.UNKNOWN_BLOCK_COLOR = {  R: 102, G: 102, B: 102 };
 Ray.Blocks.LIGHTEN_FACTOR = 0.4;
 
 Ray.Blocks.get_colour = function(type) {
@@ -89,8 +91,8 @@ Ray.Blocks.get_colour = function(type) {
       throw 'Element type color wasn\'t an R G B object';
     }
 
-  } else if(Ray.Types.is_bottom(type)) {
-      return Ray.Blocks.BOTTOM_BLOCK_COLOR;
+  } else if(Ray.Types.is_unknown(type)) {
+      return Ray.Blocks.UNKNOWN_BLOCK_COLOR;
 
   } else {
     //throw 'Unknown type!';
@@ -102,7 +104,7 @@ Ray.Blocks.get_colour = function(type) {
 Ray.Blocks.rest_arg_arg_block_name = "ray_rest_arg_arg_";
 Ray.Blocks.rest_arg_arg_block = {
   init: function() {
-    this.setColour(Ray.Blocks.BLOCK_COLOUR);
+    this.setColour(Ray.Blocks.DEFAULT_BLOCK_COLOR);
     this.appendDummyInput()
       .appendTitle('arg');
   },
@@ -163,59 +165,62 @@ Ray.Blocks.generate_all_blocks = function(r) {
 
 // Cons, first, rest, empty
 Ray.Blocks.define_list_blocks = function(r, obj) {
-  var cons_block = {
-    helpUrl: Ray.Blocks.HELP_URL,
-    __value__: r.builtins.lookup('cons'),
-    __name__: 'cons',
-    __type__: new Ray.Types.List(new Ray.Types.Bottom())
+  var ListBlock = function(name) {
+    this.helpUrl = Ray.Blocks.HELP_URL;
+    this.__value__ = r.builtins.lookup(name);
+    this.__list__ = name;
+    this.__name__ = name;
+    this.__block_class__ = Blocks[goog.string.toTitleCase(name)];
   };
 
+  var cons_block = new ListBlock('cons');
+  cons_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown());
   cons_block.init = function() {
-    this.setOutputType(new Ray.Types.List(new Ray.Types.Bottom()));
-    this.outputConnection.inferTypeFromConstraint = Ray.Inference.inferListTypeFromElementConstraint;
-    this.outputConnection.getTypeForConstraint = Ray.Inference.getElementTypeForListConstraint;
+    this.setOutputType(new Ray.Types.List(new Ray.Types.Unknown()));
     this.appendDummyInput()
-      .appendTitle(this.__name__)
+      .appendTitle('cons')
       .setAlign(this.Blockly.ALIGN_CENTRE);
-    var car_input = this.appendValueInput('car')
-      .setType(new Ray.Types.Bottom());
-    var cdr_input = this.appendValueInput('cdr')
-      .setType(new Ray.Types.List(new Ray.Types.Bottom()));
-    cdr_input.inferTypeFromConstraint = Ray.Inference.inferListTypeFromElementConstraint;
-    cdr_input.getTypeForConstraint = Ray.Inference.getElementTypeForListConstraint;
+    this.appendValueInput('car')
+      .setType(new Ray.Types.Unknown());
+    this.appendValueInput('cdr')
+      .setType(new Ray.Types.List(new Ray.Types.Unknown()));
   };
-
-  cons_block.getConstraintConnections = function() {
-    return [this.outputConnection,
-            this.getInput('car'),
-            this.getInput('cdr')];
-  };
-  cons_block.updateInferredTypes = Ray.Inference.updateInferredTypes;
-  cons_block.updateTypes = Ray.Inference.updateTypes;
-
   obj[Ray.Blocks.block_name('cons')] = cons_block;
 
-  var empty_block = {
-    helpUrl: Ray.Blocks.HELP_URL,
-    __value__: r.builtins.lookup('cons'),
-    __name__: 'empty',
-    __type__: new Ray.Types.List(new Ray.Types.Bottom())
-  };
-
+  var empty_block = new ListBlock('empty');
+  empty_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown())
   empty_block.init = function() {
-    this.setOutputType(new Ray.Types.List(new Ray.Types.Bottom()));
+    this.setOutputType(new Ray.Types.List(new Ray.Types.Unknown()));
     this.appendDummyInput()
       .appendTitle(this.__name__)
       .setAlign(Blockly.ALIGN_CENTRE);
   };
-
-  empty_block.getConstraintConnections = function() {
-    return [this.outputConnection];
-  };
-  empty_block.updateInferredTypes = Ray.Inference.updateInferredTypes;
-  empty_block.updateTypes = Ray.Inference.updateTypes;
-
   obj[Ray.Blocks.block_name('empty')] = empty_block;
+
+  var first_block = new ListBlock('first');
+  first_block.__type__ = new Ray.Types.Unknown();
+  first_block.init = function() {
+    this.setOutputType(new Ray.Types.Unknown());
+    this.appendDummyInput()
+      .appendTitle('first')
+      .setAlign(this.Blockly.ALIGN_CENTRE);
+    this.appendValueInput('x')
+      .setType(new Ray.Types.List(new Ray.Types.Unknown()));
+  };
+  obj[Ray.Blocks.block_name('first')] = first_block;
+
+  var rest_block = new ListBlock('rest');
+  rest_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown());
+  rest_block.init = function() {
+    this.setOutputType(new Ray.Types.Unknown());
+    this.appendDummyInput()
+      .appendTitle('rest')
+      .setAlign(this.Blockly.ALIGN_CENTRE);
+    this.appendValueInput('x')
+      .setType(new Ray.Types.List(new Ray.Types.Unknown()));
+  };
+  obj[Ray.Blocks.block_name('rest')] = rest_block;
+
 };
 
 Ray.Blocks.define_function_def_block = function(r, obj, name, desc, return_type) {
@@ -274,33 +279,27 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.__datatype__ = null;
     this.__form__ = name;
     this.__name__ = name;
+    this.__block_class__ = Blocks[goog.string.toTitleCase(name)];
   }
 
   // If
   var if_block = new ConditionalBlock('if');
+  if_block.__expr__ = Expressions.If;
   if_block.init = function() {
-    this.setOutputType(new Ray.Types.Bottom());
+    this.setOutputType(new Ray.Types.Unknown());
     this.appendValueInput('PRED')
       .appendTitle("if")
       .setType(new Ray.Types.Boolean());
 
     this.appendValueInput('T_EXPR')
       .appendTitle('then')
-      .setType(new Ray.Types.Bottom());
+      .setType(new Ray.Types.Unknown());
 
     this.appendValueInput('F_EXPR')
       .appendTitle('else')
-      .setType(new Ray.Types.Bottom());
+      .setType(new Ray.Types.Unknown());
 
   };
-
-  if_block.getConstraintConnections = function() {
-    return [this.outputConnection,
-            this.getInput('T_EXPR'),
-            this.getInput('F_EXPR')];
-  };
-  if_block.updateTypes = Ray.Inference.updateTypes;
-  if_block.updateInferredTypes = Ray.Inference.updateInferredTypes;
 
   obj[Ray.Blocks.conditional_block_name('if')] = if_block;
 
@@ -312,14 +311,15 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.appendDummyInput()
       .setAlign(this.Blockly.ALIGN_CENTRE)
       .appendTitle('and');
-
-    this.appendDummyInput('NO_REST_ARGS')
-      .appendTitle('...');
+    this.appendValueInput('REST_ARG0')
+      .setType(new Ray.Types.Boolean());
+    this.appendValueInput('REST_ARG1')
+      .setType(new Ray.Types.Boolean());
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
-    this.rest_arg_count_ = 0;
+    this.rest_arg_count_ = 2;
   };
 
-  Ray.Blocks.add_rest_arg(and_block, obj, 'and');
+  Ray.Blocks.add_rest_arg(and_block, obj, 'and', new Ray.Types.Boolean());
   obj[Ray.Blocks.conditional_block_name('and')] = and_block;
 
   // Or
@@ -330,43 +330,33 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.appendDummyInput()
       .setAlign(this.Blockly.ALIGN_CENTRE)
       .appendTitle('or');
-
-    this.appendDummyInput('NO_REST_ARGS')
-      .appendTitle('...');
+    this.appendValueInput('REST_ARG0')
+      .setType(new Ray.Types.Boolean());
+    this.appendValueInput('REST_ARG1')
+      .setType(new Ray.Types.Boolean());
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
-    this.rest_arg_count_ = 0;
+    this.rest_arg_count_ = 2;
   };
 
-  Ray.Blocks.add_rest_arg(or_block, obj, 'or');
+  Ray.Blocks.add_rest_arg(or_block, obj, 'or', new Ray.Types.Boolean());
   obj[Ray.Blocks.conditional_block_name('or')] = or_block;
 
   // Cond
   var cond_block = new ConditionalBlock('cond');
   cond_block.init = function() {
-    this.setOutputType(new Ray.Types.Bottom());
+    this.setOutputType(new Ray.Types.Unknown());
     this.appendDummyInput()
       .setAlign(this.Blockly.ALIGN_CENTRE)
       .appendTitle('cond');
-    this.appendValueInput('CONDITION0')
+    this.appendValueInput('CONDITION')
       .appendTitle('when')
       .setType(new Ray.Types.Boolean());
-    this.appendValueInput('BODY0')
-      .setType(new Ray.Types.Bottom());
+    this.appendValueInput('BODY')
+      .setType(new Ray.Types.Unknown());
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.cond_test_body_block_name, Ray.Blocks.cond_else_block_name]));
-    this.test_clause_count_ = 1;
+    this.test_clause_count_ = 0;
     this.else_clause_ = false;
   };
-
-
-  cond_block.getConstraintConnections = function() {
-    var connections = [this.outputConnection];
-    goog.array.forEach(goog.array.range(this.test_clause_count_), function(i) {
-      connections.push(this.getInput('BODY' + String(i)));
-    }, this);
-    return connections;
-  };
-  cond_block.updateTypes = Ray.Inference.updateTypes;
-  cond_block.updateInferredTypes = Ray.Inference.updateInferredTypes;
 
   cond_block.mutationToDom = function(workspace) {
     var container = document.createElement('mutation');
@@ -389,14 +379,14 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
         .appendTitle('when')
         .setType(new Ray.Types.Boolean());
       this.appendValueInput('BODY' + String(i))
-        .setType(new Ray.Types.Bottom());
+        .setType(new Ray.Types.Unknown());
     }
 
     this.else_clause_ = Boolean(window.parseInt(container.getAttribute('else_clause')));
     if(this.else_clause_) {
       this.appendValueInput('ELSE')
         .appendTitle('otherwise')
-        .setType(new Ray.Types.Bottom());
+        .setType(new Ray.Types.Unknown());
     }
   };
   cond_block.decompose = function(workspace) {
@@ -449,7 +439,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
           }
 
           var body_input = this.appendValueInput('BODY' + String(this.test_clause_count_))
-            .setType(new Ray.Types.Bottom());
+            .setType(new Ray.Types.Unknown());
           if(clause_block.bodyConnection_) {
             body_input.connection.connect(clause_block.bodyConnection_);
           }
@@ -459,7 +449,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
           this.else_clause_ = true;
           var else_input = this.appendValueInput('ELSE')
             .appendTitle('otherwise')
-            .setType(new Ray.Types.Bottom());
+            .setType(new Ray.Types.Unknown());
           if(clause_block.elseConnection_) {
             else_input.connection.connect(clause_block.elseConnection_);
           }
@@ -472,16 +462,19 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
         clause_block.nextConnection.targetBlock();
     }
 
-    this.updateTypes(null);
+    Ray.Blocks.TypeChecker.typecheck_block(this);
 
   };
   obj[Ray.Blocks.conditional_block_name('cond')] = cond_block;
 
   var cond_cond_block = {
+    __rest_arg_container__: true,
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
         .appendTitle('cond');
+      this.appendDummyInput()
+        .appendTitle('test/body');
       this.appendStatementInput('STACK');
       this.contextMenu = false;
     }
@@ -490,7 +483,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   var cond_test_body_block = {
     __type__: Ray.Blocks.cond_test_body_block_name,
-    __statement__: true,
+    __rest_arg__: true,
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
@@ -501,7 +494,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   var cond_else_block = {
     __type__: Ray.Blocks.cond_else_block_name,
-    __statement__: true,
+    __rest_arg__: true,
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
@@ -527,12 +520,13 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
     this.__value__ = null;
     this.__datatype__ = type_name;
     this.__type__ = type;
+    this.__block_class__ = Blocks[goog.string.toTitleCase(type_name)];
   }
 
   // Boolean
   var boolean_block = new PrimitiveDataBlock('boolean', new Ray.Types.Boolean());
   boolean_block.init = function() {
-    var dropdown = new this.Blockly.FieldDropdown([['#t', 'TRUE'],['#f', 'FALSE']]);
+    var dropdown = new this.Blockly.FieldDropdown([['true', 'TRUE'],['false', 'FALSE']]);
     this.appendDummyInput()
       .appendTitle(dropdown, 'B');
   };
@@ -642,6 +636,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       block.__name__ = name;
       block.__value__ = value;
       block.__type__ = value.body_type;
+      block.__block_class__ = Blocks.App;
       if(is_user_function) {
         block.__user_function__ = true;
       }
@@ -666,7 +661,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       };
 
       if(rest_arg) {
-        Ray.Blocks.add_rest_arg(block, obj, rest_arg);
+        Ray.Blocks.add_rest_arg(block, obj, rest_arg, arg_spec.arguments_type.rest_arg_type.base_type);
       }
       break;
     default:
@@ -736,7 +731,7 @@ Ray.Blocks.add_to_block_directory = function(block_dir, block_name, block) {
 
 Ray.Blocks.empty_block_directory = function() {
   var block_dir  = {};
-  _.each(['num', 'str', 'char', 'boolean', 'bottom'], function(ty)   {
+  _.each(['num', 'str', 'char', 'boolean', 'unknown'], function(ty)   {
     block_dir[ty] = {};
     block_dir[ty]['input'] = [];
     block_dir[ty]['output'] = [];
@@ -765,13 +760,14 @@ Ray.Blocks.generate_block_directory = function(blocks) {
 
 };
 
-Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
+Ray.Blocks.add_rest_arg = function(block, obj, rest_arg, type) {
   // Create the block which will hold the arguments as I add or subtract them.
   // The arguments themselves will be shared by any blocks with rest args.
   var rest_arg_container = {};
+  rest_arg_container.__rest_arg_container__ = true;
   rest_arg_container.helpUrl = Ray.Blocks.HELP_URL;
   rest_arg_container.init = function() {
-    this.setColour(Ray.Blocks.get_type_colour('bottom'));
+    this.setColour(Ray.Blocks.DEFAULT_BLOCK_COLOR);
     this.appendDummyInput()
       .appendTitle(rest_arg);
     this.appendStatementInput('STACK');
@@ -797,17 +793,14 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
     return container_block;
   };
   block.compose = function(container_block) {
-    if(this.rest_arg_count_ == 0) {
-      this.removeInput('NO_REST_ARGS');
-    } else {
-      for(var i = this.rest_arg_count_ - 1; i >= 0; i--) {
-        this.removeInput('REST_ARG' + String(i));
-      }
+    for(var i = this.rest_arg_count_ - 1; i >= 0; i--) {
+      this.removeInput('REST_ARG' + String(i));
     }
     this.rest_arg_count_ = 0;
     var arg_block = container_block.getInputTargetBlock('STACK');
     while(arg_block) {
-      var arg = this.appendValueInput('REST_ARG' + String(this.rest_arg_count_));
+      var arg = this.appendValueInput('REST_ARG' + String(this.rest_arg_count_))
+        .setType(type);
       // This should never be set!
       if(arg_block.value_connection_) {
         arg.connection.connect(arg_block.value_connection_);
@@ -815,11 +808,6 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
       this.rest_arg_count_++;
       arg_block = arg_block.nextConnection &&
         arg_block.nextConnection.targetBlock();
-    }
-    if(this.rest_arg_count_ === 0) {
-      this.appendDummyInput('NO_REST_ARGS')
-        .appendTitle("...");
-
     }
 
   };
@@ -834,12 +822,8 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg) {
     }
     this.rest_arg_count_ = window.parseInt(container.getAttribute('rest_args'), 10);
     for(var x = 0; x < this.rest_arg_count_; x++) {
-      this.appendValueInput('REST_ARG' + String(x));
-    }
-    if(this.rest_arg_count_ === 0
-      && (!this.getInput('NO_REST_ARGS'))) {
-      this.appendDummyInput('NO_REST_ARGS')
-        .appendTitle('...');
+      this.appendValueInput('REST_ARG' + String(x))
+        .setType(type);
     }
   };
 };

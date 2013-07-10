@@ -102,11 +102,11 @@ Blockly.Input.prototype.setType = function(type) {
   return this;
 };
 
-Blockly.Input.prototype.getForcedType = function() {
+Blockly.Input.prototype.getInitialType = function() {
   if(!this.connection) {
     throw 'This input does not have a connection.';
   }
-  return this.connection.getForcedType();
+  return this.connection.getInitialType();
 };
 
 Blockly.Input.prototype.getType = function() {

@@ -65,7 +65,7 @@ Lib.add_builtin = function(name, val) {
 };
 
 Lib.make_predicate = function(type) {
-  Lib.add_builtin(type + '?', Lib.r.prim(Lib.r.p_spec(['x', Types.bottom()]), function(x) {
+  Lib.add_builtin(type + '?', Lib.r.prim(Lib.r.p_spec(['x', Types.unknown()]), function(x) {
     return new Lib.r.Value.Boolean(Lib.r.node_type(x) === type);
   }, Types.bool()));
 };
@@ -148,23 +148,23 @@ Lib.initialize = function(r) {
    */
   Lib.add_builtin("empty", r.empty());
 
-  Lib.add_builtin("first", r.prim(r.p_spec(['x', Types.list(Types.bottom())]), function(x) {
+  Lib.add_builtin("first", r.prim(r.p_spec(['x', Types.list(Types.unknown())]), function(x) {
     return x.car;
-  }, Types.bottom()));
-  Lib.add_builtin("rest", r.prim(r.p_spec(['x', Types.list(Types.bottom())]), function(x) {
+  }, Types.unknown()));
+  Lib.add_builtin("rest", r.prim(r.p_spec(['x', Types.list(Types.unknown())]), function(x) {
     return x.cdr;
-  }, Types.list(Types.bottom())));
-  Lib.add_builtin("cons", r.prim(r.p_spec(['car', Types.bottom()], ['cdr', Types.list(Types.bottom())]), function(car, cdr) {
+  }, Types.list(Types.unknown())));
+  Lib.add_builtin("cons", r.prim(r.p_spec(['car', Types.unknown()], ['cdr', Types.list(Types.unknown())]), function(car, cdr) {
     return new r.Value.Pair(car, cdr);
-  }, Types.list(Types.bottom())));
+  }, Types.list(Types.unknown())));
 
-  Lib.add_builtin('list', r.prim(r.rest_spec('ls', Types.bottom()), function(ls) {
+  Lib.add_builtin('list', r.prim(r.rest_spec('ls', Types.unknown()), function(ls) {
     return _.reduceRight(ls, function(curr, elem) {
       return new r.Value.Pair(elem, curr);
     }, new r.Value.Empty());
-  }, Types.list(Types.bottom())));
+  }, Types.list(Types.unknown())));
 
-  Lib.add_builtin("list?", r.fn(r.p_spec(['x', Types.bottom()]),
+  Lib.add_builtin("list?", r.fn(r.p_spec(['x', Types.unknown()]),
                                 r.or(r.app(r.name('empty?'), r.p_args(r.name('x'))),
                                      r.and(r.app(r.name('pair?'),
                                                  r.p_args(r.name('x'))),
@@ -172,8 +172,8 @@ Lib.initialize = function(r) {
                                                  r.p_args(r.app(r.name('cdr'),
                                                                 r.p_args(r.name('x'))))))), Types.bool()));
 
-  Lib.add_builtin("map", r.fn(r.p_spec(['f', Types.fn(Types.p_args(Types.bottom()), Types.bottom())],
-                                       ['ls', Types.list(Types.bottom())]),
+  Lib.add_builtin("map", r.fn(r.p_spec(['f', Types.fn(Types.p_args(Types.unknown()), Types.unknown())],
+                                       ['ls', Types.list(Types.unknown())]),
                               r._if(r.app(r.name('empty?'), r.p_args(r.name('ls'))),
                                     r.empty(),
                                     r.app(r.name('cons'), r.p_args(r.app(r.name('f'),
@@ -182,7 +182,7 @@ Lib.initialize = function(r) {
                                                                    r.app(r.name('map'),
                                                                          r.p_args(r.name('f'),
                                                                                   r.app(r.name('cdr'),
-                                                                                        r.p_args(r.name('ls')))))))), Types.list(Types.bottom())));
+                                                                                        r.p_args(r.name('ls')))))))), Types.list(Types.unknown())));
 
   /**
    * Booleans and Equality

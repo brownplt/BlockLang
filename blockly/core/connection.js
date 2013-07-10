@@ -177,11 +177,8 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
   childConnection.targetConnection = parentConnection;
   parentConnection.targetConnection = childConnection;
 
-  if(childConnection.getType() &&
-     parentConnection.getType() &&
-     !Blockly.Ray_.Shared.are_same_types(childConnection.getType(), parentConnection.getType())) {
-    parentBlock.updateInferredTypes && parentBlock.updateInferredTypes(parentConnection, childConnection.getType());
-    childBlock.updateInferredTypes && childBlock.updateInferredTypes(childConnection, parentConnection.getType());
+  if(!parentBlock.__rest_arg__ && !parentBlock.__rest_arg_container__) {
+    Blockly.Ray_.Shared.typecheck_block(parentBlock.getRootBlock());
   }
 
   // Demote the inferior block so that one is a child of the superior one.
@@ -241,22 +238,17 @@ Blockly.Connection.prototype.disconnect = function() {
     // Superior block.
     parentBlock = this.sourceBlock_;
     childBlock = otherConnection.sourceBlock_;
-    parentConnection = this;
-    childConnection = otherConnection;
   } else {
     // Inferior block.
     parentBlock = otherConnection.sourceBlock_;
     childBlock = this.sourceBlock_;
-    parentConnection = otherConnection;
-    childConnection = this;
   }
 
-  parentConnection.clearInferredType();
-  childConnection.clearInferredType();
-
-  parentBlock.updateInferredTypes && parentBlock.updateInferredTypes(parentConnection, null);
-  childBlock.updateInferredTypes && childBlock.updateInferredTypes(childConnection, null);
-
+  if(!parentBlock.__rest_arg__ && !parentBlock.__rest_arg_container__ &&
+     !childBlock.__rest_arg__ && !childBlock.__rest_arg_container__) {
+    Blockly.Ray_.Shared.typecheck_block(parentBlock.getRootBlock());
+    Blockly.Ray_.Shared.typecheck_block(childBlock);
+  }
 
   if (parentBlock.rendered) {
     parentBlock.render();
@@ -545,26 +537,16 @@ Blockly.Connection.prototype.setType = function(type) {
   return this;
 };
 
-Blockly.Connection.prototype.getForcedType = function() {
-  if(this.targetConnection) {
-    return this.targetConnection.getType();
-  } else {
-    return this.__type__;
-  }
-};
-
-Blockly.Connection.prototype.getType = function(type) {
-  return this.__inferred_type__ || this.__type__;
+Blockly.Connection.prototype.getType = function(opt_initial) {
+  return opt_initial ?
+         this.__type__ :
+         (this.__inferred_type__ || this.__type__);
 };
 
 Blockly.Connection.prototype.inferType = function(type) {
-  var principal_type = Blockly.Ray_.Shared.principal_type_(this.getType(), type);
-  if(type && !Blockly.Ray_.Shared.are_same_types(this.getType(), principal_type)) {
-    this.__inferred_type__ = principal_type;
-    this.validateType();
-    if(this.type === Blockly.OUTPUT_VALUE) {
-      this.sourceBlock_.updateColour();
-    }
+  this.__inferred_type__ = type;
+  if(this.type === Blockly.OUTPUT_VALUE) {
+    this.sourceBlock_.updateColour();
   }
   return this;
 };
