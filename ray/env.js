@@ -1,7 +1,9 @@
 goog.provide('Ray.Env');
 
 goog.require('Ray.Util');
-goog.require('Ray._');
+
+goog.require('goog.array');
+goog.require('goog.object');
 
 /**
  * Environments, CS173 Style.
@@ -12,7 +14,6 @@ goog.require('Ray._');
  * These are immutable, so when I create an ExtendEnv, I must recursively copy all of the sub-environments,
  * so that both the original environment and the extended environment persist.
  */
-  var _ = Ray._;
 
 /**
  * An empty environment
@@ -90,18 +91,21 @@ var FastEnv = function() {
 FastEnv.prototype = {
   clone: function() {
     var new_env = new FastEnv();
-    _.each(this.env, function(value, name) {
+    goog.object.forEach(this.env, function(value, name) {
       new_env.extend(name, value);
     });
     return new_env;
   },
   toString: function() {
     var str = "";
-    _.each(this.env, function(value, name) {
+    goog.object.forEach(this.env, function(value, name) {
       str += '(' + name + ': ' + value.R.display(value) + ', ';
     });
     str += 'empty-env';
-    str += _.times(_.size(this.env), function(n) { return ')'; }).join('');
+    var env_keys = goog.object.getKeys(this.env);
+    for(var i = 0; i < env_keys.length; i++) {
+      str +=  ')';
+    }
     return str;
   },
   lookup: function(name) {
@@ -112,10 +116,10 @@ FastEnv.prototype = {
     return this;
   },
   all_bound_names: function() {
-    return _.keys(this.env);
+    return goog.object.getKeys(this.env);
   },
   dict: function(d) {
-    _.each(this.env, function(value, name) {
+    goog.oject.forEach(this.env, function(value, name) {
       d[name] = value;
     });
     return d;

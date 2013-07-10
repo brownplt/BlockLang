@@ -1,10 +1,10 @@
 goog.provide('Ray.Lib');
 
-goog.require('Ray._');
 goog.require('Ray.Ray');
 goog.require('Ray.Types');
 
-var _ = Ray._;
+goog.require('goog.array');
+
 var Types = Ray.Types;
 
 var Lib = Ray.Lib;
@@ -97,7 +97,7 @@ Lib.make_numeric_comparison = function(name, numbers_name) {
     var args = [x, y].concat(ls);
     var lefts = args.slice(0, -1);
     var rights = args.slice(1);
-    var result = _.reduce(_.range(lefts.length), function(result, i) {
+    var result = goog.array.reduce(goog.array.range(lefts.length), function(result, i) {
       return result && Lib.r.numbers[numbers_name](lefts[i].n,rights[i].n);
     }, true);
     return new r.Value.Boolean(result);
@@ -117,7 +117,7 @@ Lib.make_string_comparison = function(name, f) {
     var args = [x, y].concat(ls);
     var lefts = args.slice(0, -1);
     var rights = args.slice(1);
-    var result = _.reduce(_.range(lefts.length), function(result, i) {
+    var result = goog.array.reduce(goog.array.range(lefts.length), function(result, i) {
       return result && f(lefts[i].s, rights[i].s);
     }, true);
     return new r.Value.Boolean(result);
@@ -159,7 +159,7 @@ Lib.initialize = function(r) {
   }, Types.list(Types.unknown())));
 
   Lib.add_builtin('list', r.prim(r.rest_spec('ls', Types.unknown()), function(ls) {
-    return _.reduceRight(ls, function(curr, elem) {
+    return goog.array.reduceRight(ls, function(curr, elem) {
       return new r.Value.Pair(elem, curr);
     }, new r.Value.Empty());
   }, Types.list(Types.unknown())));
@@ -197,18 +197,18 @@ Lib.initialize = function(r) {
    * the binary ones, but I'll keep the varargs around in case I want to switch back later.
 
    Lib.add_builtin("+", r.prim(r.rest_spec('ls', Types.num()), function(ls) {
-      var sum = _.reduce(ls, function(a, b) { return r.numbers.add(a, b.n); }, 0);
+      var sum = goog.array.reduce(ls, function(a, b) { return r.numbers.add(a, b.n); }, 0);
       return new r.Value.Num(sum);
     }, Types.num()));
    Lib.add_builtin("*", r.prim(r.rest_spec('ls', Types.num()), function(ls) {
-      var sum = _.reduce(ls, function(a, b) { return r.numbers.multiply(a, b.n); }, 1);
+      var sum = goog.array.reduce(ls, function(a, b) { return r.numbers.multiply(a, b.n); }, 1);
       return new r.Value.Num(sum);
     }, Types.num()));
    Lib.add_builtin('-', r.prim(r.spec([['x', Types.num()]],{},['ls', Types.num()]), function(x,ls) {
       if(ls.length === 0) {
         return r.num(r.numbers.subtract(0, x.n));
       } else {
-        var result = _.reduce(ls, function(a, b) { return r.numbers.subtract(a, b.n); }, x.n);
+        var result = goog.array.reduce(ls, function(a, b) { return r.numbers.subtract(a, b.n); }, x.n);
         return new r.Value.Num(result);
       }
     }, Types.num()));
@@ -216,7 +216,7 @@ Lib.initialize = function(r) {
       if(ls.length === 0) {
         return new r.Value.Num(r.numbers.divide(1, x.n));
       } else {
-        var result = _.reduce(ls, function(a, b) { return r.numbers.divide(a, b.n); }, x.n);
+        var result = goog.array.reduce(ls, function(a, b) { return r.numbers.divide(a, b.n); }, x.n);
         return new r.Value.Num(result);
       }
     }, Types.num()));
@@ -277,13 +277,15 @@ Lib.initialize = function(r) {
    */
   Lib.add_builtin('make-string', r.prim(r.p_spec(['k', Types.num()], ['c', Types.char()]), function(k, c) {
     var str = "";
-    _.times(k.n, function() { str += c.c; });
+    for(var i = 0; i < k.n; i++) {
+      str += c.c;
+    }
     return new r.Value.Str(str);
   }, Types.str()));
 
   Lib.add_builtin('string', r.prim(r.rest_spec('ls', Types.char()), function(ls) {
     var str = "";
-    _.each(ls, function(c) { str += c.c; });
+    goog.array.forEach(ls, function(c) { str += c.c; });
     return new r.Value.Str(str);
   }, Types.str()));
 
@@ -300,7 +302,7 @@ Lib.initialize = function(r) {
   }, Types.char()));
 
   Lib.add_builtin('string-append', r.prim(r.rest_spec('ls', Types.str()), function(ls) {
-    var str = _.reduce(ls, function(str, s) { return str + s.s; }, "");
+    var str = goog.array.reduce(ls, function(str, s) { return str + s.s; }, "");
     return new r.Value.Str(str);
   }, Types.str()));
 

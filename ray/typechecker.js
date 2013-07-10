@@ -9,11 +9,9 @@ goog.provide('Ray.TypeChecker');
 goog.require('Ray.Globals');
 goog.require('Ray.Runtime');
 goog.require('Ray.Types');
-goog.require('Ray._');
 goog.require('Ray.Env');
 
 var R = Ray.Runtime;
-var _ = Ray._;
 
 var Expressions = Ray.Globals.Expressions;
 var Values = Ray.Globals.Values;

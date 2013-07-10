@@ -1,5 +1,3 @@
-* DONE First, switch to my list implementation. 
-* DONE Add in test cases for user-defined functions. 
 * DONE Then spend a day on code generation, so that we can have a representative sample of blocks to play with  
 - I also have to put an instance of Ray in place on the page, so I can use that, and I have to get the code generation working!
 - First, figure out how to generate blocks from calls to builtins. Basically,
@@ -170,3 +168,25 @@ then have it fill in the appropriate literal.
 Put it online
 Make a to-do list
 Clean stuff up
+
+* List of things to do * 
+- Make it possible to rename function arguments
+- Show the type name of function arguments alongside the
+  function. Maybe show the function signature somewhere 
+- Make it possible to edit function signature, remove a function
+- Have flyout automatically refresh when I switch tabs, so that I get
+  most up to date set of blocks
+- Get the function name to be above the function arguments.
+- Disable copying of argument blocks from one function to another.
+- See about having function body not just floating in space
+- Try and resize window so the canvas doesn't extend past visible area
+- Make failed attempts to connect react more violently to that
+  failure. 
+- Add in image atomic type.
+- Add support for world-programming, via big-bang primitives. 
+- Change unknown color to rainbow gradient.
+- Start actually catching errors, and showing them to users somewhere
+- Add primitives to top-level of toolbox
+- Remove dependencies on underscore.js and jQuery
+- Start getting compiled mode to work
+- Thoroughly test everything

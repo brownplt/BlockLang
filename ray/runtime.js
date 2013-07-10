@@ -7,10 +7,14 @@ goog.provide('Ray.Runtime');
 goog.provide('Ray.R');
 
 goog.require('Ray.Globals');
-goog.require('Ray._');
 goog.require('Ray.Util');
 goog.require('Ray.Env');
 goog.require('Ray.Types');
+
+goog.require('goog.array');
+goog.require('goog.functions');
+goog.require('goog.object');
+goog.require('goog.structs.Set');
 
 var env = Ray.Env;
 /**
@@ -20,7 +24,6 @@ var env = Ray.Env;
 var R = Ray.Runtime;
 Ray.R = R;
 
-var _ = Ray._;
 
 var clone_constructor = Ray.Util.clone_constructor;
 clone_constructor.R = R;
@@ -29,7 +32,7 @@ var construct = Ray.Util.construct;
 
 var make_expr = function(type,obj) {
   var proto = {};
-  _.extend(proto, obj);
+  goog.object.extend(proto, obj);
   proto.toString = function() { return type + 'E'; };
   proto.__node_type__ = type.toLowerCase() + 'E';
   proto.__expr_type__ = Ray.Globals.Expressions[type];
@@ -39,7 +42,7 @@ var make_expr = function(type,obj) {
 
 var make_value = function(type,obj) {
   var proto = {};
-  _.extend(proto, obj);
+  goog.object.extend(proto, obj);
   proto.toString = function() { return type; };
   proto.__node_type__ = type.toLowerCase();
   proto.__value_type__ = Ray.Globals.Values[type];
@@ -190,8 +193,8 @@ Closure.proto = {
 var ArgumentSpec = product(['p_args', 'kw_args', 'rest_arg'], ['arguments_type']);
 ArgumentSpec.proto = {
   clone: function() {
-    return new R.Value.ArgumentSpec(_.map(this.p_args, _.identity),
-                                    _.clone(this.kw_args),
+    return new R.Value.ArgumentSpec(goog.array.map(this.p_args, goog.functions.identity),
+                                    goog.object.clone(this.kw_args),
                                     this.rest_arg);
   },
   /**
@@ -204,10 +207,14 @@ ArgumentSpec.proto = {
     if(!p_args_match) {
       return false;
     }
-    var keywords_needed = _.keys(this.kw_args);
-    var keywords_provided = _.keys(args.kw_args);
-    return (_.difference(keywords_needed, keywords_provided).length === 0) &&
-      (_.difference(keywords_provided, keywords_needed).length === 0);
+    var keywords_needed = goog.object.getKeys(this.kw_args);
+    var needed_set = new goog.structs.Set();
+    needed_set.addAll(keywords_needed);
+    var keywords_provided = goog.object.getKeys(args.kw_args);
+    var provided_set = new goog.structs.Set();
+    provided_set.addAll(keywords_provided);
+    return (needed_set.difference(provided_set).getCount() === 0) &&
+           (provided_set.difference(needed_set).getCount() === 0);
   },
   /**
    * @requires args must be accepted, (call ArgumentSpec.accepts(args) before this)
@@ -221,9 +228,9 @@ ArgumentSpec.proto = {
     }
 
     if(self.rest_arg) {
-      env = env.extend(self.rest_arg, _.map(args.p_args.slice(self.p_args.length), R.interp));
+      env = env.extend(self.rest_arg, goog.array.map(args.p_args.slice(self.p_args.length), R.interp));
     }
-    _.each(self.kw_args, function(kw_name, kw) {
+    goog.object.forEach(self.kw_args, function(kw_name, kw) {
       env = env.extend(kw_name, R.interp(args.kw_args[kw]));
     });
 
@@ -233,16 +240,18 @@ ArgumentSpec.proto = {
     return R.pop_env();
   },
   display: function() {
-    return '(' + this.p_args.concat(
-        _.map(this.kw_args, function(v,k) { return '#:' + k + ' ' + v; })).concat(
-        (this.rest_arg ? ['. ' + this.rest_arg] : [])).join(' ') + ')';
+    var kw_args = [];
+    goog.object.forEach(this.kw_args, function(v,k) { kw_args.push('#:' + k + ' ' + v); });
+    return '(' + this.p_args.concat(kw_args).concat(this.rest_arg ? ['. ' + this.rest_arg] : []).join(' ') + ')';
   }
 };
 
 var Arguments = product(['p_args','kw_args']);
 Arguments.proto = {
   clone: function() {
-    return new R.Value.Arguments(_.map(this.p_args, _.identity), _.clone(this.kw_args));
+    return new R.Value.Arguments(
+      goog.array.map(this.p_args, goog.functions.identity),
+      goog.object.clone(this.kw_args));
   }
 };
 
@@ -348,7 +357,7 @@ var Cond = product(['test_clauses', 'else_clause']);
 Cond.proto = {
   clone: function() {
     var self = this;
-    var test_clause_clones = _.map(this.test_clauses, function(test_clause) {
+    var test_clause_clones = goog.array.map(this.test_clauses, function(test_clause) {
       return [R.clone(test_clause[0]), R.clone(test_clause[1])];
     });
 
@@ -373,7 +382,7 @@ Cond.proto = {
   },
   display: function() {
     var self = this;
-    var displayed_clauses = _.map(this.test_clauses, function(clause) {
+    var displayed_clauses = goog.array.map(this.test_clauses, function(clause) {
       return '[' + R.display(clause[0]) + ' ' + R.display(clause[1]) + ']';
     });
     if(this.else_clause) {
@@ -387,7 +396,7 @@ var And = product(['args']);
 And.proto = {
   clone: function() {
     var self = this;
-    return new R.Expr.And(_.map(this.args, function(arg) {
+    return new R.Expr.And(goog.array.map(this.args, function(arg) {
       return R.clone(arg);
     }));
   },
@@ -403,7 +412,7 @@ And.proto = {
   },
   display: function() {
     var self = this;
-    var displayed_args = _.map(this.args, R.display).join(' ');
+    var displayed_args = goog.array.map(this.args, R.display).join(' ');
     return '(and'  + (displayed_args ? ' ' : '') + displayed_args + ')';
   }
 };
@@ -412,7 +421,7 @@ var Or = product(['args']);
 Or.proto = {
   clone: function() {
     var self = this;
-    return new R.Expr.Or(_.map(this.args, function(arg) {
+    return new R.Expr.Or(goog.array.map(this.args, function(arg) {
       return R.clone(arg);
     }));
   },
@@ -428,7 +437,7 @@ Or.proto = {
   },
   display: function() {
     var self = this;
-    var displayed_args = _.map(this.args, R.display).join(' ');
+    var displayed_args = goog.array.map(this.args, R.display).join(' ');
     return '(or'  + (displayed_args ? ' ' : '') + displayed_args + ')';
   }
 };
@@ -458,22 +467,26 @@ Name.proto = {
 var ArgumentsExpr = product(['p_args','kw_args']);
 ArgumentsExpr.proto = {
   clone: function() {
-    return new R.Expr.Arguments(_.map(this.p_args, _.identity), _.clone(this.kw_args));
+    return new R.Expr.Arguments(
+      goog.array.map(this.p_args, goog.functions.identity),
+      goog.object.clone(this.kw_args));
   },
   interp: function() {
     var self = this;
-    var p_arg_values = _.map(this.p_args, R.interp, R);
+    var p_arg_values = goog.array.map(this.p_args, R.interp, R);
     var kw_arg_values = {};
-    _.each(this.kw_args, function(kw_arg_expr, kw) {
+    goog.object.forEach(this.kw_args, function(kw_arg_expr, kw) {
       kw_arg_values[kw] = R.interp(kw_arg_expr);
     });
     return new R.Value.Arguments(p_arg_values, kw_arg_values);
   },
   display: function() {
     var self = this;
-    return _.map(this.p_args, R.display).join(' ') +
-      (_.map(this.kw_args, function(v,k) { return '#:' + k + ' ' + R.display(v); })).join(' ') +
-      (this.rest_arg ? ' . ' + R.display(this.rest_arg) : '');
+    var kw_args = [];
+    goog.object.forEach(this.kw_args, function(v,k) { kw_args.push('#:' + k + ' ' + R.display(v)); });
+    return goog.array.map(this.p_args, R.display).join(' ') +
+           kw_args.join(' ') +
+           (this.rest_arg ? ' . ' + R.display(this.rest_arg) : '');
   }
 };
 
@@ -511,20 +524,22 @@ App.proto = {
 var ArgumentSpecExpr = product(['p_args', 'kw_args', 'rest_arg'], ['arguments_type']);
 ArgumentSpecExpr.proto = {
   clone: function() {
-    return new R.Expr.ArgumentSpec(_.map(this.p_args, _.identity),
-                                   _.clone(this.kw_args),
-                                   this.rest_arg,
-                                   this.arguments_type);
+    return new R.Expr.ArgumentSpec(
+      goog.array.map(this.p_args, goog.functions.identity),
+      goog.object.clone(this.kw_args),
+      this.rest_arg,
+      this.arguments_type);
   },
   interp: function() {
-    return new R.Value.ArgumentSpec(_.map(this.p_args, _.identity),
-                                    _.clone(this.kw_args),
-                                    this.rest_arg,
-                                    this.arguments_type);
+    return new R.Value.ArgumentSpec(
+      goog.array.map(this.p_args, goog.functions.identity),
+      goog.object.clone(this.kw_args),
+      this.rest_arg,
+      this.arguments_type);
   },
   display: function() {
-    var args = _.map(this.p_args, _.identity);
-    _.each(this.kw_args, function(v,k) {
+    var args = goog.array.map(this.p_args, goog.functions.identity);
+    goog.object.forEach(this.kw_args, function(v,k) {
       args = args.concat('#:' + k, v);
     });
     if(this.rest_arg) {
@@ -767,7 +782,7 @@ Ray.Runtime.pop_env = function() {
 
 Ray.Runtime.clone_envs = function(envs) {
   var old_envs = envs || this.envs;
-  return _.map(old_envs, function(env) {
+  return goog.array.map(old_envs, function(env) {
     return env.clone();
   });
 };
@@ -800,8 +815,8 @@ Ray.Runtime.name = function(name_arg) {
   return new R.Expr.Name(name_arg);
 };
 Ray.Runtime.spec = function(p_args, kw_args, rest_arg) {
-  var p_arg_names = _.map(p_args, function(p_arg) { return p_arg[0]; });
-  var p_arg_types = _.map(p_args, function(p_arg) { return p_arg[1]; });
+  var p_arg_names = goog.array.map(p_args, function(p_arg) { return p_arg[0]; });
+  var p_arg_types = goog.array.map(p_args, function(p_arg) { return p_arg[1]; });
   var rest_arg_name = rest_arg[0];
   var rest_arg_type = rest_arg[1];
   return new R.Expr.ArgumentSpec(p_arg_names,
@@ -812,9 +827,9 @@ Ray.Runtime.spec = function(p_args, kw_args, rest_arg) {
 };
 
 Ray.Runtime.p_spec = function(/* args */) {
-  var args = _.toArray(arguments);
-  var arg_names = _.map(args, function(arg) { return arg[0]; });
-  var arg_types = _.map(args, function(arg) { return arg[1]; });
+  var args = goog.array.toArray(arguments);
+  var arg_names = goog.array.map(args, function(arg) { return arg[0]; });
+  var arg_types = goog.array.map(args, function(arg) { return arg[1]; });
   return new R.Expr.ArgumentSpec(arg_names,
                                  {}, // kw_args
                                  null, // rest_arg
@@ -861,8 +876,8 @@ Ray.Runtime._if = function(p, t, f) {
   return new R.Expr.If(p, t, f);
 };
 Ray.Runtime.and = function(/* args */) {
-  return new R.Expr.And(Array.prototype.slice.call(arguments, 0));
+  return new R.Expr.And(goog.array.toArray(arguments));
 };
 Ray.Runtime.or = function(/* args */) {
-  return new R.Expr.Or(Array.prototype.slice.call(arguments, 0));
+  return new R.Expr.Or(goog.array.toArray(arguments));
 };

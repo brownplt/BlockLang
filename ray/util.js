@@ -1,14 +1,13 @@
 // Functions to help define the language AST nodes
 goog.provide('Ray.Util');
 
-goog.require('Ray._');
-
-var _ = Ray._;
+goog.require('goog.array');
+goog.require('goog.object');
 
 var Util = Ray.Util;
 
 Util.install = function(obj) {
-  _.each(Util, function(v,k) {
+  goog.object.forEach(Util, function(v,k) {
     if(k !== 'install') {
       obj[k] = v;
     }
@@ -55,7 +54,7 @@ Util.clone_constructor = function(R) {
       return prop;
     }
   }
-  var cloned_args = _.map(args, cloner);
-  var cloned_types = _.map(types, cloner);
+  var cloned_args = goog.array.map(args, cloner);
+  var cloned_types = goog.array.map(types, cloner);
   return Util.construct(this.__node_constructor__, cloned_args, cloned_types);
 };

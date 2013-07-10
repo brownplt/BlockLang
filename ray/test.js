@@ -1,11 +1,15 @@
 goog.provide('Ray.Test');
 
 goog.require('Ray.Ray');
-goog.require('Ray._');
 goog.require('Ray.JQuery');
 goog.require('Ray.Lib');
 goog.require('Ray.Types');
 goog.require('Ray.TypeChecker');
+
+goog.require('goog.array');
+goog.require('goog.object');
+goog.require('goog.functions');
+goog.require('goog.string');
 
 var typecheck = Ray.TypeChecker.typecheck;
 
@@ -25,7 +29,7 @@ var assert = function(expr, verify, statement, test_name) {
   tests.append(test_dt);
   console.log("Test " + test_class(bool) + "!");
   var test_dd = $("<dd></dd>");
-  test_dd.append("<code>" + _.escape(r.display(expr)) + "</code>");
+  test_dd.append("<code>" + goog.string.htmlEscape(r.display(expr)) + "</code>");
   test_dd.append(' ' + statement);
   tests.append(test_dd);
 };
@@ -38,18 +42,18 @@ var describe = function(description) {
 var display = function(expr, should_evaluate) {
   var tests = $("#tests > dl");
   var result = should_evaluate ? r.eval(expr) : expr;
-  tests.append("<p><code>" + _.escape(r.display(result)) + "</code></p>");
+  tests.append("<p><code>" + goog.string.htmlEscape(r.display(result)) + "</code></p>");
 }
 
 var display_evaluation = function(expr) {
   var tests = $("#tests > dl");
   var result = r.eval(expr);
   tests.append("<p class=\"in\"><code>" +
-                   _.escape(r.display(expr)) +
+                   goog.string.htmlEscape(r.display(expr)) +
                    " </code>" +
                    "&rArr; <br></p>" +
                    "<p class=\"out\"><code>    " +
-                   _.escape(r.display(result)) +
+                   goog.string.htmlEscape(r.display(result)) +
                    "</code></p>");
 };
 
@@ -84,9 +88,9 @@ var end_tests = function() {
 var print_lib = function(r) {
   $("#lib").prepend("<H2>Current builtins:</H2>");
   var lib_list = $("#lib > dl");
-  _.each(r.builtins.dict({}), function(value, name) {
+  goog.object.forEach(r.builtins.dict({}), function(value, name) {
     var lib_dt = $("<dt><code>" + name + "</code></dt>");
-    var lib_dd = $("<dd><code>" + _.escape(r.display(value)) + "</code></dd>");
+    var lib_dd = $("<dd><code>" + goog.string.htmlEscape(r.display(value)) + "</code></dd>");
     lib_list.append(lib_dt);
     lib_list.append(lib_dd);
   });
@@ -101,7 +105,6 @@ var create_testing_environment = function(R, lib) {
 
 Ray.Test = function() {
   window.$ = Ray.JQuery;
-  window._ = Ray._
   var R = Ray.Runtime;
   var lib = Ray.Lib;
   var r = create_testing_environment(R, lib);
@@ -192,7 +195,7 @@ Ray.Test = function() {
   /*var add_0_arg = r.app(r.name('+'), r.p_args());
   assert_equals(add_0_arg, 0, "0 argument addition");
 
-  var add_3_arg = r.app(r.name('+'), r.args(_.map([1, 2, 3], r.num), {}));
+  var add_3_arg = r.app(r.name('+'), r.args(goog.array.map([1, 2, 3], r.num), {}));
   assert_equals(add_3_arg, 6, "3 argument addition");*/
 
   var nested =

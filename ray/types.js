@@ -1,9 +1,17 @@
 goog.provide('Ray.Types');
 
-goog.require('Ray._');
+goog.require('goog.array');
 goog.require('goog.string');
 
-var _ = Ray._;
+var uniques = function(ls) {
+  var set = [];
+  goog.array.forEach(ls, function(elem) {
+    if(!goog.array.contains(set, elem)) {
+      set.push(elem);
+    }
+  });
+  return set;
+};
 
 Ray.Types.get_atomic_type = function(type_name) {
   return Ray.Types.atomic_types[type_name];
@@ -81,16 +89,16 @@ var ListOfTypes = function(ls) {
   this.list = ls;
 };
 ListOfTypes.prototype.get_all_base_types = function() {
-  var all_base_types = _.reduce(this.list, function(curr_base_types, ty) {
+  var all_base_types = goog.array.reduce(this.list, function(curr_base_types, ty) {
     return curr_base_types.concat(ty.get_all_base_types());
   }, []);
-  return _.uniq(all_base_types);
+  return uniques(all_base_types);
 };
 ListOfTypes.prototype.clone = function() {
-  return new ListOfTypes(_.map(this.list, function(ty) { return ty.clone(); }));
+  return new ListOfTypes(goog.array.map(this.list, function(ty) { return ty.clone(); }));
 };
 ListOfTypes.prototype.display = function() {
-  return '(' + _.map(this.list, function(ty) { return ty.display(); }).join(' * ') + ')';
+  return '(' + goog.array.map(this.list, function(ty) { return ty.display(); }).join(' * ') + ')';
 };
 Ray.Types.ListOfTypes = ListOfTypes;
 
@@ -136,7 +144,7 @@ ArgumentType.prototype.get_all_base_types = function() {
     all_base_types = all_base_types.concat(this.rest_arg_type.get_all_base_types());
   }
 
-  return _.uniq(all_base_types);
+  return uniques(all_base_types);
 };
 ArgumentType.prototype.clone = function() {
   return new ArgumentType(this.p_arg_types.clone(), this.rest_arg_type.clone());
@@ -159,7 +167,7 @@ var FunctionType = function(argument_type, return_type) {
 };
 FunctionType.prototype.get_all_base_types = function() {
   var all_base_types = this.argument_type.get_all_base_types();
-  return _.uniq(all_base_types.concat(this.return_type.get_all_base_types()));
+  return uniques(all_base_types.concat(this.return_type.get_all_base_types()));
 };
 FunctionType.prototype.clone = function() {
   return new FunctionType(this.argument_type.clone(), this.return_type.clone());
@@ -227,7 +235,7 @@ Ray.Types.is_match = function(ty1, ty2) {
         Ray.Types.is_match(ty1.element_type, ty2.element_type);
     case 'list_of_types':
       return ty2.__type__ === 'list_of_types' &&
-        _.every(_.zip(ty1.list, ty2.list), function(pair) {
+        goog.array.every(goog.array.zip(ty1.list, ty2.list), function(pair) {
           return Ray.Types.is_match(pair[0], pair[1]);
         });
     case 'n_arity':
@@ -270,7 +278,7 @@ Ray.Types.is_same = function(ty1, ty2) {
              Ray.Types.is_same(ty1.element_type, ty2.element_type);
     case 'list_of_types':
       return ty2.__type__ === 'list_of_types' &&
-             _.every(_.zip(ty1.list, ty2.list), function(pair) {
+             goog.array.every(goog.array.zip(ty1.list, ty2.list), function(pair) {
                return Ray.Types.is_same(pair[0], pair[1]);
              });
     case 'n_arity':
@@ -322,7 +330,7 @@ Ray.Types.principal_type_ = function(ty1, ty2) {
         return new Ray.Types.List(Ray.Types.principal_type_(ty1.element_type, ty2.element_type));
 
       case 'list_of_types':
-        return new Ray.Types.ListOfTypes(_.map(_.zip(ty1.list, ty2.list), function(pair) {
+        return new Ray.Types.ListOfTypes(goog.array.map(goog.array.zip(ty1.list, ty2.list), function(pair) {
           return Ray.Types.principal_type_(pair[0], pair[1]);
         }));
 
@@ -330,7 +338,7 @@ Ray.Types.principal_type_ = function(ty1, ty2) {
         return new Ray.Types.NArityType(Ray.Types.principal_type_(ty1.base_type, ty2.base_type));
 
       case 'args':
-        var p_arg_types = _.map(_.zip(ty1.p_arg_types, ty2.p_arg_types), function(pair) {
+        var p_arg_types = goog.array.map(goog.array.zip(ty1.p_arg_types, ty2.p_arg_types), function(pair) {
           return Ray.Types.principal_type_(pair[0], pair[1]);
         });
         var rest_arg_type = ty1.rest_arg_type ?
@@ -349,7 +357,7 @@ Ray.Types.principal_type_ = function(ty1, ty2) {
 };
 
 Ray.Types.principal_type = function(types) {
-  return _.reduce(types, function(curr, ty) {
+  return goog.array.reduce(types, function(curr, ty) {
     return Ray.Types.principal_type_(curr, ty);
   }, new Ray.Types.Unknown());
 };
