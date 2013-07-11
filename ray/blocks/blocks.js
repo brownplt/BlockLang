@@ -249,6 +249,7 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
     this.__type__ = type;
     this.__arguments__ = true;
     this.__render_as_expression__ = true;
+    this.__block_class__ = Blocks.Argument;
     this.init = function() {
       this.makeTitleRow(this.__name__);
       this.setOutputType(this.__type__);

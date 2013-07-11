@@ -1320,7 +1320,6 @@ Blockly.BlockSvg.prototype.renderComputeExpression_ = function(iconWidth) {
  */
 Blockly.BlockSvg.prototype.renderDrawRightExpression_ = function(steps, highlightSteps,
                                                                  inlineSteps, highlightInlineSteps, connectionsXY, inputRows, iconWidth) {
-  console.log('inputRows.rightEdge ' + String(inputRows.rightEdge));
   var cursorX;
   var cursorY = 0;
   var connectionX, connectionY;
@@ -1431,8 +1430,6 @@ Blockly.BlockSvg.prototype.renderDrawRightExpression_ = function(steps, highligh
       }
 
       cursorX = Math.max(cursorX, inputRows.rightEdge);
-      console.log('cursorX ' + String(cursorX));
-      console.log('row.height ' + String(row.height));
       if(cursorX > maxWidth) {
         maxWidth = cursorX;
       }

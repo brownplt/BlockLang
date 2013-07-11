@@ -174,13 +174,24 @@ var typecheck_block_expr = function(block, ty, ty_env) {
 
     case Blocks.App:
       var func_name = block.__name__;
-      var f = r.lookup(func_name);
+      var f;
+      if(block.__user_function__) {
+        f = block.__value__;
+      } else {
+        f = r.lookup(func_name); // Why am I looking it up when I can just typecheck against the block itself?
+        // To make sure I'm looking at an up-to-date version? (Figure this out!)
+      }
+
       if(!f) {
-        return false;
+        throw 'No function found for application block, can\'t typecheck!';
       }
 
       var f_type = new Ray.Types.FunctionType(f.arg_spec.arguments_type, f.body_type);
       output_type = typecheck_function_arguments(block, f_type, f.arg_spec, ty_env);
+      break;
+
+    case Blocks.Argument:
+      output_type = block.__type__;
       break;
   }
 

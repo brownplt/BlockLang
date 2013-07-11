@@ -65,4 +65,5 @@ Blocks.First = 7;
 Blocks.Rest = 8;
 Blocks.Empty = 9;
 Blocks.App = 10;
+Blocks.Argument = 11;
 
