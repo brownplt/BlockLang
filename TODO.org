@@ -190,3 +190,5 @@ Clean stuff up
 - Remove dependencies on underscore.js and jQuery
 - Start getting compiled mode to work
 - Thoroughly test everything
+- Switch to rounded rectangles
+- Fix list

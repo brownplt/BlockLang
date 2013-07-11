@@ -1237,6 +1237,19 @@ Blockly.Block.prototype.appendDummyInput = function(opt_name) {
 };
 
 /**
+ * Shortcut for appending a row containing only the title for the block.
+ * @param {string} name The Block's displayed title.
+ * @returns {!Blockly.Input} The input object created.
+ */
+Blockly.Block.prototype.makeTitleRow = function(name) {
+  var input = this.appendDummyInput();
+  input.appendTitle(name)
+    .setAlign(Blockly.ALIGN_CENTRE);
+  input.__title__ = true;
+  return input;
+};
+
+/**
  * Add a value input, statement input or local variable to this block.
  * @param {number} type Either Blockly.INPUT_VALUE or Blockly.NEXT_STATEMENT or
  *     Blockly.DUMMY_INPUT.

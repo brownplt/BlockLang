@@ -171,9 +171,7 @@ Ray.Blocks.define_list_blocks = function(r, obj) {
   cons_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown());
   cons_block.init = function() {
     this.setOutputType(new Ray.Types.List(new Ray.Types.Unknown()));
-    this.appendDummyInput()
-      .appendTitle('cons')
-      .setAlign(this.Blockly.ALIGN_CENTRE);
+    this.makeTitleRow('cons');
     this.appendValueInput('car')
       .setType(new Ray.Types.Unknown());
     this.appendValueInput('cdr')
@@ -185,9 +183,7 @@ Ray.Blocks.define_list_blocks = function(r, obj) {
   empty_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown())
   empty_block.init = function() {
     this.setOutputType(new Ray.Types.List(new Ray.Types.Unknown()));
-    this.appendDummyInput()
-      .appendTitle(this.__name__)
-      .setAlign(Blockly.ALIGN_CENTRE);
+    this.makeTitleRow('empty');
   };
   obj[Ray.Blocks.block_name('empty')] = empty_block;
 
@@ -195,9 +191,7 @@ Ray.Blocks.define_list_blocks = function(r, obj) {
   first_block.__type__ = new Ray.Types.Unknown();
   first_block.init = function() {
     this.setOutputType(new Ray.Types.Unknown());
-    this.appendDummyInput()
-      .appendTitle('first')
-      .setAlign(this.Blockly.ALIGN_CENTRE);
+    this.makeTitleRow('first');
     this.appendValueInput('x')
       .setType(new Ray.Types.List(new Ray.Types.Unknown()));
   };
@@ -207,9 +201,7 @@ Ray.Blocks.define_list_blocks = function(r, obj) {
   rest_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown());
   rest_block.init = function() {
     this.setOutputType(new Ray.Types.Unknown());
-    this.appendDummyInput()
-      .appendTitle('rest')
-      .setAlign(this.Blockly.ALIGN_CENTRE);
+    this.makeTitleRow('rest');
     this.appendValueInput('x')
       .setType(new Ray.Types.List(new Ray.Types.Unknown()));
   };
@@ -232,9 +224,7 @@ Ray.Blocks.define_function_def_block = function(r, obj, name, desc, return_type)
 
   fun_def_block.init = function() {
     this.setColour(Ray.Blocks.get_colour(this.__return_type__));
-    this.appendDummyInput()
-      .appendTitle(this.__name__)
-      .setAlign(this.Blockly.ALIGN_CENTRE);
+    this.makeTitleRow(this.__name__);
     this.appendValueInput('BODY');
             this.setTooltip(this.__desc__);
     this.setOutput(false);
@@ -301,10 +291,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   var and_block = new ConditionalBlock('and', new Ray.Types.Boolean());
   and_block.init = function() {
     this.setOutputType(new Ray.Types.Boolean());
-
-    this.appendDummyInput()
-      .setAlign(this.Blockly.ALIGN_CENTRE)
-      .appendTitle('and');
+    this.makeTitleRow('and');
     this.appendValueInput('REST_ARG0')
       .setType(new Ray.Types.Boolean());
     this.appendValueInput('REST_ARG1')
@@ -320,10 +307,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   var or_block = new ConditionalBlock('or', new Ray.Types.Boolean());
   or_block.init = function() {
     this.setOutputType(new Ray.Types.Boolean());
-
-    this.appendDummyInput()
-      .setAlign(this.Blockly.ALIGN_CENTRE)
-      .appendTitle('or');
+    this.makeTitleRow('or');
     this.appendValueInput('REST_ARG0')
       .setType(new Ray.Types.Boolean());
     this.appendValueInput('REST_ARG1')
@@ -339,9 +323,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   var cond_block = new ConditionalBlock('cond');
   cond_block.init = function() {
     this.setOutputType(new Ray.Types.Unknown());
-    this.appendDummyInput()
-      .setAlign(this.Blockly.ALIGN_CENTRE)
-      .appendTitle('cond');
+    this.makeTitleRow('cond');
     this.appendValueInput('CONDITION')
       .appendTitle('when')
       .setType(new Ray.Types.Boolean());
@@ -636,9 +618,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       block.helpUrl = Ray.Blocks.HELP_URL;
       block.init = function() {
 
-        this.appendDummyInput()
-          .setAlign(this.Blockly.ALIGN_CENTRE)
-          .appendTitle(name);
+        this.makeTitleRow(name);
 
         for(var i = 0; i < arity; i++) {
           this.appendValueInput(arg_spec.p_args[i])
