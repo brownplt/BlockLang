@@ -34,7 +34,7 @@ goog.addDependency('../../../blockly/core/warning.js', ['Blockly.Warning'], []);
 goog.addDependency('../../../blockly/core/workspace.js', ['Blockly.Workspace'], ['Blockly.ScrollbarPair', 'Blockly.Trashcan', 'Blockly.Xml']);
 goog.addDependency('../../../blockly/core/xml.js', ['Blockly.Xml'], []);
 goog.addDependency('../../../ray/blocks/block-typechecker.js', ['Ray.Blocks.TypeChecker'], ['Ray.Env', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types']);
-goog.addDependency('../../../ray/blocks/blocks.js', ['Ray.Blocks'], ['Blockly', 'Ray.Globals', 'Ray.Inference', 'Ray.Runtime', 'Ray.Types', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml', 'goog.string']);
+goog.addDependency('../../../ray/blocks/blocks.js', ['Ray.Blocks'], ['Blockly', 'Blockly.BlockSvg', 'Ray.Globals', 'Ray.Inference', 'Ray.Runtime', 'Ray.Types', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml', 'goog.string']);
 goog.addDependency('../../../ray/blocks/inference.js', ['Ray.Inference'], ['Ray.Types', 'goog.array']);
 goog.addDependency('../../../ray/env.js', ['Ray.Env'], ['Ray.Util', 'goog.array', 'goog.object']);
 goog.addDependency('../../../ray/generate.js', ['Ray.Generator'], ['Ray.Blocks']);

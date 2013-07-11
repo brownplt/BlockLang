@@ -70,6 +70,9 @@ Ray.Blocks.UNKNOWN_BLOCK_COLOR = {  R: 102, G: 102, B: 102 };
 Ray.Blocks.LIGHTEN_FACTOR = 0.4;
 
 Ray.Blocks.get_colour = function(type) {
+  if(!type) {
+    return Ray.Blocks.DEFAULT_BLOCK_COLOR;
+  }
   var key = type.__type__;
   var c = Ray.Blocks.TypeColourTable[key];
   if(goog.isDef(c)) {
@@ -102,7 +105,8 @@ Ray.Blocks.rest_arg_arg_block = {
     this.appendDummyInput()
       .appendTitle('arg');
   },
-  __rest_arg__: true
+  __rest_arg__: true,
+  __render_as_expression__: false
 };
 Ray.Blocks.cond_test_body_block_name = "ray_conditional_cond_test_body";
 Ray.Blocks.cond_else_block_name = "ray_conditional_cond_else";
@@ -136,7 +140,7 @@ Ray.Blocks.get_drawers = function(block) {
   } else if(block.__arguments__) {
     drawers.push('arguments');
   } else{
-    throw new Ray.Error("Unknown sort of block!!");
+    //throw new Ray.Error("Unknown sort of block!!");
   }
   return drawers;
 };
@@ -165,6 +169,7 @@ Ray.Blocks.define_list_blocks = function(r, obj) {
     this.__list__ = name;
     this.__name__ = name;
     this.__block_class__ = Blocks[goog.string.toTitleCase(name)];
+    this.__render_as_expression__ = true;
   };
 
   var cons_block = new ListBlock('cons');
@@ -243,9 +248,10 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
     this.__name__ = name;
     this.__type__ = type;
     this.__arguments__ = true;
+    this.__render_as_expression__ = true;
     this.init = function() {
-      this.appendDummyInput()
-        .appendTitle(this.__name__);
+      this.makeTitleRow(this.__name__);
+      this.setOutputType(this.__type__);
     };
   }
 
@@ -264,6 +270,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
     this.__form__ = name;
     this.__name__ = name;
     this.__block_class__ = Blocks[goog.string.toTitleCase(name)];
+    this.__render_as_expression__ = true;
   }
 
   // If
@@ -445,6 +452,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   var cond_cond_block = {
     __rest_arg_container__: true,
+    __render_as_expression__: false,
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
       this.appendDummyInput()
@@ -459,6 +467,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   var cond_test_body_block = {
     __type__: Ray.Blocks.cond_test_body_block_name,
+    __render_as_expression__: false,
     __rest_arg__: true,
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
@@ -470,6 +479,7 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   var cond_else_block = {
     __type__: Ray.Blocks.cond_else_block_name,
+    __render_as_expression__: false,
     __rest_arg__: true,
     init: function() {
       this.setColour(Ray.Blocks.get_colour('forms'));
@@ -497,6 +507,7 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
     this.__datatype__ = type_name;
     this.__type__ = type;
     this.__block_class__ = Blocks[goog.string.toTitleCase(type_name)];
+    this.__render_as_expression__ = true;
   }
 
   // Boolean
@@ -612,6 +623,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       block.__value__ = value;
       block.__type__ = value.body_type;
       block.__block_class__ = Blocks.App;
+      block.__render_as_expression__ = true;
       if(is_user_function) {
         block.__user_function__ = true;
       }
@@ -626,10 +638,12 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
         }
 
         if(rest_arg) {
-          this.appendDummyInput('NO_REST_ARGS')
-            .appendTitle('...');
+          this.appendValueInput('REST_ARG0')
+            .setType(arg_spec.arguments_type.rest_arg_type.base_type);
+          this.appendValueInput('REST_ARG1')
+            .setType(arg_spec.arguments_type.rest_arg_type.base_type);
           this.setMutator(new this.Blockly.Mutator([Ray.Blocks.rest_arg_arg_block_name]));
-          this.rest_arg_count_ = 0;
+          this.rest_arg_count_ = 2;
         }
       };
 
@@ -714,6 +728,7 @@ Ray.Blocks.empty_block_directory = function() {
   block_dir['arguments'] = [];
   block_dir['functions'] = [];
   block_dir['all'] = [];
+  block_dir['other'] = [];
   return block_dir;
 };
 
@@ -738,6 +753,7 @@ Ray.Blocks.add_rest_arg = function(block, obj, rest_arg, type) {
   // The arguments themselves will be shared by any blocks with rest args.
   var rest_arg_container = {};
   rest_arg_container.__rest_arg_container__ = true;
+  rest_arg_container.__render_as_expression__ =  false;
   rest_arg_container.helpUrl = Ray.Blocks.HELP_URL;
   rest_arg_container.init = function() {
     this.setColour(Ray.Blocks.DEFAULT_BLOCK_COLOR);

@@ -173,6 +173,12 @@ Clean stuff up
 - Make it possible to rename function arguments
 - Show the type name of function arguments alongside the
   function. Maybe show the function signature somewhere 
+(Inside the function definition dialog, have a header of the function
+  information)
+(Inside the canvas as well)
+Drag arguments from the signature into the function body
+(Drag a name and type into the signature to add)
+(Switch from "consumes char" to "consumes") Use full name of types.
 - Make it possible to edit function signature, remove a function
 - Have flyout automatically refresh when I switch tabs, so that I get
   most up to date set of blocks
@@ -192,3 +198,4 @@ Clean stuff up
 - Thoroughly test everything
 - Switch to rounded rectangles
 - Fix list
+- Define a function, provide test cases that are automatically run

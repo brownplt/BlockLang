@@ -7,6 +7,10 @@
     <script type="text/javascript" src="ray-deps.js"></script>
     <script>
         goog.require('Ray.Main');
+        goog.require('Ray.Shared');
+        goog.require('Ray.Types');
+        goog.require('Ray.JQuery');
+        goog.require('goog.dom');
     </script>
     <style>
         .button {
@@ -61,86 +65,46 @@
             padding: 0;
             margin: 0;
             width: 100%;
-            height: 70%;
+            height: 100%;
             border-width: 0;
             border-style: solid;
             border-color: #fff;
         }
 
-        div#generatorPanel {
-            padding: .2em;
-            margin: 0;
-            border: 0px;
-            width: 100%;
-            height: 30%;
-            overflow: auto;
-            box-sizing: border-box;
-        }
-
-        div#generateButton {
-            width: 10%;
-            height: 100%;
-            padding: .2em;
-            margin: 0;
-            float: left;
-            box-sizing: border-box;
-        }
-
-        div#generateButton > button {
-            width: 98%;
-            margin: 1%;
-            height: 48%;
-        }
-
-        div#generatedCode {
-            width: 90%;
-            height: 100%;
-            padding: 0;
-            margin: 0;
-            float: left;
-        }
-
-        div#generatedCode > textarea {
-            width: 100%;
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: monospace;
-            font-size: 14pt;
-        }
-
-
-
     </style>
     <script>
-        var r = Ray.Main.create_ray();
-        var ray_blocks = Ray.Blocks.generate_all_blocks(r);
-        Blockly.Language = ray_blocks;
-        var toolbox = Ray.Blocks.generate_toolbox(ray_blocks);
+        window.$ = Ray.JQuery;
 
-        Ray.Main.install_generators(ray_blocks);
+        var hello_block = {};
+        hello_block.init = function() {
+            this.makeTitleRow('hello');
+            this.setOutputType(new Ray.Types.Unknown());
+            this.appendValueInput('a')
+                    .setType(new Ray.Types.Unknown());
+        };
+        var goodbye_block = {};
+        goodbye_block.init = function() {
+            this.makeTitleRow('goodbye');
+            this.setOutputType(new Ray.Types.Unknown());
+            this.appendValueInput('a')
+                    .setType(new Ray.Types.Unknown());
+            this.appendValueInput('b')
+                    .setType(new Ray.Types.Unknown());
+        };
+        Blockly.Ray_ = Ray;
+        Blockly.Ray_.Shared.set_blocks({'hello_block':hello_block, 'goodbye_block':goodbye_block});
+        toolbox = '<xml id="toolbox" style="display: none;">' +
+                  '<block type="hello_block"></block>' +
+                  '<block type="goodbye_block"></block>' +
+                  '</xml>';
 
-        function showGeneratedCode() {
-            var code = Blockly.Generator.workspaceToCode('Ray');
-            $("#generatedCode > textarea").text(code);
-        }
 
-        function evaluateCode() {
-            var textarea = $("#generatedCode > textarea");
-            var code = eval(textarea.text());
-            textarea.text(r.display(r.eval(code)));
-        }
-
-        function resizeBlockly() {
-            var separator = 100;
-            var height = window.innerHeight;
-            var width = window.innerWidth;
-            var blocklyDiv = $("#blocklyDiv");
-            blocklyDiv.height(height - separator - 200);
-            blocklyDiv.width(width - 20);
-        }
-
+        var separator = 100;
+        var height = window.innerHeight;
+        var width = window.innerWidth;
+        var blocklyDiv = $("#blocklyDiv");
+        blocklyDiv.height(height);
+        blocklyDiv.width(width);
     </script>
 
 </head>
@@ -148,23 +112,16 @@
 <div id="container">
     <div id="blocklyDiv"></div>
     <script>
-        // resizeBlockly();
-        $("#blocklyDiv").height(window.innerHeight - 200);
+        $("#blocklyDiv").height(window.innerHeight);
         Blockly.inject(document.getElementById('blocklyDiv'),
                        {path : '../blockly/', toolbox: toolbox});
+        setTimeout(function() {
+            goog.dom.getElementsByTagNameAndClass('svg')[0].setAttribute(
+                    'transform',
+                    'scale(2)');
+        }, 2000);
 
-        //Blockly.addChangeListener(showGeneratedCode);
     </script>
-    <div id="generatorPanel">
-        <div id="generateButton">
-            <button class="button" onclick="showGeneratedCode()">Generate Code!</button>
-            <button class="button2" onclick="evaluateCode()">Evaluate Code!</button>
-        </div>
-        <div id="generatedCode">
-            <textarea>
-            </textarea>
-        </div>
-    </div>
 </div>
 </body>
 </html>
