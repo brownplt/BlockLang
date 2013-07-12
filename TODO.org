@@ -170,57 +170,60 @@ Make a to-do list
 Clean stuff up
 
 * List of things to do * 
-- Make it possible to rename function arguments.
-- Show the type name of function arguments alongside the
+- [ ] Make it possible to rename function arguments.
+- [ ] Show the type name of function arguments alongside the
   function. 
-- Show the function signature inside the function definition dialog,
+- [ ] Show the function signature inside the function definition dialog,
   maybe as the header. 
-- Show the function signature inside the canvas as well, so that you
+- [ ] Show the function signature inside the canvas as well, so that you
   can drag arguments from the signature into the function body.
-- Inside function definition dialog, you should be able to drag a name
+- [ ] Inside function definition dialog, you should be able to drag a name
   and type into the signature to add an argument.
-- Switch from "consumes char" to "consumes", and same for "produces"
+- [ ] Switch from "consumes char" to "consumes", and same for "produces"
   and other types.
-- Use full name of types. num -> number, str -> string, char -> character.
-- Make it possible to edit function signature, remove a function.
-- Have flyout automatically refresh when I switch tabs, so that I get
+- [ ] Use full name of types. num -> number, str -> string, char -> character.
+- [ ] Make it possible to edit function signature, remove a function.
+- [ ] Have flyout automatically refresh when I switch tabs, so that I get
   most up to date set of blocks.
-- Get the function name to be above the function arguments.
-- Disable copying of argument blocks from one function to another.
-- See about having function body not just floating in space.
-- Try and resize window so the canvas doesn't extend past visible area.
-- Make failed attempts to connect react more violently to that
+- [ ] Get the function name to be above the function arguments.
+- [ ] Disable copying of argument blocks from one function to another.
+- [ ] See about having function body not just floating in space.
+- [ ] Try and resize window so the canvas doesn't extend past visible area.
+- [ ] Make failed attempts to connect react more violently to that
   failure. Maybe have block to which you can't connect get repelled!
-- Add in image atomic type.
-- Add support for world-programming, via big-bang primitives. 
-- Change unknown color to rainbow gradient.
-- Start actually catching errors, and showing them to users somewhere.
-- Add primitives to top-level of toolbox.
-- Remove dependencies on underscore.js and jQuery.
-- Start getting compiled mode to work.
-- Thoroughly test everything.
-- Switch to rounded rectangles.
-- Fix list block.
-- Define a function, provide test cases that are automatically run.
-- Hook up to WeScheme for saving programs, etc...
-- Color toolbar items, according to type.
-- Re-order blocks to match likely use.
-- Figure out why drawers get confused sometimes. 
-- Rename 'unknown' to 'misc'. 
-- Put 'and' and 'or' in 'booleans'.
-- Make drop targets for blocks larger, so that it's easier to connect
+- [ ] Add in image atomic type.
+- [ ] Add support for world-programming, via big-bang primitives. 
+- [ ] Change unknown color to rainbow gradient.
+- [ ] Start actually catching errors, and showing them to users somewhere.
+- [ ] Add primitives to top-level of toolbox.
+- [ ] Remove dependencies on underscore.js and jQuery.
+- [ ] Start getting compiled mode to work.
+- [ ] Thoroughly test everything.
+- [ ] Switch to rounded rectangles.
+- [ ] Fix list block.
+- [ ] Define a function, provide test cases that are automatically run.
+- [ ] Hook up to WeScheme for saving programs, etc...
+- [ ] Color toolbar items, according to type.
+- [ ] Re-order blocks to match likely use.
+- [ ] Figure out why drawers get confused sometimes. 
+- [ ] Rename 'unknown' to 'misc'. 
+- [ ] Put 'and' and 'or' in 'booleans'.
+- [ ] Make drop targets for blocks larger, so that it's easier to connect
   them.
-- Name, Domain, Range in modal dialog. Look at how Snap does it.
-- In funtion creation dialog, arguments names should be colored
+- [ ] Name, Domain, Range in modal dialog. Look at how Snap does it.
+- [ ] In funtion creation dialog, arguments names should be colored
   according to their type. Same with function name. 
-- Make it possible to define a value.
-- Default type of argument should be blank.
-- Ordering for evaluation of multiple expressions in main workspace.
-- Double-click to evaluate expression!
-- Figure out how to handle unfinished function definitions, or
-  multiple blocks in function definition window.
-- Have function definition be modal, so they can appear.
+- [ ] Make it possible to define a value.
+- [ ] Default type of argument should be blank.
+- [ ] Ordering for evaluation of multiple expressions in main workspace.
+- [ ] Double-click to evaluate expression!
+- [ ] Figure out how to handle unfinished function definitions, or
+  [ ] multiple blocks in function definition window.
+- [ ] Have function definition be modal, so they can appear.
   simultaneously with canvas. Do this instead-of/as-well-as tabbed interface.
+- [ ] Get rid of 'all' drawer
+- [ ] Make function names black
+
 
 * Non-code things to do *
 - Mail the list about increasing drop target size
