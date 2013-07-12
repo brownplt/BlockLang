@@ -104,7 +104,7 @@ var Boolean = product(['b']);
 Boolean.proto = {
   clone: clone_constructor,
   display: function() {
-    return this.b ? "#t" : "#f";
+    return this.b ? "true" : "false";
   }
 };
 
@@ -128,7 +128,7 @@ var Char = product(['c']);
 Char.proto = {
   clone: clone_constructor,
   display: function() {
-    return "#\\" + this.c;
+    return "'" + this.c + "'";
   }
 }
 
@@ -287,7 +287,7 @@ BooleanExpr.proto = {
     return new R.Value.Boolean(this.b);
   },
   display: function() {
-    return this.b ? "#t" : "#f";
+    return this.b ? "true" : "false";
   }
 };
 
@@ -320,7 +320,7 @@ CharExpr.proto = {
     return new R.Char(this.c);
   },
   display: function() {
-    return "#\\" + this.c;
+    return "'" + this.c + "'";
   }
 };
 

@@ -551,8 +551,8 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
     };
     var textfield = new this.Blockly.FieldTextInput('a', char_validator);
     this.appendDummyInput()
-      .appendTitle('#\\')
-      .appendTitle(textfield, 'C')
+      .appendTitle('char')
+      .appendTitle(textfield, 'C');
   };
 
   obj[Ray.Blocks.primitive_data_block_name('char')] = char_block;

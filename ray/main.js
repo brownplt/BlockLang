@@ -19,6 +19,8 @@ goog.require('Blockly.Xml');
 goog.require('goog.dom');
 goog.require('goog.object');
 
+Ray.Main.DIRECTORY_PREFIX = "ray/ui/";
+
 Ray.Main.MAIN_BLOCKLY_ID = "blockly_main";
 Ray.Main.FUNCTION_DEFINITION_BLOCKLY_ID = "blockly_function_definition";
 Ray.Main.function_definition_blockly = function() {
@@ -55,7 +57,7 @@ Ray.Main.create_ray = function() {
 };
 
 Ray.Main.load_main_blockly = function(iframe) {
-  goog.dom.setProperties(iframe, {src: 'main_blockly.html'});
+  goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'main_blockly.html'});
 };
 
 /**
@@ -75,7 +77,7 @@ Ray.Main.load_func_def_blockly = function(iframe, arg_blocks, func_name, func_sp
     return_type: return_type
   };
   window.__function_definition_info__ = func_def;
-  goog.dom.setProperties(iframe, {src: 'func_def_blockly.html'});
+  goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'func_def_blockly.html'});
 };
 
 Ray.Main.block_to_workspace_xml = function(block_name, block) {
