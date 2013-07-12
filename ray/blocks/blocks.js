@@ -28,6 +28,7 @@ goog.require('goog.dom.xml');
 goog.require('goog.string');
 
 var Blocks = Ray.Globals.Blocks;
+var Priorities = Ray.Globals.Priorities;
 var R = Ray.Runtime;
 
 Ray.Blocks.rest_arg_arg_block_name = "ray_rest_arg_arg_";
@@ -142,6 +143,7 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
     this.__arguments__ = true;
     this.__render_as_expression__ = true;
     this.__block_class__ = Blocks.Argument;
+    this.priority_ = Priorities.ARGUMENT;
     this.init = function() {
       this.makeTitleRow(this.__name__);
       this.setOutputType(this.__type__);
@@ -402,6 +404,7 @@ Ray.Blocks.define_primitive_data_blocks = function(r, obj) {
     this.__type__ = type;
     this.__block_class__ = Blocks[goog.string.toTitleCase(type_name)];
     this.__render_as_expression__ = true;
+    this.priority_ = Priorities.PRIMITIVE_DATA_VALUE;
   }
 
   // Boolean
@@ -479,6 +482,7 @@ function FunctionBlock(name, value, is_user_function) {
   this.__type__ = value.body_type;
   this.__block_class__ = Blocks.App;
   this.__render_as_expression__ = true;
+  this.priority_ = value.priority_ || null;
   if(is_user_function) {
     this.__user_function__ = true;
   }
@@ -524,7 +528,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       var arity = arg_spec.p_args.length;
       var rest_arg = arg_spec.rest_arg || null;
 
-      var block = new FunctionBlock(name, value, is_user_function);
+      block = new FunctionBlock(name, value, is_user_function);
       block.init = function() {
         this.makeTitleRow(name);
         for(var i = 0; i < arity; i++) {
@@ -552,7 +556,7 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
   }
   if(block) {
     obj[block_name] = block;
-  };
+  }
   return block;
 };
 

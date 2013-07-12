@@ -114,12 +114,34 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
     throw 'Nothing in category!';
   }
 
+  goog.array.stableSort(all_category_blocks, function(block_name1, block_name2) {
+    var block1 = Ray.Shared.get_block_prototype(Blockly, block_name1);
+    var block2 = Ray.Shared.get_block_prototype(Blockly, block_name2);
+    return Ray.Shared.precedes_other_block(block1, block2);
+  });
+
   goog.array.forEach(all_category_blocks, function(block_name) {
     var block = new Blockly.Block(workspace, block_name);
     block.initSvg();
     blocks.push(block);
     gaps.push(margin * 2);
   });
+};
+
+Ray.Shared.precedes_other_block = function(block1, block2) {
+  var priority1 = block1.priority_;
+  var priority2 = block2.priority_;
+  var is_num1 = goog.isNumber(priority1);
+  var is_num2 = goog.isNumber(priority2);
+  if(is_num1 && is_num2) {
+    return block1.priority_ - block2.priority_;
+  } else if(is_num1) {
+    return -1;
+  } else if(is_num2) {
+    return 1;
+  } else {
+    return 0;
+  }
 };
 
 Ray.Shared.get_type_colour = function(type) {
@@ -144,4 +166,14 @@ Ray.Shared.principal_type_ = function(ty1, ty2) {
 
 Ray.Shared.typecheck_block = function(block) {
   return Ray.Blocks.TypeChecker.typecheck_block(block);
+};
+
+Ray.Shared.get_block_prototype = function(Blockly, prototypeName) {
+  var prototype = null;
+  if(Blockly.FunctionDefinitionBlocks && Blockly.FunctionDefinitionBlocks[prototypeName]) {
+    prototype = Blockly.FunctionDefinitionBlocks[prototypeName];
+  } else if(Ray.Shared.saved_blocks_[prototypeName]) {
+    prototype = Ray.Shared.saved_blocks_[prototypeName];
+  }
+  return prototype;
 };

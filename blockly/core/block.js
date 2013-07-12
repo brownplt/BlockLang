@@ -88,12 +88,8 @@ Blockly.Block = function(workspace, prototypeName) {
   if (prototypeName) {
     this.type = prototypeName;
     var prototype = null;
-
-    if(Blockly.FunctionDefinitionBlocks && Blockly.FunctionDefinitionBlocks[prototypeName]) {
-      prototype = Blockly.FunctionDefinitionBlocks[prototypeName];
-    } else if(Blockly.Ray_.Shared.saved_blocks_[prototypeName]) {
-      prototype = Blockly.Ray_.Shared.saved_blocks_[prototypeName];
-    } else {
+    prototype = Blockly.Ray_.Shared.get_block_prototype(Blockly, prototypeName);
+    if(!prototype) {
       throw 'Error: "' + prototypeName + '" is an unknown language block.';
     }
     goog.mixin(this, prototype);

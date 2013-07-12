@@ -67,3 +67,9 @@ Blocks.Empty = 9;
 Blocks.App = 10;
 Blocks.Argument = 11;
 
+Ray.Globals.Priorities = {};
+var Priorities = Ray.Globals.Priorities;
+Priorities.BASIC_NUMBER_OPERATION = 3;
+Priorities.PRIMITIVE_DATA_VALUE = 2;
+Priorities.ARGUMENT = 1;
+

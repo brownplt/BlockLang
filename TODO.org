@@ -204,10 +204,10 @@ Clean stuff up
 - [ ] Define a function, provide test cases that are automatically run.
 - [ ] Hook up to WeScheme for saving programs, etc...
 - [ ] Color toolbar items, according to type.
-- [ ] Re-order blocks to match likely use.
+- [X] Re-order blocks to match likely use.
 - [ ] Figure out why drawers get confused sometimes. 
 - [ ] Rename 'unknown' to 'misc'. 
-- [ ] Put 'and' and 'or' in 'booleans'.
+- [X] Put 'and' and 'or' in 'booleans'.
 - [ ] Make drop targets for blocks larger, so that it's easier to connect
   them.
 - [ ] Name, Domain, Range in modal dialog. Look at how Snap does it.

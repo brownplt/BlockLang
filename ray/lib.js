@@ -2,6 +2,7 @@ goog.provide('Ray.Lib');
 
 goog.require('Ray.Ray');
 goog.require('Ray.Types');
+goog.require('Ray.Globals');
 
 goog.require('goog.array');
 
@@ -62,6 +63,13 @@ var string_comparisons = {
 
 Lib.add_builtin = function(name, val) {
   Lib.r.builtins_bind(name, val);
+};
+
+Lib.set_priority = function(name, priority) {
+  var value = Lib.r.lookup(name);
+  if(value) {
+    value.priority_ = priority;
+  }
 };
 
 Lib.make_predicate = function(type) {
@@ -229,24 +237,28 @@ Lib.initialize = function(r) {
                                 var z = r.numbers.add(x.n, y.n);
                                 return new r.Value.Num(z);
                               }, Types.num()));
+  Lib.set_priority('+', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
   Lib.add_builtin('*', r.prim(r.p_spec(['x', Types.num()],
                                        ['y', Types.num()]),
                               function(x, y) {
                                 var z = r.numbers.multiply(x.n, y.n);
                                 return new r.Value.Num(z);
                               }, Types.num()));
+  Lib.set_priority('*', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
   Lib.add_builtin('-', r.prim(r.p_spec(['x', Types.num()],
                                        ['y', Types.num()]),
                               function(x, y) {
                                 var z = r.numbers.subtract(x.n, y.n);
                                 return new r.Value.Num(z);
                               }, Types.num()));
+  Lib.set_priority('-', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
   Lib.add_builtin('/', r.prim(r.p_spec(['x', Types.num()],
                                        ['y', Types.num()]),
                               function(x, y) {
                                 var z = r.numbers.divide(x.n, y.n);
                                 return new r.Value.Num(z);
                               }, Types.num()));
+  Lib.set_priority('/', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
 
   /**
    * Numeric comparisons and other binary operations
