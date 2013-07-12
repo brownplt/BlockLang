@@ -86,36 +86,71 @@ Ray.Blocks.get_colour = function(type) {
   }
 };
 
+/**
+ * Get output type for a block specification
+ * @param block
+ * @returns {*}
+ */
+Ray.Blocks.get_output_type = function(block) {
+  return block.__type__;
+};
+
+/**
+ * Get a list of input types for a block specification, for use in determining drawers
+ * @param block
+ */
+Ray.Blocks.get_input_types = function(block) {
+  var input_types = [];
+  if(block.__value__) {
+    // If the block's value isn't a primitive or closure, then it shouldn't have any inputs
+    var value = block.__value__;
+    if(!value.arg_spec) {
+      return input_types;
+    } else {
+      input_types = input_types.concat(Ray.Types.get_arguments_types(value.arg_spec.arguments_type));
+    }
+  } else if(block.__input_types__) {
+    input_types = input_types.concat(goog.array.clone(block.__input_types__));
+  }
+  return input_types;
+};
+
 Ray.Blocks.get_drawers = function(block) {
   var drawers = [];
-  if(block.__value__) {
-    var value = block.__value__;
-    if(R.node_type(block.__value__) === 'primitive' || R.node_type(block.__value__) === 'closure') {
-      var output_types = value.body_type.get_all_base_types();
-      var input_types = value.arg_spec.arguments_type.get_all_base_types();
-      goog.array.forEach(input_types, function(type) {
-        drawers.push(type + '_input');
-      });
-      goog.array.forEach(output_types, function(type) {
-        drawers.push(type + '_output');
-      });
-      if(block.__user_function__) {
-        drawers.push('functions');
-      }
-    } else {
-      goog.array.forEach(block.__type__.get_all_base_types(), function(type)  {
-        drawers.push(type + '_input');
-      });
-    }
 
-  } else if(block.__form__) {
+  var output_type = Ray.Blocks.get_output_type(block);
+  var output_type_set = output_type.get_all_base_types();
+
+  var input_type_list = goog.array.flatten(goog.array.map(Ray.Blocks.get_input_types(block), function(type) {
+    return type.get_all_base_types();
+  }));
+  var input_type_set = [];
+  goog.array.forEach(input_type_list, function(type) {
+    if(!goog.array.contains(input_type_set, type)) {
+      input_type_set.push(type);
+    }
+  });
+
+  goog.array.forEach(input_type_set, function(type) {
+    drawers.push(type + '_input');
+  });
+  goog.array.forEach(output_type_set, function(type) {
+    drawers.push(type + '_output');
+  });
+  if(block.__user_function__) {
+    drawers.push('functions');
+  }
+
+  if(block.__form__) {
     drawers.push('forms');
-  } else if(block.__datatype__) {
-    drawers.push(block.__datatype__ + '_output');
-  } else if(block.__arguments__) {
+  }
+
+  if(block.__arguments__) {
     drawers.push('arguments');
-  } else{
-    //throw new Ray.Error("Unknown sort of block!!");
+  }
+
+  if(drawers.length === 0) {
+    throw 'This block will not be in any drawers!';
   }
   return drawers;
 };
@@ -123,7 +158,7 @@ Ray.Blocks.get_drawers = function(block) {
 /**
  * Generates an xml string representing the toolbox of blocks that will be available on a Blockly page.
  * @param {Object} block_dir the block directory for which we will generate the toolbox
- * @param {?boolean=} opt_include_arguments
+ * @param {?boolean=} opt_include_arguments Should we include arguments blocks in this block directory?
  */
 Ray.Blocks.generate_toolbox = function(block_dir, opt_include_arguments) {
   var include_arguments = goog.isDef(opt_include_arguments) ? opt_include_arguments : true;
@@ -142,7 +177,7 @@ Ray.Blocks.generate_toolbox = function(block_dir, opt_include_arguments) {
     if(!goog.isArray(block_dir[category])) {
       goog.array.forEach(goog.object.getKeys(block_dir[category]), function(subcategory) {
         var attributes = {};
-        attributes.name = (subcategory === 'input' ? 'consumes' : 'produces') + ' ' + category;
+        attributes.name = (subcategory === 'input' ? 'consumes' : 'produces');
         attributes.key = subcategory;
         attributes.custom = category + '_' + attributes.key;
         var subcat = goog.dom.createDom('category');
@@ -176,7 +211,10 @@ Ray.Blocks.add_to_block_directory = function(block_dir, block_name, block) {
 
 Ray.Blocks.empty_block_directory = function() {
   var block_dir  = {};
-  goog.array.forEach(['num', 'str', 'char', 'boolean', 'unknown'], function(ty)   {
+  var base_types = goog.array.map(Ray.Types.get_base_types(), function(ty) {
+    return ty.key();
+  });
+  goog.array.forEach(base_types, function(ty)   {
     block_dir[ty] = {};
     block_dir[ty]['input'] = [];
     block_dir[ty]['output'] = [];
@@ -186,7 +224,6 @@ Ray.Blocks.empty_block_directory = function() {
   block_dir['arguments'] = [];
   block_dir['functions'] = [];
   block_dir['all'] = [];
-  block_dir['other'] = [];
   return block_dir;
 };
 

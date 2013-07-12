@@ -32,9 +32,10 @@ var AtomicType = function (type_name, opt_no_register) {
   AtomicTypeConstructor.prototype.display = function() {
     return goog.string.toTitleCase(type_name);
   };
-  AtomicTypeConstructor.prototype.key = function() {
+  AtomicTypeConstructor.key = function() {
     return type_name;
   };
+  AtomicTypeConstructor.prototype.key = AtomicTypeConstructor.key;
 
   if(!opt_no_register) {
     Ray.Types.atomic_types[type_name] = AtomicTypeConstructor;
@@ -49,6 +50,15 @@ Ray.Types.Str = AtomicType('str');
 Ray.Types.Char = AtomicType('char');
 // Used to capture expressions which we don't know anything about
 Ray.Types.Unknown = AtomicType('unknown', true);
+// We don't want to register it as an ordinary type,
+// so that we don't generate a color for it.
+
+Ray.Types.get_base_types = function() {
+  var atomic_types = goog.object.getValues(Ray.Types.atomic_types);
+  atomic_types.push(Ray.Types.Unknown);
+  return atomic_types;
+};
+
 
 Ray.Types.is_atomic_type = function(ty) {
   return !!Ray.Types.get_atomic_type(ty.__type__);
@@ -153,6 +163,18 @@ ArgumentType.prototype.display = function() {
   return '{' + this.p_arg_types.display() + (this.rest_arg_type ? (' ' + this.rest_arg_type.display()) : '') + '}';
 };
 Ray.Types.ArgumentType = ArgumentType;
+
+Ray.Types.get_arguments_types = function(arguments_type) {
+  var types = [];
+  if(arguments_type.p_arg_types) {
+    types = types.concat(arguments_type.p_arg_types.list);
+  }
+  if(arguments_type.rest_arg_type) {
+    types.push(arguments_type.rest_arg_type.base_type)
+  }
+  return types;
+};
+
 
 /**
  * Function type

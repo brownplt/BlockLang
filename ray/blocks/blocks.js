@@ -61,19 +61,18 @@ Ray.Blocks.generate_all_blocks = function(r) {
 
 // Cons, first, rest, empty
 Ray.Blocks.define_list_blocks = function(r, obj) {
-  var ListBlock = function(name) {
+  var ListBlock = function(name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
     this.__value__ = r.builtins.lookup(name);
+    this.__type__ = type;
     this.__list__ = name;
     this.__name__ = name;
     this.__block_class__ = Blocks[goog.string.toTitleCase(name)];
     this.__render_as_expression__ = true;
   };
 
-  var cons_block = new ListBlock('cons');
-  cons_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown());
+  var cons_block = new ListBlock('cons', new Ray.Types.List(new Ray.Types.Unknown()));
   cons_block.init = function() {
-    this.setOutputType(new Ray.Types.List(new Ray.Types.Unknown()));
     this.makeTitleRow('cons');
     this.appendValueInput('car')
       .setType(new Ray.Types.Unknown());
@@ -82,18 +81,14 @@ Ray.Blocks.define_list_blocks = function(r, obj) {
   };
   obj[Ray.Blocks.block_name('cons')] = cons_block;
 
-  var empty_block = new ListBlock('empty');
-  empty_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown())
+  var empty_block = new ListBlock('empty', new Ray.Types.List(new Ray.Types.Unknown()));
   empty_block.init = function() {
-    this.setOutputType(new Ray.Types.List(new Ray.Types.Unknown()));
     this.makeTitleRow('empty');
   };
   obj[Ray.Blocks.block_name('empty')] = empty_block;
 
-  var first_block = new ListBlock('first');
-  first_block.__type__ = new Ray.Types.Unknown();
+  var first_block = new ListBlock('first', new Ray.Types.Unknown());
   first_block.init = function() {
-    this.setOutputType(new Ray.Types.Unknown());
     this.makeTitleRow('first');
     this.appendValueInput('x')
       .setType(new Ray.Types.List(new Ray.Types.Unknown()));
@@ -103,7 +98,6 @@ Ray.Blocks.define_list_blocks = function(r, obj) {
   var rest_block = new ListBlock('rest');
   rest_block.__type__ = new Ray.Types.List(new Ray.Types.Unknown());
   rest_block.init = function() {
-    this.setOutputType(new Ray.Types.Unknown());
     this.makeTitleRow('rest');
     this.appendValueInput('x')
       .setType(new Ray.Types.List(new Ray.Types.Unknown()));
@@ -162,21 +156,22 @@ Ray.Blocks.define_arg_blocks = function(r, obj, args) {
 };
 
 Ray.Blocks.define_conditional_blocks = function(r, obj) {
-  function ConditionalBlock(name) {
+  function ConditionalBlock(name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
     this.__value__ = null;
     this.__datatype__ = null;
     this.__form__ = name;
     this.__name__ = name;
+    this.__type__ = type;
     this.__block_class__ = Blocks[goog.string.toTitleCase(name)];
     this.__render_as_expression__ = true;
   }
 
   // If
-  var if_block = new ConditionalBlock('if');
+  var if_block = new ConditionalBlock('if', new Ray.Types.Unknown());
   if_block.__expr__ = Expressions.If;
+  if_block.__input_types__ = [new Ray.Types.Unknown(), new Ray.Types.Boolean()];
   if_block.init = function() {
-    this.setOutputType(new Ray.Types.Unknown());
     this.appendValueInput('PRED')
       .appendTitle("if")
       .setType(new Ray.Types.Boolean());
@@ -195,8 +190,8 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   // And
   var and_block = new ConditionalBlock('and', new Ray.Types.Boolean());
+  and_block.__input_types__ = [new Ray.Types.Boolean()];
   and_block.init = function() {
-    this.setOutputType(new Ray.Types.Boolean());
     this.makeTitleRow('and');
     this.appendValueInput('REST_ARG0')
       .setType(new Ray.Types.Boolean());
@@ -211,8 +206,8 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
 
   // Or
   var or_block = new ConditionalBlock('or', new Ray.Types.Boolean());
+  or_block.__input_types__ = [new Ray.Types.Boolean()];
   or_block.init = function() {
-    this.setOutputType(new Ray.Types.Boolean());
     this.makeTitleRow('or');
     this.appendValueInput('REST_ARG0')
       .setType(new Ray.Types.Boolean());
@@ -226,9 +221,9 @@ Ray.Blocks.define_conditional_blocks = function(r, obj) {
   obj[Ray.Blocks.conditional_block_name('or')] = or_block;
 
   // Cond
-  var cond_block = new ConditionalBlock('cond');
+  var cond_block = new ConditionalBlock('cond', new Ray.Types.Unknown());
+  cond_block.__input_types__ = [new Ray.Types.Unknown(), new Ray.Types.Boolean()];
   cond_block.init = function() {
-    this.setOutputType(new Ray.Types.Unknown());
     this.makeTitleRow('cond');
     this.appendValueInput('CONDITION')
       .appendTitle('when')
@@ -478,6 +473,18 @@ Ray.Blocks.define_builtin_blocks = function(r, obj) {
   return obj;
 };
 
+function FunctionBlock(name, value, is_user_function) {
+  this.__name__ = name;
+  this.__value__ = value;
+  this.__type__ = value.body_type;
+  this.__block_class__ = Blocks.App;
+  this.__render_as_expression__ = true;
+  if(is_user_function) {
+    this.__user_function__ = true;
+  }
+  this.helpUrl = Ray.Blocks.HELP_URL;
+};
+
 /**
  * Create the block corresponding to a use of value
  * (Note, that this is function application, and not definition)
@@ -512,30 +519,18 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       break;
     case 'primitive':
     case 'closure':
-      block = {};
       var arg_spec = value.arg_spec;
       // Ignoring rest and keyword arguments
       var arity = arg_spec.p_args.length;
       var rest_arg = arg_spec.rest_arg || null;
 
-      block.__name__ = name;
-      block.__value__ = value;
-      block.__type__ = value.body_type;
-      block.__block_class__ = Blocks.App;
-      block.__render_as_expression__ = true;
-      if(is_user_function) {
-        block.__user_function__ = true;
-      }
-      block.helpUrl = Ray.Blocks.HELP_URL;
+      var block = new FunctionBlock(name, value, is_user_function);
       block.init = function() {
-
         this.makeTitleRow(name);
-
         for(var i = 0; i < arity; i++) {
           this.appendValueInput(arg_spec.p_args[i])
             .setType(arg_spec.arguments_type.p_arg_types.list[i])
         }
-
         if(rest_arg) {
           this.appendValueInput('REST_ARG0')
             .setType(arg_spec.arguments_type.rest_arg_type.base_type);
