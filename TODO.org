@@ -224,6 +224,8 @@ Clean stuff up
 - [ ] Get rid of 'all' drawer
 - [X] Make function names black
 - [X] Switch '*' for '×'
+- [ ] Figure out how to get the workspace to fit in the available
+  space exactly.
 
 
 * Non-code things to do *
