@@ -222,7 +222,8 @@ Clean stuff up
 - [ ] Have function definition be modal, so they can appear.
   simultaneously with canvas. Do this instead-of/as-well-as tabbed interface.
 - [ ] Get rid of 'all' drawer
-- [ ] Make function names black
+- [X] Make function names black
+- [X] Switch '*' for '×'
 
 
 * Non-code things to do *

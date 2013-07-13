@@ -527,10 +527,13 @@ Ray.Blocks.generate_block = function(r, name, value, obj, opt_user_function) {
       // Ignoring rest and keyword arguments
       var arity = arg_spec.p_args.length;
       var rest_arg = arg_spec.rest_arg || null;
+      var block_title = goog.isDef(value.display_name_) ?
+                        goog.string.unescapeEntities(value.display_name_) :
+                        name;
 
       block = new FunctionBlock(name, value, is_user_function);
       block.init = function() {
-        this.makeTitleRow(name);
+        this.makeTitleRow(block_title);
         for(var i = 0; i < arity; i++) {
           this.appendValueInput(arg_spec.p_args[i])
             .setType(arg_spec.arguments_type.p_arg_types.list[i])

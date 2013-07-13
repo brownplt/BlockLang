@@ -42,6 +42,8 @@ Blockly.Css.inject = function() {
   goog.cssom.addCssText(text);
 };
 
+Blockly.Css.FONT_COLOR = '#000';
+
 
 Blockly.Css.CONTENT = [
   '.blocklySvg {',
@@ -108,14 +110,14 @@ Blockly.Css.CONTENT = [
   '  cursor: default;',
   '  font-family: sans-serif;',
   '  font-size: 11pt;',
-  '  fill: #fff;',
+  '  fill: ' + Blockly.Css.FONT_COLOR + ';',
   '}',
   '.blocklyNonEditableText>text {',
   '  pointer-events: none;',
   '}',
   '.blocklyNonEditableText>rect,',
   '.blocklyEditableText>rect {',
-  '  fill: #fff;',
+  '  fill: #fff;',// + Blockly.Css.FONT_COLOR + ';',
   '  fill-opacity: 0.6;',
   '}',
   '.blocklyNonEditableText>text,',
@@ -124,7 +126,7 @@ Blockly.Css.CONTENT = [
   '}',
   '.blocklyEditableText:hover>rect {',
   '  stroke-width: 2;',
-  '  stroke: #fff;',
+  '  stroke: ' + Blockly.Css.FONT_COLOR + ';',
   '}',
   '/*',
   ' * Don\'t allow users to select text.  It gets annoying when trying to',

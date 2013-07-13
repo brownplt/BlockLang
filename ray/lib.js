@@ -72,6 +72,13 @@ Lib.set_priority = function(name, priority) {
   }
 };
 
+Lib.set_display_name = function(name, display_name) {
+  var value = Lib.r.lookup(name);
+  if(value) {
+    value.display_name_ = display_name;
+  }
+};
+
 Lib.make_predicate = function(type) {
   Lib.add_builtin(type + '?', Lib.r.prim(Lib.r.p_spec(['x', Types.unknown()]), function(x) {
     return new Lib.r.Value.Boolean(Lib.r.node_type(x) === type);
@@ -245,6 +252,7 @@ Lib.initialize = function(r) {
                                 return new r.Value.Num(z);
                               }, Types.num()));
   Lib.set_priority('*', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
+  Lib.set_display_name('*', '&times;');
   Lib.add_builtin('-', r.prim(r.p_spec(['x', Types.num()],
                                        ['y', Types.num()]),
                               function(x, y) {
