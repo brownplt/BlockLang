@@ -88,19 +88,19 @@ Blockly.Block = function(workspace, prototypeName) {
   if (prototypeName) {
     this.type = prototypeName;
     var prototype = null;
-    prototype = Blockly.Ray_.Shared.get_block_prototype(Blockly, prototypeName);
+    prototype = Blockly.Ray_.Shared.getBlockPrototype(Blockly, prototypeName);
     if(!prototype) {
       throw 'Error: "' + prototypeName + '" is an unknown language block.';
     }
     goog.mixin(this, prototype);
   }
 
-  if(this.__rest_arg__) {
+  if(this.isRestArg_) {
     this.makeRestArg();
-  } else if(this.__rest_arg_container__) {
+  } else if(this.restArgContainer_) {
     this.makeRestArgContainer();
   } else {
-    this.setOutputType(this.__type__);
+    this.setOutputType(this.outputType_);
   }
 
   // Call an initialization function, if it exists.
@@ -530,11 +530,11 @@ Blockly.Block.prototype.duplicate_ = function() {
 };
 
 Blockly.Block.prototype.saveToClipboard_ = function() {
-  Blockly.Ray_.Shared.save_block_xml(this);
+  Blockly.Ray_.Shared.saveBlockXml(this);
 };
 
 Blockly.Block.prototype.loadFromClipboard_ = function() {
-  Blockly.Ray_.Shared.load_block_xml(Blockly, Blockly.mainWorkspace);
+  Blockly.Ray_.Shared.loadBlockXml(Blockly, Blockly.mainWorkspace);
 };
 
 /**
@@ -986,7 +986,7 @@ Blockly.Block.prototype.getDescendants = function() {
 Blockly.Block.prototype.getColour = function() {
   return goog.isDef(this.colourHue_) ?
          this.colourHue_ :
-         Blockly.Ray_.Shared.get_type_colour(this.outputConnection.getType());
+         Blockly.Ray_.Shared.getTypeColour(this.outputConnection.getType());
 
 };
 

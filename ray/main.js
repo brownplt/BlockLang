@@ -22,33 +22,33 @@ goog.require('goog.object');
 Ray.Main.DIRECTORY_PREFIX = "ray/ui/";
 
 Ray.Main.MAIN_BLOCKLY_ID = "blockly_main";
-Ray.Main.FUNCTION_DEFINITION_BLOCKLY_ID = "blockly_function_definition";
-Ray.Main.function_definition_blockly = function() {
-  return goog.dom.getElement(Ray.Main.FUNCTION_DEFINITION_BLOCKLY_ID);
+Ray.Main.FUN_DEF_BLOCKLY_ID = "blockly_function_definition";
+Ray.Main.funDefBlockly = function() {
+  return goog.dom.getElement(Ray.Main.FUN_DEF_BLOCKLY_ID);
 };
-Ray.Main.main_blockly = function () {
+Ray.Main.mainBlockly = function () {
   return goog.dom.getElement(Ray.Main.MAIN_BLOCKLY_ID);
 };
-Ray.Main.initialize_main_blockly_dom = function() {
+Ray.Main.initializeMainBlocklyDom = function() {
   goog.dom.appendChild(document.body,
                   goog.dom.createDom('div', Ray.UI.VISIBLE_CONTAINER_CLASS,
                                      goog.dom.createDom('iframe', {
                                        id: Ray.Main.MAIN_BLOCKLY_ID,
                                        src: "Javascript:''"})));
 };
-Ray.Main.initialize_function_definition_blockly_dom = function() {
+Ray.Main.initializeFunctionDefinitionBlocklyDom = function() {
   goog.dom.appendChild(document.body,
                        goog.dom.createDom('div', Ray.UI.HIDDEN_CONTAINER_CLASS,
                                           goog.dom.createDom('iframe', {
-                                            id: Ray.Main.FUNCTION_DEFINITION_BLOCKLY_ID,
+                                            id: Ray.Main.FUN_DEF_BLOCKLY_ID,
                                             src: "Javascript:''"})));
 };
 
-Ray.Main.run_test = function() {
+Ray.Main.runTest = function() {
   return Ray.Test();
 };
 
-Ray.Main.create_ray = function() {
+Ray.Main.createRay = function() {
   var R = Ray.R;
   var lib = Ray.Lib;
   var r = lib.initialize(R);
@@ -56,32 +56,32 @@ Ray.Main.create_ray = function() {
   return r;
 };
 
-Ray.Main.load_main_blockly = function(iframe) {
+Ray.Main.loadMainBlockly = function(iframe) {
   goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'main_blockly.html'});
 };
 
 /**
  *
  * @param {HTMLIFrameElement} iframe
- * @param {?Object=} arg_blocks
- * @param {?string=} func_name
- * @param {?Array.<string>=} initial_blocks
- * @param {Ray.Types} return_type
+ * @param {?Object=} argBlocks
+ * @param {?string=} funName
+ * @param {?Array.<string>=} initialBlocks
+ * @param {Ray.Types} returnType
  */
-Ray.Main.load_func_def_blockly = function(iframe, arg_blocks, func_name, func_spec, initial_blocks, return_type) {
-  var func_def = {
-    args: arg_blocks,
-    func_name: func_name,
-    func_spec: func_spec,
-    initial_blocks: initial_blocks,
-    return_type: return_type
+Ray.Main.loadFunDefBlockly = function(iframe, argBlocks, funName, funSpec, initialBlocks, returnType) {
+  var funDef = {
+    args: argBlocks,
+    funName: funName,
+    funSpec: funSpec,
+    initialBlocks: initialBlocks,
+    returnType: returnType
   };
-  window.__function_definition_info__ = func_def;
-  goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'func_def_blockly.html'});
+  window.funDefInfo_ = funDef;
+  goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'fun_def_blockly.html'});
 };
 
-Ray.Main.block_to_workspace_xml = function(block_name, block) {
-  var block_instance = new Ray.Main.Block(block_name, block, false);
+Ray.Main.blockToWorkspaceXml = function(blockName, block) {
+  var block_instance = new Ray.Main.Block(blockName, block, false);
   var xml = goog.dom.createDom('xml');
   var element = Blockly.Xml.blockToDom_(block_instance);
   element.setAttribute('x', 0);
@@ -90,77 +90,77 @@ Ray.Main.block_to_workspace_xml = function(block_name, block) {
   return xml;
 };
 
-Ray.Main.create_ray_blocks = function(r) {
-  var blocks = Ray.Blocks.generate_all_blocks(r, {});
+Ray.Main.createRayBlocks = function(r) {
+  var blocks = Ray.Blocks.generateAllBlocks(r, {});
   return blocks;
 };
 
-Ray.Main.atomic_type_to_type_instance = function(type_name) {
-  var type = Ray.Types.get_atomic_type(type_name);
+Ray.Main.atomicTypeToTypeInstance = function(typeName) {
+  var type = Ray.Types.getAtomicType(typeName);
   return new type();
 };
 
-Ray.Main.make_function_argument_blocks = function(r, block_dir, function_parts) {
-  return Ray.Blocks.define_arg_blocks(r, block_dir, function_parts.args);
+Ray.Main.makeFunArgBlocks = function(r, blockDir, funParts) {
+  return Ray.Blocks.defineArgBlocks(r, blockDir, funParts.args);
 };
 
-Ray.Main.make_function_application_block = function(r, block_dir, function_parts) {
-  var return_type_instance = function_parts.return_type;
-  var arg_spec = function_parts.arg_spec;
-  var f_value = new r.Value.Closure(arg_spec,
+Ray.Main.makeFunAppBlock = function(r, blockDir, funParts) {
+  var return_type_instance = funParts.returnType;
+  var argSpec = funParts.argSpec;
+  var f_value = new r.Value.Closure(argSpec,
                                     null,
                                     null,
                                     return_type_instance);
-  return Ray.Blocks.generate_block(r, function_parts.name, f_value, block_dir, true);
+  return Ray.Blocks.generateBlock(r, funParts.name, f_value, blockDir, true);
 };
 
 /**
  *
  * @param r
- * @param function_spec
- * @param opt_as_value
+ * @param funSpec
+ * @param opt_asValue
  */
-Ray.Main.make_function_parts_from_spec = function(r, function_spec, opt_as_value) {
-  var as_value = goog.isDef(opt_as_value) ? opt_as_value : false;
-  var return_type_name = function_spec.return_type;
-  var return_type = Ray.Types.get_atomic_type(return_type_name);
-  var return_type_instance = new return_type();
-  var arg_type_names = goog.array.map(function_spec.args, function(a) { return a.getType(); });
-  var arg_types = goog.array.map(arg_type_names, Ray.Main.atomic_type_to_type_instance);
+Ray.Main.funSpecToParts = function(r, funSpec, opt_asValue) {
+  var asValue = goog.isDef(opt_asValue) ? opt_asValue : false;
+  var returnTypeName = funSpec.returnType;
+  var returnType = Ray.Types.getAtomicType(returnTypeName);
+  var returnTypeInstance = new returnType();
+  var argTypeNames = goog.array.map(funSpec.args, function(a) { return a.getType(); });
+  var argTypes = goog.array.map(argTypeNames, Ray.Main.atomicTypeToTypeInstance);
 
-  var arg_names = goog.array.map(function_spec.args, function(a)  {return a.getName(); });
-  var arg_types_and_names = goog.array.zip(arg_types, arg_names);
-  var final_args = goog.array.map(arg_types_and_names, function(arg_type_and_name) {
+  var argNames = goog.array.map(funSpec.args, function(a)  {return a.getName(); });
+  var argTypesAndNames = goog.array.zip(argTypes, argNames);
+  var finalArgs = goog.array.map(argTypesAndNames, function(arg_type_and_name) {
     return {
       type_: arg_type_and_name[0],
       name_: arg_type_and_name[1]
     };
   });
 
-  var arguments_type = new Ray.Types.ArgumentType(
-    new Ray.Types.ListOfTypes(arg_types));
-  var arg_spec = as_value ?
-    new r.Value.ArgumentSpec(arg_names, {}, null, arguments_type) :
-    new r.Expr.ArgumentSpec(arg_names, {}, null, arguments_type);
+  var argsType = new Ray.Types.ArgumentsType(
+    new Ray.Types.ListOfTypes(argTypes));
+  var argSpec = asValue ?
+    new r.Value.ArgumentSpec(argNames, {}, null, argsType) :
+    new r.Expr.ArgumentSpec(argNames, {}, null, argsType);
   return {
-    args: final_args,
-    arg_spec: arg_spec,
-    return_type: return_type_instance,
-    name: function_spec.name
+    args: finalArgs,
+    argSpec: argSpec,
+    returnType: returnTypeInstance,
+    name: funSpec.name
   };
 };
 
 
-Ray.Main.make_function_application_and_argument_blocks = function(r, function_spec) {
-  var block_dir = {};
-  var function_parts = Ray.Main.make_function_parts_from_spec(r, function_spec, true);
-  var arg_blocks = Ray.Main.make_function_argument_blocks(r, block_dir, function_parts);
-  var app_block = Ray.Main.make_function_application_block(r, {}, function_parts);
-  var func_block_name = Ray.Main.get_function_block_name(function_spec.name);
-  return [arg_blocks, app_block, func_block_name];
+Ray.Main.makeFunAppAndArgBlocks = function(r, funSpec) {
+  var blockDir = {};
+  var funParts = Ray.Main.funSpecToParts(r, funSpec, true);
+  var argBlocks = Ray.Main.makeFunArgBlocks(r, blockDir, funParts);
+  var appBlocks = Ray.Main.makeFunAppBlock(r, {}, funParts);
+  var funBlockName = Ray.Main.getFunBlockName(funSpec.name);
+  return [argBlocks, appBlocks, funBlockName];
 };
 
-Ray.Main.get_function_body_expression_block = function(Blockly) {
+Ray.Main.getFunBodyBlock = function(Blockly) {
   var workspace = Blockly.mainWorkspace;
   var topBlocks = workspace.getTopBlocks(false);
   if(topBlocks.length > 1) {
@@ -170,28 +170,28 @@ Ray.Main.get_function_body_expression_block = function(Blockly) {
   }
 };
 
-Ray.Main.block_to_code = function(block) {
+Ray.Main.blockToCode = function(block) {
   var expr = Ray.Generator.generate(block, Ray.Shared.Ray);
   return expr;
 };
 
-Ray.Main.evaluate_code = function(expr) {
+Ray.Main.evaluateCode = function(expr) {
   var result = Ray.Shared.Ray.eval(expr);
   return result;
 };
 
-Ray.Main.format_result = function(result) {
+Ray.Main.formatResult = function(result) {
   var text = Ray.Shared.Ray.display(result);
   return text;
 };
 
-Ray.Main.evaluate_block_and_format = function(block) {
-  var code = Ray.Main.block_to_code(block);
-  var result = Ray.Main.evaluate_code(code);
-  return Ray.Main.format_result(result);
+Ray.Main.evaluateBlockAndFormat = function(block) {
+  var code = Ray.Main.blockToCode(block);
+  var result = Ray.Main.evaluateCode(code);
+  return Ray.Main.formatResult(result);
 };
 
-Ray.Main.get_main_expression_block = function() {
+Ray.Main.getMainExpressionBlock = function() {
   var Blockly = Ray.Shared.MainBlockly;
   var workspace = Blockly.mainWorkspace;
   var topBlocks = workspace.getTopBlocks(false);
@@ -203,32 +203,32 @@ Ray.Main.get_main_expression_block = function() {
 };
 
 Ray.Main.go = function() {
-  goog.array.forEach(Ray.Shared.FuncDefBlocklys, Ray.Main.bind_func_def_blockly);
-  return Ray.Main.evaluate_block_and_format(Ray.Main.get_main_expression_block());
+  goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Main.bindFunDefBlockly);
+  return Ray.Main.evaluateBlockAndFormat(Ray.Main.getMainExpressionBlock());
 };
 
-Ray.Main.bind_func_def_blockly = function(Blockly) {
+Ray.Main.bindFunDefBlockly = function(Blockly) {
   var r = Ray.Shared.Ray;
-  var body_block = Ray.Main.get_function_body_expression_block(Blockly);
-  var body = Ray.Main.block_to_code(body_block);
-  var function_parts = Ray.Main.make_function_parts_from_spec(r, Blockly.FunctionSpec, false);
-  var fn = r.Expr.Lambda(function_parts.arg_spec, body, function_parts.return_type);
-  r.top_level_bind(Blockly.FunctionName, fn);
+  var body_block = Ray.Main.getFunBodyBlock(Blockly);
+  var body = Ray.Main.blockToCode(body_block);
+  var function_parts = Ray.Main.funSpecToParts(r, Blockly.FunSpec, false);
+  var fn = r.Expr.Lambda(function_parts.argSpec, body, function_parts.returnType);
+  r.bindTopLevel(Blockly.FunName, fn);
 };
 
-Ray.Main.get_function_block_name = function(name) {
-  return Ray.Blocks.block_name(name);
+Ray.Main.getFunBlockName = function(name) {
+  return Ray.Blocks.blockName(name);
 };
-Ray.Main.get_function_block = function(name, blocks) {
-  return blocks[Ray.Blocks.block_name(name)];
+Ray.Main.getFunBlock = function(name, blocks) {
+  return blocks[Ray.Blocks.blockName(name)];
 };
 
-Ray.Main.setup_language = function(Blockly, blocks) {
+Ray.Main.setupLanguage = function(Blockly, blocks) {
   Blockly.Language = goog.object.clone(blocks);
 };
 
-Ray.Main.setup_toolbox = function(Blockly, blocks) {
-  Blockly.__toolbox__ = Ray.Blocks.generate_toolbox(blocks);
+Ray.Main.setupToolbox = function(Blockly, blocks) {
+  Blockly.__toolbox__ = Ray.Blocks.generateToolbox(blocks);
 };
 
 Ray.Main.Block = function(block_name, block, editable) {

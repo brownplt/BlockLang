@@ -10,7 +10,7 @@ var Types = Ray.Types;
 
 var Lib = Ray.Lib;
 
-var string_comparisons = {
+var stringComparisons = {
   'EQ': function(a, b) {
     for(var i = 0; i < (a.length < b.length ? a.length : b.length); i++) {
       if(a.charCodeAt(i) !== b.charCodeAt(i)) {
@@ -61,54 +61,54 @@ var string_comparisons = {
   }
 };
 
-Lib.add_builtin = function(name, val) {
-  Lib.r.builtins_bind(name, val);
+Lib.addBuiltin = function(name, val) {
+  Lib.r.bindBuiltin(name, val);
 };
 
-Lib.set_priority = function(name, priority) {
+Lib.setPriority = function(name, priority) {
   var value = Lib.r.lookup(name);
   if(value) {
     value.priority_ = priority;
   }
 };
 
-Lib.set_display_name = function(name, display_name) {
+Lib.setDisplayName = function(name, display_name) {
   var value = Lib.r.lookup(name);
   if(value) {
     value.display_name_ = display_name;
   }
 };
 
-Lib.make_predicate = function(type) {
-  Lib.add_builtin(type + '?', Lib.r.prim(Lib.r.p_spec(['x', Types.unknown()]), function(x) {
-    return new Lib.r.Value.Boolean(Lib.r.node_type(x) === type);
+Lib.makePredicate = function(type) {
+  Lib.addBuiltin(type + '?', Lib.r.prim(Lib.r.p_spec(['x', Types.unknown()]), function(x) {
+    return new Lib.r.Value.Boolean(Lib.r.nodeType(x) === type);
   }, Types.bool()));
 };
 
-Lib.make_numeric_unary_op = function(name, numbers_name) {
+Lib.makeNumericUnaryOp = function(name, numbers_name) {
   var internal_name = numbers_name || name;
-  Lib.add_builtin(name, Lib.r.prim(Lib.r.p_spec(['x', Types.num()]), function(x) {
+  Lib.addBuiltin(name, Lib.r.prim(Lib.r.p_spec(['x', Types.num()]), function(x) {
     return new r.Value.Num(Lib.r.numbers[internal_name](x.n));
   }, Types.num()));
 };
 
-Lib.make_numeric_binop = function(name, numbers_name) {
+Lib.makeNumericBinop = function(name, numbers_name) {
   var internal_name = numbers_name || name;
-  Lib.add_builtin(name, Lib.r.prim(Lib.r.p_spec(['x', Types.num()],['y', Types.num()]), function(x,y) {
+  Lib.addBuiltin(name, Lib.r.prim(Lib.r.p_spec(['x', Types.num()],['y', Types.num()]), function(x,y) {
     return new r.Value.Num(Lib.r.numbers[internal_name](x.n, y.n));
   }, Types.num()));
 };
 
-Lib.make_numeric_comparison = function(name, numbers_name) {
+Lib.makeNumericComparison = function(name, numbers_name) {
   var r = Lib.r;
 
-  Lib.add_builtin(name, r.prim(r.p_spec(['x', Types.num()], ['y', Types.num()]), function(x,y) {
+  Lib.addBuiltin(name, r.prim(r.p_spec(['x', Types.num()], ['y', Types.num()]), function(x,y) {
     var result = Lib.r.numbers[numbers_name](x.n, y.n);
     return new r.Value.Boolean(result);
   }, Types.bool()));
   /**
    * Unused variable arity version
-  Lib.add_builtin(name, r.prim(r.spec([['x', Types.num()],['y', Types.num()]],{},['ls', Types.num()]), function(x, y, ls) {
+  Lib.addBuiltin(name, r.prim(r.spec([['x', Types.num()],['y', Types.num()]],{},['ls', Types.num()]), function(x, y, ls) {
     var args = [x, y].concat(ls);
     var lefts = args.slice(0, -1);
     var rights = args.slice(1);
@@ -120,9 +120,9 @@ Lib.make_numeric_comparison = function(name, numbers_name) {
    */
 };
 
-Lib.make_string_comparison = function(name, f) {
+Lib.makeStringComparison = function(name, f) {
   var r = Lib.r;
-  Lib.add_builtin(name, r.prim(Lib.r.p_spec(['x', Types.str()], ['y', Types.str()]), function(x,y) {
+  Lib.addBuiltin(name, r.prim(Lib.r.p_spec(['x', Types.str()], ['y', Types.str()]), function(x,y) {
     var result = f(x.s, y.s);
     return new r.Value.Boolean(result);
   }, Types.bool()));
@@ -141,7 +141,7 @@ Lib.make_string_comparison = function(name, f) {
                                     ['y', Types.str()]],{},
                                    ['ls', Types.str()]),
                             str_cmp_f, Types.bool());
-  Lib.add_builtin(name, str_cmp_prim);
+  Lib.addBuiltin(name, str_cmp_prim);
    */
 };
 
@@ -152,57 +152,57 @@ Lib.initialize = function(r) {
   /**
    * Type tests
    */
-  Lib.make_predicate('boolean');
-  Lib.make_predicate('pair');
-  Lib.make_predicate('number');
-  Lib.make_predicate('string');
-  Lib.make_predicate('empty');
+  Lib.makePredicate('boolean');
+  Lib.makePredicate('pair');
+  Lib.makePredicate('number');
+  Lib.makePredicate('string');
+  Lib.makePredicate('empty');
 
   /**
    * Pairs and Lists
    */
-  Lib.add_builtin("empty", r.empty());
+  Lib.addBuiltin("empty", r.empty());
 
-  Lib.add_builtin("first", r.prim(r.p_spec(['x', Types.list(Types.unknown())]), function(x) {
+  Lib.addBuiltin("first", r.prim(r.p_spec(['x', Types.list(Types.unknown())]), function(x) {
     return x.car;
   }, Types.unknown()));
-  Lib.add_builtin("rest", r.prim(r.p_spec(['x', Types.list(Types.unknown())]), function(x) {
+  Lib.addBuiltin("rest", r.prim(r.p_spec(['x', Types.list(Types.unknown())]), function(x) {
     return x.cdr;
   }, Types.list(Types.unknown())));
-  Lib.add_builtin("cons", r.prim(r.p_spec(['car', Types.unknown()], ['cdr', Types.list(Types.unknown())]), function(car, cdr) {
+  Lib.addBuiltin("cons", r.prim(r.p_spec(['car', Types.unknown()], ['cdr', Types.list(Types.unknown())]), function(car, cdr) {
     return new r.Value.Pair(car, cdr);
   }, Types.list(Types.unknown())));
 
-  Lib.add_builtin('list', r.prim(r.rest_spec('ls', Types.unknown()), function(ls) {
+  Lib.addBuiltin('list', r.prim(r.rest_spec('ls', Types.unknown()), function(ls) {
     return goog.array.reduceRight(ls, function(curr, elem) {
       return new r.Value.Pair(elem, curr);
     }, new r.Value.Empty());
   }, Types.list(Types.unknown())));
 
-  Lib.add_builtin("list?", r.fn(r.p_spec(['x', Types.unknown()]),
-                                r.or(r.app(r.name('empty?'), r.p_args(r.name('x'))),
+  Lib.addBuiltin("list?", r.fn(r.p_spec(['x', Types.unknown()]),
+                                r.or(r.app(r.name('empty?'), r.positionalArgs(r.name('x'))),
                                      r.and(r.app(r.name('pair?'),
-                                                 r.p_args(r.name('x'))),
+                                                 r.positionalArgs(r.name('x'))),
                                            r.app(r.name('list?'),
-                                                 r.p_args(r.app(r.name('cdr'),
-                                                                r.p_args(r.name('x'))))))), Types.bool()));
+                                                 r.positionalArgs(r.app(r.name('cdr'),
+                                                                r.positionalArgs(r.name('x'))))))), Types.bool()));
 
-  Lib.add_builtin("map", r.fn(r.p_spec(['f', Types.fn(Types.p_args(Types.unknown()), Types.unknown())],
+  Lib.addBuiltin("map", r.fn(r.p_spec(['f', Types.fn(Types.positionalArgs(Types.unknown()), Types.unknown())],
                                        ['ls', Types.list(Types.unknown())]),
-                              r._if(r.app(r.name('empty?'), r.p_args(r.name('ls'))),
+                              r._if(r.app(r.name('empty?'), r.positionalArgs(r.name('ls'))),
                                     r.empty(),
-                                    r.app(r.name('cons'), r.p_args(r.app(r.name('f'),
-                                                                         r.p_args(r.app(r.name('car'),
-                                                                                        r.p_args(r.name('ls'))))),
+                                    r.app(r.name('cons'), r.positionalArgs(r.app(r.name('f'),
+                                                                         r.positionalArgs(r.app(r.name('car'),
+                                                                                        r.positionalArgs(r.name('ls'))))),
                                                                    r.app(r.name('map'),
-                                                                         r.p_args(r.name('f'),
+                                                                         r.positionalArgs(r.name('f'),
                                                                                   r.app(r.name('cdr'),
-                                                                                        r.p_args(r.name('ls')))))))), Types.list(Types.unknown())));
+                                                                                        r.positionalArgs(r.name('ls')))))))), Types.list(Types.unknown())));
 
   /**
    * Booleans and Equality
    */
-  Lib.add_builtin('not', r.prim(r.p_spec(['x', Types.bool()]), function(x) {
+  Lib.addBuiltin('not', r.prim(r.p_spec(['x', Types.bool()]), function(x) {
     return new r.Value.Boolean(!x.b);
   }, Types.bool()));
 
@@ -211,15 +211,15 @@ Lib.initialize = function(r) {
    * For the time being I'm going to get rid of variable arity versions, and just stick with
    * the binary ones, but I'll keep the varargs around in case I want to switch back later.
 
-   Lib.add_builtin("+", r.prim(r.rest_spec('ls', Types.num()), function(ls) {
+   Lib.addBuiltin("+", r.prim(r.rest_spec('ls', Types.num()), function(ls) {
       var sum = goog.array.reduce(ls, function(a, b) { return r.numbers.add(a, b.n); }, 0);
       return new r.Value.Num(sum);
     }, Types.num()));
-   Lib.add_builtin("*", r.prim(r.rest_spec('ls', Types.num()), function(ls) {
+   Lib.addBuiltin("*", r.prim(r.rest_spec('ls', Types.num()), function(ls) {
       var sum = goog.array.reduce(ls, function(a, b) { return r.numbers.multiply(a, b.n); }, 1);
       return new r.Value.Num(sum);
     }, Types.num()));
-   Lib.add_builtin('-', r.prim(r.spec([['x', Types.num()]],{},['ls', Types.num()]), function(x,ls) {
+   Lib.addBuiltin('-', r.prim(r.spec([['x', Types.num()]],{},['ls', Types.num()]), function(x,ls) {
       if(ls.length === 0) {
         return r.num(r.numbers.subtract(0, x.n));
       } else {
@@ -227,7 +227,7 @@ Lib.initialize = function(r) {
         return new r.Value.Num(result);
       }
     }, Types.num()));
-   Lib.add_builtin('/', r.prim(r.spec([['x', Types.num()]],{},['ls', Types.num()]), function(x,ls) {
+   Lib.addBuiltin('/', r.prim(r.spec([['x', Types.num()]],{},['ls', Types.num()]), function(x,ls) {
       if(ls.length === 0) {
         return new r.Value.Num(r.numbers.divide(1, x.n));
       } else {
@@ -238,64 +238,64 @@ Lib.initialize = function(r) {
 
    */
 
-  Lib.add_builtin('+', r.prim(r.p_spec(['x', Types.num()],
+  Lib.addBuiltin('+', r.prim(r.p_spec(['x', Types.num()],
                                        ['y', Types.num()]),
                               function(x, y) {
                                 var z = r.numbers.add(x.n, y.n);
                                 return new r.Value.Num(z);
                               }, Types.num()));
-  Lib.set_priority('+', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
-  Lib.add_builtin('*', r.prim(r.p_spec(['x', Types.num()],
+  Lib.setPriority('+', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
+  Lib.addBuiltin('*', r.prim(r.p_spec(['x', Types.num()],
                                        ['y', Types.num()]),
                               function(x, y) {
                                 var z = r.numbers.multiply(x.n, y.n);
                                 return new r.Value.Num(z);
                               }, Types.num()));
-  Lib.set_priority('*', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
-  Lib.set_display_name('*', '&times;');
-  Lib.add_builtin('-', r.prim(r.p_spec(['x', Types.num()],
+  Lib.setPriority('*', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
+  Lib.setDisplayName('*', '&times;');
+  Lib.addBuiltin('-', r.prim(r.p_spec(['x', Types.num()],
                                        ['y', Types.num()]),
                               function(x, y) {
                                 var z = r.numbers.subtract(x.n, y.n);
                                 return new r.Value.Num(z);
                               }, Types.num()));
-  Lib.set_priority('-', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
-  Lib.add_builtin('/', r.prim(r.p_spec(['x', Types.num()],
+  Lib.setPriority('-', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
+  Lib.addBuiltin('/', r.prim(r.p_spec(['x', Types.num()],
                                        ['y', Types.num()]),
                               function(x, y) {
                                 var z = r.numbers.divide(x.n, y.n);
                                 return new r.Value.Num(z);
                               }, Types.num()));
-  Lib.set_priority('/', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
+  Lib.setPriority('/', Ray.Globals.Priorities.BASIC_NUMBER_OPERATION);
 
   /**
    * Numeric comparisons and other binary operations
    */
-  Lib.make_numeric_comparison('>', 'greaterThan');
-  Lib.make_numeric_comparison('<', 'lessThan');
-  Lib.make_numeric_comparison('>=', 'greaterThanOrEqual');
-  Lib.make_numeric_comparison('<=', 'lessThanOrEqual');
-  Lib.make_numeric_comparison('=', 'equals');
-  Lib.make_numeric_binop('quotient');
-  Lib.make_numeric_binop('remainder');
-  Lib.make_numeric_binop('modulo');
+  Lib.makeNumericComparison('>', 'greaterThan');
+  Lib.makeNumericComparison('<', 'lessThan');
+  Lib.makeNumericComparison('>=', 'greaterThanOrEqual');
+  Lib.makeNumericComparison('<=', 'lessThanOrEqual');
+  Lib.makeNumericComparison('=', 'equals');
+  Lib.makeNumericBinop('quotient');
+  Lib.makeNumericBinop('remainder');
+  Lib.makeNumericBinop('modulo');
 
-  Lib.make_numeric_unary_op('abs');
-  Lib.make_numeric_unary_op('sqrt');
-  Lib.make_numeric_unary_op('exp');
-  Lib.make_numeric_unary_op('log');
-  Lib.make_numeric_unary_op('magnitude');
-  Lib.make_numeric_unary_op('numerator');
-  Lib.make_numeric_unary_op('sgn');
-  Lib.make_numeric_unary_op('sqr');
-  Lib.make_numeric_unary_op('ceiling');
-  Lib.make_numeric_unary_op('floor');
-  Lib.make_numeric_unary_op('round');
+  Lib.makeNumericUnaryOp('abs');
+  Lib.makeNumericUnaryOp('sqrt');
+  Lib.makeNumericUnaryOp('exp');
+  Lib.makeNumericUnaryOp('log');
+  Lib.makeNumericUnaryOp('magnitude');
+  Lib.makeNumericUnaryOp('numerator');
+  Lib.makeNumericUnaryOp('sgn');
+  Lib.makeNumericUnaryOp('sqr');
+  Lib.makeNumericUnaryOp('ceiling');
+  Lib.makeNumericUnaryOp('floor');
+  Lib.makeNumericUnaryOp('round');
 
   /**
    * Strings
    */
-  Lib.add_builtin('make-string', r.prim(r.p_spec(['k', Types.num()], ['c', Types.char()]), function(k, c) {
+  Lib.addBuiltin('make-string', r.prim(r.p_spec(['k', Types.num()], ['c', Types.char()]), function(k, c) {
     var str = "";
     for(var i = 0; i < k.n; i++) {
       str += c.c;
@@ -303,17 +303,17 @@ Lib.initialize = function(r) {
     return new r.Value.Str(str);
   }, Types.str()));
 
-  Lib.add_builtin('string', r.prim(r.rest_spec('ls', Types.char()), function(ls) {
+  Lib.addBuiltin('string', r.prim(r.rest_spec('ls', Types.char()), function(ls) {
     var str = "";
     goog.array.forEach(ls, function(c) { str += c.c; });
     return new r.Value.Str(str);
   }, Types.str()));
 
-  Lib.add_builtin('string-length', r.prim(r.p_spec(['x', Types.str()]), function(s) {
+  Lib.addBuiltin('string-length', r.prim(r.p_spec(['x', Types.str()]), function(s) {
     return new r.Value.Num(s.s.length);
   }, Types.num()));
 
-  Lib.add_builtin('string-ref', r.prim(r.p_spec(['str', Types.str()], ['k', Types.num()]), function(str, k) {
+  Lib.addBuiltin('string-ref', r.prim(r.p_spec(['str', Types.str()], ['k', Types.num()]), function(str, k) {
     var c = str.s.charAt(k.n);
     if(!c) {
       throw new r.Error("Invalid index passed to string-ref!");
@@ -321,12 +321,12 @@ Lib.initialize = function(r) {
     return new r.Value.Char(c);
   }, Types.char()));
 
-  Lib.add_builtin('string-append', r.prim(r.rest_spec('ls', Types.str()), function(ls) {
+  Lib.addBuiltin('string-append', r.prim(r.rest_spec('ls', Types.str()), function(ls) {
     var str = goog.array.reduce(ls, function(str, s) { return str + s.s; }, "");
     return new r.Value.Str(str);
   }, Types.str()));
 
-  Lib.add_builtin('substring', r.prim(r.p_spec(['str', Types.str()], ['start', Types.num()], ['end', Types.num()]), function(str, start, end) {
+  Lib.addBuiltin('substring', r.prim(r.p_spec(['str', Types.str()], ['start', Types.num()], ['end', Types.num()]), function(str, start, end) {
     if(start.n >= 0 && start.n <= str.s.length &&
       end.n >= start.n &&  end.n <= str.s.length) {
       return new r.Value.Str(str.s.substring(start.n, end.n));
@@ -335,11 +335,11 @@ Lib.initialize = function(r) {
     }
   }, Types.str()));
 
-  Lib.make_string_comparison('string=?', string_comparisons.EQ);
-  Lib.make_string_comparison('string<?', string_comparisons.LT);
-  Lib.make_string_comparison('string>?', string_comparisons.GT);
-  Lib.make_string_comparison('string<=?', string_comparisons.LE);
-  Lib.make_string_comparison('string>=?', string_comparisons.GE);
+  Lib.makeStringComparison('string=?', stringComparisons.EQ);
+  Lib.makeStringComparison('string<?', stringComparisons.LT);
+  Lib.makeStringComparison('string>?', stringComparisons.GT);
+  Lib.makeStringComparison('string<=?', stringComparisons.LE);
+  Lib.makeStringComparison('string>=?', stringComparisons.GE);
 
   return r;
 };

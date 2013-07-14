@@ -115,61 +115,34 @@ Do I actually pass extra arguments bound to rest arg to the function
 body when I have a closure and not just a primitive? I don't think
 this is tested anywhere...
 
-Next up, ACTUALLY DO THE TYPE INFERENCE
-
-Actually, first just get If working. Have the block, when it makes a
-connection, call Block.prototype.updateTypes if it exists! That way,
-you can test it with just 'if' first.
-
-Then, try getting it working with 'Cond'. Then you just gotta do
-'first', and 'rest'. Then the hard part, which is function types!
-
-Make a version of the typechecker that works on blocks!
-
-
-
-Ok, in the process of figuring out how this is all going to work for
-If and Cond, I realize the following:
-
-I want to have each connection know it's current type, it's starting
-type, and the type forced upon it by the connected block.
-
-At the moment, the behavior is different if you put empty inside cons
-after a boolean, and before a boolean!
-
-Also, if I remove the boolean from the cons, the empty retains the
-inferred type incorrectly. Only when I remove it, and then put it
-back in again, do I end up with the expected principal type.
-
-Rename #f -> false, #t -> true
-
-Make it so you can rename function arguments
-
-Make type rejection more violent, be faster, have it shake
-
-Add a constants/values drawer for primitive datatypes
-
 Have unfinished function definitions trigger errors when they are
 used during evaluation
 
 If you have partially defined functions, you can still use what you
 have defined, and throw an error if you explore unfinished branches
 
-Fix error with (+ 0 4)
-
 Make constants always available
 
 Think about making it possible to just type in a value in a slot, and
 then have it fill in the appropriate literal.
 
+* Non-code things to do *
+- Mail the list about increasing drop target size
 
-** TODAY **
+* Completed Tasks
+- [X] Switch from "consumes char" to "consumes", and same for "produces"
+  and other types.
+- [X] Get the function name to be above the function arguments.
+- [X] Re-order blocks to match likely use.
+- [X] Put 'and' and 'or' in 'booleans'.
+- [X] Make function names black
+- [X] Switch '*' for '×'
+- [X] Refactor to have consistent naming conventions!!!
+- [X] Fix bug where disposing an expression with sub-expressions
+  throws an error during typechecking
+- [X] Remove dependency on underscore.js 
 
-Put it online
-Make a to-do list
-Clean stuff up
-
-* List of things to do * 
+* Remaining Tasks
 - [ ] Make it possible to rename function arguments.
 - [ ] Show the type name of function arguments alongside the
   function. 
@@ -179,16 +152,12 @@ Clean stuff up
   can drag arguments from the signature into the function body.
 - [ ] Inside function definition dialog, you should be able to drag a name
   and type into the signature to add an argument.
-- [ ] Switch from "consumes char" to "consumes", and same for "produces"
-  and other types.
 - [ ] Use full name of types. num -> number, str -> string, char -> character.
 - [ ] Make it possible to edit function signature, remove a function.
 - [ ] Have flyout automatically refresh when I switch tabs, so that I get
   most up to date set of blocks.
-- [ ] Get the function name to be above the function arguments.
 - [ ] Disable copying of argument blocks from one function to another.
 - [ ] See about having function body not just floating in space.
-- [ ] Try and resize window so the canvas doesn't extend past visible area.
 - [ ] Make failed attempts to connect react more violently to that
   failure. Maybe have block to which you can't connect get repelled!
 - [ ] Add in image atomic type.
@@ -196,7 +165,7 @@ Clean stuff up
 - [ ] Change unknown color to rainbow gradient.
 - [ ] Start actually catching errors, and showing them to users somewhere.
 - [ ] Add primitives to top-level of toolbox.
-- [ ] Remove dependencies on underscore.js and jQuery.
+- [ ] Remove dependency on jQuery.
 - [ ] Start getting compiled mode to work.
 - [ ] Thoroughly test everything.
 - [ ] Switch to rounded rectangles.
@@ -204,10 +173,8 @@ Clean stuff up
 - [ ] Define a function, provide test cases that are automatically run.
 - [ ] Hook up to WeScheme for saving programs, etc...
 - [ ] Color toolbar items, according to type.
-- [X] Re-order blocks to match likely use.
 - [ ] Figure out why drawers get confused sometimes. 
 - [ ] Rename 'unknown' to 'misc'. 
-- [X] Put 'and' and 'or' in 'booleans'.
 - [ ] Make drop targets for blocks larger, so that it's easier to connect
   them.
 - [ ] Name, Domain, Range in modal dialog. Look at how Snap does it.
@@ -222,11 +189,8 @@ Clean stuff up
 - [ ] Have function definition be modal, so they can appear.
   simultaneously with canvas. Do this instead-of/as-well-as tabbed interface.
 - [ ] Get rid of 'all' drawer
-- [X] Make function names black
-- [X] Switch '*' for '×'
 - [ ] Figure out how to get the workspace to fit in the available
   space exactly.
-
-
-* Non-code things to do *
-- Mail the list about increasing drop target size
+- [ ] Make drop targets simple rectangles
+- [ ] Build up support for vertical layouts, and convert 'if' and
+  'cond' to use vertical layouts.

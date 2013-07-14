@@ -50,17 +50,17 @@
     </div>
 </div>
 <script>
-    var r = Ray.Main.create_ray();
-    var blocks = Ray.Main.create_ray_blocks(r);
-    Ray.Shared.set_ray_instance(r);
-    Ray.Shared.set_blocks(blocks);
-    var dialog = Ray.UI.make_function_definition_dialog();
-    Ray.UI.populate_dialog_w_test_data(dialog);
+    var r = Ray.Main.createRay();
+    var blocks = Ray.Main.createRayBlocks(r);
+    Ray.Shared.setRayInstance(r);
+    Ray.Shared.setBlocks(blocks);
+    var dialog = Ray.UI.makeFunDefDialog();
+    Ray.UI.testPopulateFunDefDialog_(dialog);
 
     var workspace_content = goog.dom.getElement('workspace_content');
     var tabbar = new goog.ui.TabBar();
     tabbar.decorate(goog.dom.getElement('workspace_tabs'));
-    tabbar.getSelectedTab().workspace_id_ = 'blockly_main';
+    tabbar.getSelectedTab().workspaceId_ = 'blockly_main';
 
     var create_function_button = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
     create_function_button.decorate(goog.dom.getElement('create_function_button'));
@@ -81,36 +81,36 @@
     });
 
     goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
-        var func_specs = Ray.UI.get_function_definition_dialog_values(dialog);
-        var results = Ray.Main.make_function_application_and_argument_blocks(r, func_specs);
+        var func_specs = Ray.UI.getFunDefDialogValues(dialog);
+        var results = Ray.Main.makeFunAppAndArgBlocks(r, func_specs);
         var func_arg_blocks = results[0];
         var func_use_block = results[1];
         var func_block_name = results[2];
-        Ray.Shared.add_to_saved_blocks(func_block_name, func_use_block);
+        Ray.Shared.addToSavedBlocks(func_block_name, func_use_block);
 
-        var func_def_workspace = Ray.UI.add_function_definition_workspace_dom(func_specs.name,
+        var func_def_workspace = Ray.UI.addFunDefWorkspaceDom(func_specs.name,
                                                                          workspace_content);
-        var func_def_tab = Ray.UI.add_function_definition_workspace_tab(func_specs.name, tabbar);
+        var func_def_tab = Ray.UI.addFunDefWorkspaceTab(func_specs.name, tabbar);
 
-        Ray.Main.load_func_def_blockly(func_def_workspace,
+        Ray.Main.loadFunDefBlockly(func_def_workspace,
                                        func_arg_blocks,
                                        func_specs.name,
                                        func_specs,
                                        [func_block_name],
-                                       func_specs.return_type);
+                                       func_specs.returnType);
 
         tabbar.setSelectedTab(func_def_tab);
-        Ray.UI.show_workspace_from_tab(func_def_tab, workspace_content);
+        Ray.UI.showWorkspaceForTab(func_def_tab, workspace_content);
     });
 
     goog.events.listen(tabbar, goog.ui.Component.EventType.SELECT, function(e) {
         console.log('Hello');
-        Ray.UI.show_workspace_from_tab(e.target, workspace_content);
+        Ray.UI.showWorkspaceForTab(e.target, workspace_content);
     });
 
-    //Ray.Main.initialize_main_blockly_dom();
-    Ray.Main.initialize_function_definition_blockly_dom();
-    Ray.Main.load_main_blockly(Ray.Main.main_blockly());
+    //Ray.Main.initializeMainBlocklyDom();
+    Ray.Main.initializeFunctionDefinitionBlocklyDom();
+    Ray.Main.loadMainBlockly(Ray.Main.mainBlockly());
 
     goog.events.listen(window, goog.events.EventType.BEFOREUNLOAD, function(e) {
         return 'If you leave the page, any unsaved programs will be lost!';

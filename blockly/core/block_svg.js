@@ -477,7 +477,7 @@ Blockly.BlockSvg.prototype.render = function() {
   // If there are no icons, cursorX will be 0, otherwise it will be the
   // width that the first label needs to move over by.
 
-  var inputRows = this.block_.__render_as_expression__ ?
+  var inputRows = this.block_.renderAsExpression_ ?
                   this.renderComputeExpression_(cursorX) :
                   this.renderCompute_(cursorX);
   this.renderDraw_(cursorX, inputRows);
@@ -583,7 +583,7 @@ Blockly.BlockSvg.prototype.renderDraw_ = function(iconWidth, inputRows) {
   this.renderDrawTop_(steps, highlightSteps, connectionsXY,
       inputRows.rightEdge);
   // If we have an expression block, use the modified version of renderDrawRight_
-  var cursorY = this.block_.__render_as_expression__ ?
+  var cursorY = this.block_.renderAsExpression_ ?
                 this.renderDrawRightExpression_(steps, highlightSteps, inlineSteps,
                                       highlightInlineSteps, connectionsXY, inputRows, iconWidth) :
                 this.renderDrawRight_(steps, highlightSteps, inlineSteps,
@@ -788,7 +788,7 @@ Blockly.BlockSvg.prototype.renderDrawRight_ = function(steps, highlightSteps,
           Array.prototype.push.apply(inlineSteps, inlinePath);
           if(input.getType()) {
             var input_type = input.getType();
-            var input_type_hue = Blockly.Ray_.Shared.get_type_colour(input_type);
+            var input_type_hue = Blockly.Ray_.Shared.getTypeColour(input_type);
             fill_value = Blockly.makeColour(input_type_hue);
           } else {
             fill_value = Blockly.BlockSvg.DEFAULT_INPUT_COLOR;
@@ -1367,7 +1367,7 @@ Blockly.BlockSvg.prototype.renderDrawRightExpression_ = function(steps, highligh
           Array.prototype.push.apply(inlineSteps, inlinePath);
           if(input.getType()) {
             var input_type = input.getType();
-            var input_type_hue = Blockly.Ray_.Shared.get_type_colour(input_type);
+            var input_type_hue = Blockly.Ray_.Shared.getTypeColour(input_type);
             fill_value = Blockly.makeColour(input_type_hue);
           } else {
             fill_value = Blockly.BlockSvg.DEFAULT_INPUT_COLOR;

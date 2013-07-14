@@ -35,7 +35,7 @@ Ray.Inference.inferListTypeFromElementConstraint = function(ty) {
 };
 
 Ray.Inference.getElementTypeForListConstraint = function(ty) {
-  return ty.element_type;
+  return ty.elementType;
 };
 
 Ray.Inference.clearInferredType = function(conns) {
@@ -62,7 +62,7 @@ Ray.Inference.updateTypes = function(ty) {
   } else {
     Ray.Inference.clearInferredType(connections)
     var types = Ray.Inference.getInitialType(connections);
-    var principal_type = Ray.Types.principal_type(types);
+    var principal_type = Ray.Types.principalType(types);
     Ray.Inference.inferType(connections, principal_type);
   }
 };

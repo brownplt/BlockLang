@@ -34,7 +34,7 @@ EmptyEnv.prototype = {
   extend: function(name, value) {
     return new ExtendEnv(name, value, this);
   },
-  all_bound_names: function() {
+  allBoundNames: function() {
     return [];
   },
   dict: function(d) {
@@ -69,8 +69,8 @@ ExtendEnv.prototype = {
   extend: function(name, value) {
     return new ExtendEnv(name, value, this);
   },
-  all_bound_names: function() {
-    return [this.name].concat(this.env.all_bound_names());
+  allBoundNames: function() {
+    return [this.name].concat(this.env.allBoundNames());
   },
   dict: function(d) {
     d[this.name] = this.value;
@@ -90,11 +90,11 @@ var FastEnv = function() {
 };
 FastEnv.prototype = {
   clone: function() {
-    var new_env = new FastEnv();
+    var newEnv = new FastEnv();
     goog.object.forEach(this.env, function(value, name) {
-      new_env.extend(name, value);
+      newEnv.extend(name, value);
     });
-    return new_env;
+    return newEnv;
   },
   toString: function() {
     var str = "";
@@ -102,8 +102,8 @@ FastEnv.prototype = {
       str += '(' + name + ': ' + value.R.display(value) + ', ';
     });
     str += 'empty-env';
-    var env_keys = goog.object.getKeys(this.env);
-    for(var i = 0; i < env_keys.length; i++) {
+    var envKeys = goog.object.getKeys(this.env);
+    for(var i = 0; i < envKeys.length; i++) {
       str +=  ')';
     }
     return str;
@@ -115,7 +115,7 @@ FastEnv.prototype = {
     this.env[name] = value;
     return this;
   },
-  all_bound_names: function() {
+  allBoundNames: function() {
     return goog.object.getKeys(this.env);
   },
   dict: function(d) {
@@ -127,17 +127,17 @@ FastEnv.prototype = {
 };
 
 // Convenience function to create an empty environment
-Ray.Env.empty_env = function() {
+Ray.Env.emptyEnv = function() {
   return new EmptyEnv();
 };
 
 // Convenience function to extend an environment
-Ray.Env.extend_env = function(name, value, env) {
+Ray.Env.extendEnv = function(name, value, env) {
   return this.env.extend(name, value);
 };
 
 // Convenience method to create an empty fast environment
-Ray.Env.empty_fast_env = function() {
+Ray.Env.emptyFastEnv = function() {
   return new FastEnv();
 };
 

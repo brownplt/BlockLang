@@ -177,8 +177,8 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
   childConnection.targetConnection = parentConnection;
   parentConnection.targetConnection = childConnection;
 
-  if(!parentBlock.__rest_arg__ && !parentBlock.__rest_arg_container__) {
-    Blockly.Ray_.Shared.typecheck_block(parentBlock.getRootBlock());
+  if(!parentBlock.isRestArg_ && !parentBlock.restArgContainer_) {
+    Blockly.Ray_.Shared.typecheckBlock(parentBlock.getRootBlock());
   }
 
   // Demote the inferior block so that one is a child of the superior one.
@@ -244,10 +244,10 @@ Blockly.Connection.prototype.disconnect = function() {
     childBlock = this.sourceBlock_;
   }
 
-  if(!parentBlock.__rest_arg__ && !parentBlock.__rest_arg_container__ &&
-     !childBlock.__rest_arg__ && !childBlock.__rest_arg_container__) {
-    Blockly.Ray_.Shared.typecheck_block(parentBlock.getRootBlock());
-    Blockly.Ray_.Shared.typecheck_block(childBlock);
+  if(!parentBlock.isRestArg_ && !parentBlock.restArgContainer_ &&
+     !childBlock.isRestArg_ && !childBlock.restArgContainer_) {
+    Blockly.Ray_.Shared.typecheckBlock(parentBlock.getRootBlock());
+    Blockly.Ray_.Shared.typecheckBlock(childBlock);
   }
 
   if (parentBlock.rendered) {
@@ -504,7 +504,7 @@ Blockly.Connection.prototype.checkType_ = function(otherConnection) {
     // One or both sides are promiscuous enough that anything will fit.
     return true;
   }
-  return Blockly.Ray_.Shared.types_match(this.getType(), otherConnection.getType());
+  return Blockly.Ray_.Shared.areMatchingTypes(this.getType(), otherConnection.getType());
 };
 
 Blockly.Connection.prototype.validateType = function() {
@@ -528,31 +528,36 @@ Blockly.Connection.prototype.validateType = function() {
  */
 Blockly.Connection.prototype.setType = function(type) {
   if(type) {
-    this.__type__ = type;
+    this.outputType_ = type;
     // The new value type may not be compatible with the existing connection.
     this.validateType();
   } else {
-    this.__type__ = null;
+    this.outputType_ = null;
   }
   return this;
 };
 
 Blockly.Connection.prototype.getType = function(opt_initial) {
   return opt_initial ?
-         this.__type__ :
-         (this.__inferred_type__ || this.__type__);
+         this.outputType_ :
+         (this.inferredType_ || this.outputType_);
 };
 
 Blockly.Connection.prototype.inferType = function(type) {
-  this.__inferred_type__ = type;
-  if(this.type === Blockly.OUTPUT_VALUE) {
+  this.inferredType_ = type;
+  if(this.type === Blockly.OUTPUT_VALUE)  {
+    var parentBlock = this.sourceBlock_.getParent();
+    // Check to make sure that parentBlock isn't in the process of being disposed, and not rendered
+    if(parentBlock && !parentBlock.rendered) {
+      return this;
+    }
     this.sourceBlock_.updateColour();
   }
   return this;
 };
 
 Blockly.Connection.prototype.clearInferredType = function() {
-  this.__inferred_type__ = null;
+  this.inferredType_ = null;
   this.sourceBlock_.updateColour();
   return this;
 };

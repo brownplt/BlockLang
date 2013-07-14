@@ -6,20 +6,20 @@ goog.require('Ray.Types');
 
 goog.require('Blockly');
 
-Ray.Shared.set_ray_instance = function(r) {
+Ray.Shared.setRayInstance = function(r) {
   Ray.Shared.Ray = r;
 };
 
-Ray.Shared.save_block_xml = function(block) {
+Ray.Shared.saveBlockXml = function(block) {
   var block_xml = Blockly.Xml.blockToDom_(block);
   var xy = block.getRelativeToSurfaceXY();
   block_xml.setAttribute('x', Blockly.RTL ? -xy.x : xy.x);
   block_xml.setAttribute('y', xy.y);
-  Ray.Shared.saved_block_xml_ = block_xml;
+  Ray.Shared.savedBlockXml_ = block_xml;
 };
 
-Ray.Shared.load_block_xml = function(Blockly, workspace) {
-  var block_xml = Ray.Shared.saved_block_xml_;
+Ray.Shared.loadBlockXml = function(Blockly, workspace) {
+  var block_xml = Ray.Shared.savedBlockXml_;
   var block = Blockly.Xml.domToBlock_(workspace, block_xml);
   var blockX = parseInt(block_xml.getAttribute('x'), 10);
   var blockY = parseInt(block_xml.getAttribute('y'), 10);
@@ -31,51 +31,51 @@ Ray.Shared.load_block_xml = function(Blockly, workspace) {
 };
 
 Ray.Shared.counter = 0;
-Ray.Shared.attach_to_blockly = function(Blockly) {
+Ray.Shared.attachToBlockly = function(Blockly) {
   Blockly.Ray_ = Ray;
   Blockly.id_ = Ray.Shared.counter++;
 };
 
-Ray.Shared.set_main_blockly = function(Blockly) {
+Ray.Shared.setMainBlockly = function(Blockly) {
   Ray.Shared.MainBlockly = Blockly;
 };
 
-Ray.Shared.FuncDefBlocklys = []
-Ray.Shared.register_func_def_blockly = function(Blockly) {
-  Ray.Shared.FuncDefBlocklys.push(Blockly);
+Ray.Shared.FunDefBlocklys = [];
+Ray.Shared.registerFunDefBlockly = function(Blockly) {
+  Ray.Shared.FunDefBlocklys.push(Blockly);
 };
 
-Ray.Shared.set_blocks = function(blocks) {
-  Ray.Shared.saved_blocks_ = blocks;
-  Ray.Shared.block_dir_ = Ray.Blocks.generate_block_directory(blocks);
+Ray.Shared.setBlocks = function(blocks) {
+  Ray.Shared.savedBlocks_ = blocks;
+  Ray.Shared.blockDir_ = Ray.Blocks.generateBlockDir(blocks);
 };
 
 /**
  *
- * @param {?boolean=} opt_include_arguments
+ * @param {?boolean=} opt_includeArguments
  * @returns {*}
  */
-Ray.Shared.get_toolbox = function(opt_include_arguments) {
-  return Ray.Blocks.generate_toolbox(Ray.Shared.block_dir_, opt_include_arguments);
+Ray.Shared.getToolbox = function(opt_includeArguments) {
+  return Ray.Blocks.generateToolbox(Ray.Shared.blockDir_, opt_includeArguments);
 };
 
-Ray.Shared.add_to_saved_blocks = function(block_name, block) {
-  if(Ray.Shared.saved_blocks_[block_name]) {
+Ray.Shared.addToSavedBlocks = function(blockName, block) {
+  if(Ray.Shared.savedBlocks_[blockName]) {
     throw 'Would overwrite pre-existing block!';
   }
-  Ray.Shared.saved_blocks_[block_name] = block;
-  Ray.Blocks.add_to_block_directory(Ray.Shared.block_dir_, block_name, block);
+  Ray.Shared.savedBlocks_[blockName] = block;
+  Ray.Blocks.addToBlockDir(Ray.Shared.blockDir_, blockName, block);
 };
 
 /**
  * A single key can have multiple words separated by underscores, in which case they are used in turn during the lookup
  * @param key
- * @param block_dir
+ * @param blockDir
  * @returns {*}
  */
-Ray.Shared.lookup_in_block_dir_ = function(key, block_dir) {
+Ray.Shared.lookupInBlockDir_ = function(key, blockDir) {
   var keys = key.split('_');
-  var curr_category = block_dir;
+  var curr_category = blockDir;
   for(var i = 0; i < keys.length; i++) {
     curr_category = curr_category[keys[i]];
     if(!curr_category) {
@@ -85,8 +85,8 @@ Ray.Shared.lookup_in_block_dir_ = function(key, block_dir) {
   return curr_category;
 };
 
-Ray.Shared.lookup_in_shared_block_dir_ = function(key) {
-  var category_blocks = Ray.Shared.lookup_in_block_dir_(key, Ray.Shared.block_dir_);
+Ray.Shared.lookupInSharedBlockDir_ = function(key) {
+  var category_blocks = Ray.Shared.lookupInBlockDir_(key, Ray.Shared.blockDir_);
   if(!category_blocks) {
     throw 'Unknown category!';
   } else {
@@ -95,32 +95,32 @@ Ray.Shared.lookup_in_shared_block_dir_ = function(key) {
 };
 
 Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Blockly) {
-  var all_category_blocks = [];
-  var func_def_blocks = Blockly.FunctionDefinitionBlocks;
-  if(func_def_blocks) {
-    var func_def_dir = Ray.Blocks.generate_block_directory(func_def_blocks);
-    var func_def_category_blocks = Ray.Shared.lookup_in_block_dir_(key, func_def_dir);
-    if(func_def_category_blocks) {
-      all_category_blocks = all_category_blocks.concat(func_def_category_blocks);
+  var allBlocks = [];
+  var funDefBlocks = Blockly.FunDefBlocks;
+  if(funDefBlocks) {
+    var funDefDir = Ray.Blocks.generateBlockDir(funDefBlocks);
+    var funDefCategory = Ray.Shared.lookupInBlockDir_(key, funDefDir);
+    if(funDefCategory) {
+      allBlocks = allBlocks.concat(funDefCategory);
     }
   }
 
-  var category_blocks = Ray.Shared.lookup_in_shared_block_dir_(key);
-  if(category_blocks) {
-    all_category_blocks = all_category_blocks.concat(category_blocks);
+  var categoryBlocks = Ray.Shared.lookupInSharedBlockDir_(key);
+  if(categoryBlocks) {
+    allBlocks = allBlocks.concat(categoryBlocks);
   }
 
-  if(all_category_blocks.length === 0) {
+  if(allBlocks.length === 0) {
     throw 'Nothing in category!';
   }
 
-  goog.array.stableSort(all_category_blocks, function(block_name1, block_name2) {
-    var block1 = Ray.Shared.get_block_prototype(Blockly, block_name1);
-    var block2 = Ray.Shared.get_block_prototype(Blockly, block_name2);
-    return Ray.Shared.precedes_other_block(block1, block2);
+  goog.array.stableSort(allBlocks, function(block_name1, block_name2) {
+    var block1 = Ray.Shared.getBlockPrototype(Blockly, block_name1);
+    var block2 = Ray.Shared.getBlockPrototype(Blockly, block_name2);
+    return Ray.Shared.precedesOtherBlock_(block1, block2);
   });
 
-  goog.array.forEach(all_category_blocks, function(block_name) {
+  goog.array.forEach(allBlocks, function(block_name) {
     var block = new Blockly.Block(workspace, block_name);
     block.initSvg();
     blocks.push(block);
@@ -128,7 +128,7 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
   });
 };
 
-Ray.Shared.precedes_other_block = function(block1, block2) {
+Ray.Shared.precedesOtherBlock_ = function(block1, block2) {
   var priority1 = block1.priority_;
   var priority2 = block2.priority_;
   var is_num1 = goog.isNumber(priority1);
@@ -144,36 +144,36 @@ Ray.Shared.precedes_other_block = function(block1, block2) {
   }
 };
 
-Ray.Shared.get_type_colour = function(type) {
-  return Ray.Blocks.get_colour(type);
+Ray.Shared.getTypeColour = function(type) {
+  return Ray.Blocks.getColour(type);
 };
 
-Ray.Shared.types_match = function(ty1, ty2) {
-  return Ray.Types.is_match(ty1, ty2);
+Ray.Shared.areMatchingTypes = function(ty1, ty2) {
+  return Ray.Types.areMatchingTypes(ty1, ty2);
 };
 
-Ray.Shared.are_same_types = function(ty1, ty2) {
-  return Ray.Types.is_same(ty1, ty2);
+Ray.Shared.areSameTypes = function(ty1, ty2) {
+  return Ray.Types.areSameType(ty1, ty2);
 };
 
-Ray.Shared.principal_type = function(types) {
-  return Ray.Types.principal_type(types);
+Ray.Shared.principalType = function(types) {
+  return Ray.Types.principalType(types);
 };
 
-Ray.Shared.principal_type_ = function(ty1, ty2) {
-  return Ray.Types.principal_type_(ty1, ty2);
+Ray.Shared.principalType_ = function(ty1, ty2) {
+  return Ray.Types.principalType_(ty1, ty2);
 };
 
-Ray.Shared.typecheck_block = function(block) {
-  return Ray.Blocks.TypeChecker.typecheck_block(block);
+Ray.Shared.typecheckBlock = function(block) {
+  return Ray.Blocks.TypeChecker.typecheckBlock(block);
 };
 
-Ray.Shared.get_block_prototype = function(Blockly, prototypeName) {
+Ray.Shared.getBlockPrototype = function(Blockly, prototypeName) {
   var prototype = null;
-  if(Blockly.FunctionDefinitionBlocks && Blockly.FunctionDefinitionBlocks[prototypeName]) {
-    prototype = Blockly.FunctionDefinitionBlocks[prototypeName];
-  } else if(Ray.Shared.saved_blocks_[prototypeName]) {
-    prototype = Ray.Shared.saved_blocks_[prototypeName];
+  if(Blockly.FunDefBlocks && Blockly.FunDefBlocks[prototypeName]) {
+    prototype = Blockly.FunDefBlocks[prototypeName];
+  } else if(Ray.Shared.savedBlocks_[prototypeName]) {
+    prototype = Ray.Shared.savedBlocks_[prototypeName];
   }
   return prototype;
 };

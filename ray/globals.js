@@ -49,7 +49,7 @@ Types.Boolean = 4;
 Types.List = 5;
 Types.ListOfTypes = 6;
 Types.NArityType = 7;
-Types.ArgumentType = 8;
+Types.ArgumentsType = 8;
 Types.FunctionType = 9;
 
 Ray.Globals.Blocks = {};

@@ -2,7 +2,7 @@ goog.provide('Ray.Generator');
 
 goog.require('Ray.Blocks');
 
-var get_arg = function(block, name, r) {
+var getArg = function(block, name, r) {
   var arg = block.getInputTargetBlock(name);
   if(!arg) {
     throw 'Missing argument!';
@@ -11,38 +11,38 @@ var get_arg = function(block, name, r) {
   }
 };
 
-var gen_form = function(block, r) {
+var genForm = function(block, r) {
   var args = [];
   var i;
 
-  switch(block.__form__) {
+  switch(block.form_) {
     case('and'):
-      for(i = 0; i < block.rest_arg_count_; i++) {
-        args.push(get_arg(block, 'REST_ARG' + String(i), r));
+      for(i = 0; i < block.restArgCount_; i++) {
+        args.push(getArg(block, 'REST_ARG' + String(i), r));
       }
       return r.and.apply(null, args);
       break;
     case('or'):
-      for(i = 0; i < block.rest_arg_count_; i++) {
-        args.push(get_arg(block, 'REST_ARG' + String(i), r));
+      for(i = 0; i < block.restArgCount_; i++) {
+        args.push(getArg(block, 'REST_ARG' + String(i), r));
       }
       return r.or.apply(null, args);
       break;
     case('if'):
-      var pred = get_arg(block, 'PRED', r);
-      var t_expr = get_arg(block, 'T_EXPR', r);
-      var f_expr = get_arg(block, 'F_EXPR', r);
-      return r._if(pred, t_expr, f_expr);
+      var pred = getArg(block, 'PRED', r);
+      var thenExpr = getArg(block, 'THEN_EXPR', r);
+      var elseExpr = getArg(block, 'ELSE_EXPR', r);
+      return r._if(pred, thenExpr, elseExpr);
       break;
     case('cond'):
-      for(i = 0; i <= block.test_clause_count_; i++) {
-        var test = get_arg(block, 'CONDITION' + String(i), r);
-        var body = get_arg(block, 'BODY' + String(i), r);
+      for(i = 0; i <= block.testClauseCount_; i++) {
+        var test = getArg(block, 'CONDITION' + String(i), r);
+        var body = getArg(block, 'BODY' + String(i), r);
         args.push([test,body]);
       }
-      if(this.else_clause_) {
-        var else_clause = get_arg(block, 'ELSE', r);
-        return r.cond(args, else_clause);
+      if(this.elseClause_) {
+        var elseClause = getArg(block, 'ELSE', r);
+        return r.cond(args, elseClause);
       } else {
         return r.cond(args);
       }
@@ -53,25 +53,25 @@ var gen_form = function(block, r) {
   }
 };
 
-var gen_value = function(block, r) {
-  // Has an arg_spec obj we can extract information from
-  var arg_spec = block.__value__.arg_spec;
+var genValue = function(block, r) {
+  // Has an argSpec obj we can extract information from
+  var argSpec = block.value_.argSpec;
   var args = [];
-  for(var i = 0; i < arg_spec.p_args.length; i++) {
-    args.push(get_arg(block, arg_spec.p_args[i], r));
+  for(var i = 0; i < argSpec.positionalArgs.length; i++) {
+    args.push(getArg(block, argSpec.positionalArgs[i], r));
   }
-  if(arg_spec.rest_arg && block.rest_arg_count_) {
-    for(var i = 0; i < block.rest_arg_count_; i++) {
-      args.push(get_arg(block, 'REST_ARG' + String(i), r));
+  if(argSpec.restArg && block.restArgCount_) {
+    for(var i = 0; i < block.restArgCount_; i++) {
+      args.push(getArg(block, 'REST_ARG' + String(i), r));
     }
   }
   // Ignoring keyword arguments for the time being
-  return r.app(r.name(block.__name__), r.p_args.apply(null, args));
+  return r.app(r.name(block.name_), r.positionalArgs.apply(null, args));
 
 };
 
-var gen_datatype = function(block, r) {
-  switch(block.__datatype__) {
+var genDatatype = function(block, r) {
+  switch(block.datatype_) {
     case('boolean'):
       var b = block.getTitleValue('B');
       return r.bool(b === 'TRUE');
@@ -94,19 +94,19 @@ var gen_datatype = function(block, r) {
   }
 };
 
-var gen_argument = function(block, r) {
-  return r.name(block.__name__);
+var genArgument = function(block, r) {
+  return r.name(block.name_);
 };
 
 var gen = function(block, r) {
-  if(block.__value__) {
-    return gen_value(block, r);
-  } else if(block.__form__) {
-    return gen_form(block, r);
-  } else if(block.__datatype__) {
-    return gen_datatype(block, r);
-  } else if(block.__arguments__) {
-    return gen_argument(block, r);
+  if(block.value_) {
+    return genValue(block, r);
+  } else if(block.form_) {
+    return genForm(block, r);
+  } else if(block.datatype_) {
+    return genDatatype(block, r);
+  } else if(block.arguments_) {
+    return genArgument(block, r);
   } else {
     throw "Unknown type of block! Can't generate!";
   }

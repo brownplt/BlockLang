@@ -408,10 +408,10 @@ Blockly.showContextMenu_ = function(x, y) {
 
   // Option to paste a previously saved block or blocks
   var pasteOption = {
-    enabled: !!Blockly.Ray_.Shared.saved_block_xml_,
+    enabled: !!Blockly.Ray_.Shared.savedBlockXml_,
     text: 'Paste Block from Clipboard',
     callback: function() {
-      Blockly.Ray_.Shared.load_block_xml(Blockly, Blockly.mainWorkspace);
+      Blockly.Ray_.Shared.loadBlockXml(Blockly, Blockly.mainWorkspace);
     }
   };
   options.push(pasteOption);

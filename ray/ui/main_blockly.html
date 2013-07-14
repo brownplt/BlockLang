@@ -42,13 +42,13 @@
             Blockly.MSG_EXPAND_ALL = 'Expand Blocks';
 
             var Ray = window.parent.Ray;
-            Ray.Shared.attach_to_blockly(Blockly);
-            Ray.Shared.set_main_blockly(Blockly);
+            Ray.Shared.attachToBlockly(Blockly);
+            Ray.Shared.setMainBlockly(Blockly);
 
 
             Blockly.inject(document.body,
                            {path: "../../blockly/", toolbox:
-                                   Ray.Shared.get_toolbox(false)});
+                                   Ray.Shared.getToolbox(false)});
         }
     </script>
 </head>
