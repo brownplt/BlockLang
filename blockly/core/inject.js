@@ -192,10 +192,14 @@ Blockly.createDom_ = function(container) {
       {'width': 10, 'height': 10, 'fill': '#aaa'}, disabled_pattern);
   Blockly.createSvgElement('path',
       {'d': 'M 0 0 L 10 10 M 10 0 L 0 10', 'stroke': '#cc0'}, disabled_pattern);
-  Blockly.mainWorkspace = new Blockly.Workspace(Blockly.editable);
-  svg.appendChild(Blockly.mainWorkspace.createDom());
-  Blockly.mainWorkspace.maxBlocks = Blockly.maxBlocks;
-
+  /*
+    <pattern id="blocklySlotPattern" patternUnits="userSpaceOnUse"
+             width="4" height="4">
+      <rect width="4" height = "4" fill="#fff" />
+      <path d=" M -1 1 l 2 -2 M 0 4 l 4 -4 M 3 5 l 2 -2" stroke="#000"
+            fill="transparent" />
+    </pattern>
+   */
   slot_pattern = Blockly.createSvgElement('pattern',
       {'id': 'blocklySlotPattern', 'patternUnits': 'userSpaceOnUse',
        'width': 4, 'height': 4}, defs);
@@ -204,7 +208,14 @@ Blockly.createDom_ = function(container) {
   Blockly.createSvgElement('path',
       {'d': 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2',
        'stroke': '#000', 'fill': 'transparent'}, slot_pattern);
-
+  /*
+    <mask id="blocklySlotMask" maskContentUnits="userSpaceOnUse"
+          maskUnits="objectBoundingBox" x="0" y="0"
+          width="1.0" height="1.0">
+      <rect x="0" y="0" width="100%" height="100%"
+            fill="url(#blocklySlotPattern)" />
+    </mask>
+   */
   slot_mask = Blockly.createSvgElement('mask',
       {'id': 'blocklySlotMask', 'maskContentUnits': 'userSpaceOnUse',
        'maskUnits': 'objectBoundingBox',
@@ -212,6 +223,11 @@ Blockly.createDom_ = function(container) {
   Blockly.createSvgElement('rect',
       {'x': 0, 'y': 0, 'width': '100%', 'height': '100%',
        'fill': 'url(#blocklySlotPattern)'}, slot_mask);
+
+  // Create the workspace
+  Blockly.mainWorkspace = new Blockly.Workspace(Blockly.editable);
+  svg.appendChild(Blockly.mainWorkspace.createDom());
+  Blockly.mainWorkspace.maxBlocks = Blockly.maxBlocks;
 
 
   if (Blockly.editable) {

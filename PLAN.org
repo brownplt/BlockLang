@@ -1,0 +1,40 @@
+* I want to do related types of things
+I want to make it possible to see the definition of a function in a
+small bubble while you are in the main workspace and trying to use it.
+
+In order to do this, I need to figure out how to put stuff on top of
+the blockly workspace, and have it interact with the blockly
+workspace. This is I think the main challenge associated with this
+feature. 
+
+I think the way to go about doing this is to figure out how the
+flyouts work, in terms of interaction, and then to add the function
+signature to the function definition workspace, with the ability to
+pull the arguments out from the signature.
+
+So I should investigate this first.
+
+* Things I've learned
+I can create a workspace anywhere, without an associated toolbox or
+workspace. Flyouts just use a regular workspace like anything else. I
+can do the function signature in FunDefBlocklys by making my own
+Flyout class, let's call it 'Ray.UI.Signature', which will hang out
+at the top of the workspace, and will have the function name, and
+then, in blocks, the arguments, and something representing the return
+type.
+
+You should be able to drag blocks from the signature into the regular
+workspace to use them.
+
+Also, in the function definition dialog, I want to be able to show a
+real-time demo of the block being created, with the argument slots
+and argument blocks appearing, the idea being that I want to present
+people with what blocks they will get if they define the function
+with those choices.
+
+This seems doable. Yay! 
+
+I think the first thing to do is to get the live block in function
+definition dialog going! 
+
+So create a workspace, and just listen for changes to update things!
