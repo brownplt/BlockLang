@@ -94,13 +94,7 @@ Blockly.FieldColour.prototype.showEditor_ = function() {
   // Position the palette to line up with the field.
   var xy = Blockly.getAbsoluteXY_(/** @type {!Element} */ (this.borderRect_));
   var borderBBox = this.borderRect_.getBBox();
-  if (Blockly.RTL) {
-    xy.x += borderBBox.width;
-  }
   xy.y += borderBBox.height - 1;
-  if (Blockly.RTL) {
-    xy.x -= Blockly.widgetDiv.offsetWidth;
-  }
   Blockly.widgetDiv.style.left = xy.x + 'px';
   Blockly.widgetDiv.style.top = xy.y + 'px';
 

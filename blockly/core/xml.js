@@ -40,7 +40,7 @@ Blockly.Xml.workspaceToDom = function(workspace) {
   for (var i = 0, block; block = blocks[i]; i++) {
     var element = Blockly.Xml.blockToDom_(block);
     var xy = block.getRelativeToSurfaceXY();
-    element.setAttribute('x', Blockly.RTL ? -xy.x : xy.x);
+    element.setAttribute('x',  xy.x);
     element.setAttribute('y', xy.y);
     xml.appendChild(element);
   }
@@ -205,7 +205,7 @@ Blockly.Xml.domToWorkspace = function(workspace, xml) {
       var blockX = parseInt(xmlChild.getAttribute('x'), 10);
       var blockY = parseInt(xmlChild.getAttribute('y'), 10);
       if (!isNaN(blockX) && !isNaN(blockY)) {
-        block.moveBy(Blockly.RTL ? -blockX : blockX, blockY);
+        block.moveBy( blockX, blockY);
       }
     }
   }

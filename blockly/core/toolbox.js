@@ -71,7 +71,7 @@ Blockly.Toolbox.createDom = function(svg, container) {
   // Create an HTML container for the Toolbox menu.
   Blockly.Toolbox.HtmlDiv = goog.dom.createDom('div',
       {'class': 'blocklyToolboxDiv'});
-  Blockly.Toolbox.HtmlDiv.setAttribute('dir', Blockly.RTL ? 'RTL' : 'LTR');
+  Blockly.Toolbox.HtmlDiv.setAttribute('dir',  'LTR');
   container.appendChild(Blockly.Toolbox.HtmlDiv);
 
   /**
@@ -101,7 +101,7 @@ Blockly.Toolbox.init = function() {
   Blockly.Toolbox.CONFIG_['cleardotPath'] =
       Blockly.pathToBlockly + 'media/1x1.gif';
   Blockly.Toolbox.CONFIG_['cssCollapsedFolderIcon'] =
-      'blocklyTreeIconClosed' + (Blockly.RTL ? 'Rtl' : 'Ltr');
+      'blocklyTreeIconClosed' + ( 'Ltr');
   var tree = new Blockly.Toolbox.TreeControl('root', Blockly.Toolbox.CONFIG_);
   Blockly.Toolbox.tree_ = tree;
   tree.setShowRootNode(false);
@@ -129,13 +129,7 @@ Blockly.Toolbox.position_ = function() {
   var treeDiv = Blockly.Toolbox.HtmlDiv;
   var svgBox = goog.style.getBorderBox(Blockly.svg);
   var svgSize = Blockly.svgSize();
-  if (Blockly.RTL) {
-    var x = svgSize.left + 1;
-    x += svgSize.width - treeDiv.offsetWidth;
-    treeDiv.style.left = x + 'px';
-  } else {
-    treeDiv.style.marginLeft = svgBox.left;
-  }
+  treeDiv.style.marginLeft = svgBox.left;
   treeDiv.style.height = (svgSize.height + 1) + 'px';
   Blockly.Toolbox.width = treeDiv.offsetWidth;
 };

@@ -392,7 +392,7 @@ Blockly.copy_ = function(block) {
   Blockly.Xml.deleteNext(xmlBlock);
   // Encode start position in XML.
   var xy = block.getRelativeToSurfaceXY();
-  xmlBlock.setAttribute('x', Blockly.RTL ? -xy.x : xy.x);
+  xmlBlock.setAttribute('x',  xy.x);
   xmlBlock.setAttribute('y', xy.y);
   Blockly.clipboard_ = xmlBlock;
 };
@@ -611,7 +611,7 @@ Blockly.getMainWorkspaceMetrics = function() {
   var bottomEdge = Math.max(blockBox.y + blockBox.height + viewHeight / 2,
                             blockBox.y + viewHeight);
   var absoluteLeft = 0;
-  if (Blockly.Toolbox && !Blockly.RTL) {
+  if (Blockly.Toolbox) {
     absoluteLeft = Blockly.Toolbox.width;
   }
   return {

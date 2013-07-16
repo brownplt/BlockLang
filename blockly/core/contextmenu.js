@@ -122,15 +122,7 @@ Blockly.ContextMenu.show = function(anchorX, anchorY, options) {
   for (var x = 0; x < resizeList.length; x++) {
     resizeList[x].setAttribute('width', maxWidth);
   }
-  if (Blockly.RTL) {
-    // Right-align the text.
-    for (var x = 0, gElement;
-         gElement = Blockly.ContextMenu.svgOptions.childNodes[x]; x++) {
-      var textElement = gElement.lastChild;
-      textElement.setAttribute('text-anchor', 'end');
-      textElement.setAttribute('x', maxWidth - Blockly.ContextMenu.X_PADDING);
-    }
-  }
+
   Blockly.ContextMenu.svgBackground.setAttribute('height',
       options.length * Blockly.ContextMenu.Y_HEIGHT + 8);
   Blockly.ContextMenu.svgShadow.setAttribute('height',
@@ -148,21 +140,14 @@ Blockly.ContextMenu.show = function(anchorX, anchorY, options) {
     // Falling off the bottom of the screen; flip the menu up.
     anchorY -= bBox.height - 10;
   }
-  if (Blockly.RTL) {
-    if (anchorX - bBox.width <= 0) {
-      anchorX++;
-    } else {
-      // Falling off the left edge in RTL mode; flip menu to right.
-      anchorX -= bBox.width;
-    }
+
+  if (anchorX + bBox.width > svgSize.width) {
+    // Falling off the right edge in LTR mode; flip the menu to left.
+    anchorX -= bBox.width;
   } else {
-    if (anchorX + bBox.width > svgSize.width) {
-      // Falling off the right edge in LTR mode; flip the menu to left.
-      anchorX -= bBox.width;
-    } else {
-      anchorX++;
-    }
+    anchorX++;
   }
+
   Blockly.ContextMenu.svgGroup.setAttribute('transform',
       'translate(' + anchorX + ', ' + anchorY + ')');
   Blockly.ContextMenu.visible = true;
@@ -214,11 +199,9 @@ Blockly.ContextMenu.callbackFactory = function(block, xml) {
     var newBlock = Blockly.Xml.domToBlock_(block.workspace, xml);
     // Move the new block next to the old block.
     var xy = block.getRelativeToSurfaceXY();
-    if (Blockly.RTL) {
-      xy.x -= Blockly.SNAP_RADIUS;
-    } else {
-      xy.x += Blockly.SNAP_RADIUS;
-    }
+
+    xy.x += Blockly.SNAP_RADIUS;
+
     xy.y += Blockly.SNAP_RADIUS * 2;
     newBlock.moveBy(xy.x, xy.y);
     newBlock.select();

@@ -169,11 +169,8 @@ Blockly.Mutator.prototype.resizeBubble_ = function() {
   var workspaceSize = this.workspace_.getCanvas().getBBox();
   var flyoutMetrics = this.flyout_.getMetrics();
   var width;
-  if (Blockly.RTL) {
-    width = -workspaceSize.x;
-  } else {
-    width = workspaceSize.width + workspaceSize.x;
-  }
+  width = workspaceSize.width + workspaceSize.x;
+
   var height = Math.max(workspaceSize.height + doubleBorderWidth * 3,
                         flyoutMetrics.contentHeight + 20);
   width += doubleBorderWidth * 3;
@@ -190,11 +187,6 @@ Blockly.Mutator.prototype.resizeBubble_ = function() {
     this.svgDialog_.setAttribute('height', this.workspaceHeight_);
   }
 
-  if (Blockly.RTL) {
-    // Scroll the workspace to always left-align.
-    var translation = 'translate(' + this.workspaceWidth_ + ',0)';
-    this.workspace_.getCanvas().setAttribute('transform', translation);
-  }
 };
 
 /**
@@ -235,9 +227,7 @@ Blockly.Mutator.prototype.setVisible = function(visible) {
     this.rootBlock_.deletable = false;
     var margin = this.flyout_.CORNER_RADIUS * 2;
     var x = this.flyout_.width_ + margin;
-    if (Blockly.RTL) {
-      x = -x;
-    }
+
     this.rootBlock_.moveBy(x, margin);
     // Save the initial connections, then listen for further changes.
     if (this.block_.saveConnections) {
@@ -288,7 +278,7 @@ Blockly.Mutator.prototype.workspaceChanged_ = function() {
       var xy = block.getRelativeToSurfaceXY();
       var bBox = block.getSvgRoot().getBBox();
       if ((xy.y < MARGIN - bBox.height) ||  // Off the top.
-          (Blockly.RTL ? xy.x > -this.flyout_.width_ + MARGIN :
+          (
            xy.x < this.flyout_.width_ - MARGIN)  // Over the flyout.
           ) {
         block.dispose(false, false);
@@ -326,9 +316,6 @@ Blockly.Mutator.prototype.workspaceChanged_ = function() {
  */
 Blockly.Mutator.prototype.getFlyoutMetrics_ = function() {
   var left = 0;
-  if (Blockly.RTL) {
-    left += this.workspaceWidth_;
-  }
   return {
     viewHeight: this.workspaceHeight_,
     viewWidth: 0,  // This seem wrong, but results in correct RTL layout.
@@ -383,17 +370,12 @@ Blockly.Mutator.prototype.renderIcon = function(cursorX) {
   this.iconGroup_.setAttribute('display', 'block');
 
   var TOP_MARGIN = 5;
-  if (Blockly.RTL) {
-    cursorX -= Blockly.Mutator.ICON_SIZE;
-  }
+
   this.iconGroup_.setAttribute('transform',
       'translate(' + cursorX + ', ' + TOP_MARGIN + ')');
   this.computeIconLocation();
-  if (Blockly.RTL) {
-    cursorX -= Blockly.BlockSvg.SEP_SPACE_X;
-  } else {
-    cursorX += Blockly.Mutator.ICON_SIZE + Blockly.BlockSvg.SEP_SPACE_X;
-  }
+  cursorX += Blockly.Mutator.ICON_SIZE + Blockly.BlockSvg.SEP_SPACE_X;
+
   return cursorX;
 };
 

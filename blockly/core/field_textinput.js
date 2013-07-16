@@ -143,9 +143,8 @@ Blockly.FieldTextInput.prototype.showEditor_ = function() {
   var baseXy = Blockly.getSvgXY_(workspaceSvg);
   xy.x -= baseXy.x;
   xy.y -= baseXy.y;
-  if (!Blockly.RTL) {
-    htmlInputFrame.setAttribute('x', xy.x + 1);
-  }
+  htmlInputFrame.setAttribute('x', xy.x + 1);
+
   if (goog.userAgent.GECKO) {
     htmlInputFrame.setAttribute('y', xy.y - 1);
   } else {

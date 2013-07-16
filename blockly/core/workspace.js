@@ -301,6 +301,7 @@ Blockly.Workspace.prototype.highlightBlock = function(id) {
  * 'blocklyWorkspaceChange' on Blockly.mainWorkspace.getCanvas().
  */
 Blockly.Workspace.prototype.fireChangeEvent = function() {
+  console.log('workspace method fireChangeEvent is being called');
   if (this.fireChangeEventPid_) {
     window.clearTimeout(this.fireChangeEventPid_);
   }
@@ -326,9 +327,7 @@ Blockly.Workspace.prototype.paste = function(xmlBlock) {
   var blockX = parseInt(xmlBlock.getAttribute('x'), 10);
   var blockY = parseInt(xmlBlock.getAttribute('y'), 10);
   if (!isNaN(blockX) && !isNaN(blockY)) {
-    if (Blockly.RTL) {
-      blockX = -blockX;
-    }
+
     // Offset block until not clobbering another block.
     do {
       var collide = false;
@@ -337,11 +336,7 @@ Blockly.Workspace.prototype.paste = function(xmlBlock) {
         var otherXY = otherBlock.getRelativeToSurfaceXY();
         if (Math.abs(blockX - otherXY.x) <= 1 &&
             Math.abs(blockY - otherXY.y) <= 1) {
-          if (Blockly.RTL) {
-            blockX -= Blockly.SNAP_RADIUS;
-          } else {
-            blockX += Blockly.SNAP_RADIUS;
-          }
+          blockX += Blockly.SNAP_RADIUS;
           blockY += Blockly.SNAP_RADIUS * 2;
           collide = true;
         }

@@ -44,9 +44,7 @@ Blockly.Bubble = function(workspace, content, shape,
                           anchorX, anchorY,
                           bubbleWidth, bubbleHeight) {
   var angle = Blockly.Bubble.ARROW_ANGLE;
-  if (Blockly.RTL) {
-    angle = -angle;
-  }
+
   this.arrow_radians_ = angle / 360 * Math.PI * 2;
 
   this.workspace_ = workspace;
@@ -212,7 +210,7 @@ Blockly.Bubble.prototype.createDom_ = function(content, hasResize) {
       bubbleEmboss);
   if (hasResize) {
     this.resizeGroup_ = Blockly.createSvgElement('g',
-        {'class': Blockly.RTL ? 'blocklyResizeSW' : 'blocklyResizeSE'},
+        {'class':  'blocklyResizeSE'},
         this.bubbleGroup_);
     var resizeSize = 2 * Blockly.Bubble.BORDER_WIDTH;
     Blockly.createSvgElement('polygon',
@@ -251,11 +249,8 @@ Blockly.Bubble.prototype.bubbleMouseDown_ = function(e) {
   // Left-click (or middle click)
   Blockly.setCursorHand_(true);
   // Record the starting offset between the current location and the mouse.
-  if (Blockly.RTL) {
-    this.dragDeltaX = this.relativeLeft_ + e.clientX;
-  } else {
-    this.dragDeltaX = this.relativeLeft_ - e.clientX;
-  }
+  this.dragDeltaX = this.relativeLeft_ - e.clientX;
+
   this.dragDeltaY = this.relativeTop_ - e.clientY;
 
   Blockly.Bubble.onMouseUpWrapper_ = Blockly.bindEvent_(document,
@@ -274,11 +269,9 @@ Blockly.Bubble.prototype.bubbleMouseDown_ = function(e) {
  */
 Blockly.Bubble.prototype.bubbleMouseMove_ = function(e) {
   this.autoLayout_ = false;
-  if (Blockly.RTL) {
-    this.relativeLeft_ = this.dragDeltaX - e.clientX;
-  } else {
-    this.relativeLeft_ = this.dragDeltaX + e.clientX;
-  }
+
+  this.relativeLeft_ = this.dragDeltaX + e.clientX;
+
   this.relativeTop_ = this.dragDeltaY + e.clientY;
   this.positionBubble_();
   this.renderArrow_();
@@ -299,11 +292,9 @@ Blockly.Bubble.prototype.resizeMouseDown_ = function(e) {
   // Left-click (or middle click)
   Blockly.setCursorHand_(true);
   // Record the starting offset between the current location and the mouse.
-  if (Blockly.RTL) {
-    this.resizeDeltaWidth = this.width_ + e.clientX;
-  } else {
-    this.resizeDeltaWidth = this.width_ - e.clientX;
-  }
+
+  this.resizeDeltaWidth = this.width_ - e.clientX;
+
   this.resizeDeltaHeight = this.height_ - e.clientY;
 
   Blockly.Bubble.onMouseUpWrapper_ = Blockly.bindEvent_(document,
@@ -324,18 +315,11 @@ Blockly.Bubble.prototype.resizeMouseMove_ = function(e) {
   this.autoLayout_ = false;
   var w = this.resizeDeltaWidth;
   var h = this.resizeDeltaHeight + e.clientY;
-  if (Blockly.RTL) {
-    // RTL drags the bottom-left corner.
-    w -= e.clientX;
-  } else {
-    // LTR drags the bottom-right corner.
-    w += e.clientX;
-  }
+
+  // LTR drags the bottom-right corner.
+  w += e.clientX;
+
   this.setBubbleSize(w, h);
-  if (Blockly.RTL) {
-    // RTL requires the bubble to move its left edge.
-    this.positionBubble_();
-  }
 };
 
 /**
@@ -413,11 +397,8 @@ Blockly.Bubble.prototype.layoutBubble_ = function() {
  */
 Blockly.Bubble.prototype.positionBubble_ = function() {
   var left;
-  if (Blockly.RTL) {
-    left = this.anchorX_ - this.relativeLeft_ - this.width_;
-  } else {
-    left = this.anchorX_ + this.relativeLeft_;
-  }
+  left = this.anchorX_ + this.relativeLeft_;
+
   var top = this.relativeTop_ + this.anchorY_;
   this.bubbleGroup_.setAttribute('transform',
       'translate(' + left + ', ' + top + ')');
@@ -446,17 +427,10 @@ Blockly.Bubble.prototype.setBubbleSize = function(width, height) {
   this.bubbleBack_.setAttribute('width', width);
   this.bubbleBack_.setAttribute('height', height);
   if (this.resizeGroup_) {
-    if (Blockly.RTL) {
-      // Mirror the resize group.
-      var resizeSize = 2 * Blockly.Bubble.BORDER_WIDTH;
-      this.resizeGroup_.setAttribute('transform', 'translate(' +
-          resizeSize + ', ' +
-          (height - doubleBorderWidth) + ') scale(-1 1)');
-    } else {
-      this.resizeGroup_.setAttribute('transform', 'translate(' +
-          (width - doubleBorderWidth) + ', ' +
-          (height - doubleBorderWidth) + ')');
-    }
+    this.resizeGroup_.setAttribute('transform', 'translate(' +
+                                                (width - doubleBorderWidth) + ', ' +
+                                                (height - doubleBorderWidth) + ')');
+
   }
   if (this.rendered_) {
     if (this.autoLayout_) {
@@ -489,9 +463,7 @@ Blockly.Bubble.prototype.renderArrow_ = function() {
     // Compute the angle of the arrow's line.
     var rise = relAnchorY - relBubbleY;
     var run = relAnchorX - relBubbleX;
-    if (Blockly.RTL) {
-      run *= -1;
-    }
+
     var hypotenuse = Math.sqrt(rise * rise + run * run);
     var angle = Math.acos(run / hypotenuse);
     if (rise < 0) {

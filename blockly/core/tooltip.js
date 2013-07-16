@@ -276,23 +276,12 @@ Blockly.Tooltip.show_ = function() {
   Blockly.Tooltip.svgBackground_.setAttribute('height', height);
   Blockly.Tooltip.svgShadow_.setAttribute('width', width);
   Blockly.Tooltip.svgShadow_.setAttribute('height', height);
-  if (Blockly.RTL) {
-    // Right-align the paragraph.
-    // This cannot be done until the tooltip is rendered on screen.
-    var maxWidth = bBox.width;
-    for (var x = 0, textElement;
-         textElement = Blockly.Tooltip.svgText_.childNodes[x]; x++) {
-      textElement.setAttribute('text-anchor', 'end');
-      textElement.setAttribute('x', maxWidth + Blockly.Tooltip.MARGINS);
-    }
-  }
+
   // Move the tooltip to just below the cursor.
   var anchorX = Blockly.Tooltip.lastX_;
-  if (Blockly.RTL) {
-    anchorX -= Blockly.Tooltip.OFFSET_X + width;
-  } else {
-    anchorX += Blockly.Tooltip.OFFSET_X;
-  }
+
+  anchorX += Blockly.Tooltip.OFFSET_X;
+
   var anchorY = Blockly.Tooltip.lastY_ + Blockly.Tooltip.OFFSET_Y;
 
   // Convert the mouse coordinates into SVG coordinates.
@@ -305,15 +294,11 @@ Blockly.Tooltip.show_ = function() {
     // Falling off the bottom of the screen; shift the tooltip up.
     anchorY -= bBox.height + 2 * Blockly.Tooltip.OFFSET_Y;
   }
-  if (Blockly.RTL) {
-    // Prevent falling off left edge in RTL mode.
-    anchorX = Math.max(Blockly.Tooltip.MARGINS, anchorX);
-  } else {
-    if (anchorX + bBox.width > svgSize.width - 2 * Blockly.Tooltip.MARGINS) {
-      // Falling off the right edge of the screen;
-      // clamp the tooltip on the edge.
-      anchorX = svgSize.width - bBox.width - 2 * Blockly.Tooltip.MARGINS;
-    }
+
+  if (anchorX + bBox.width > svgSize.width - 2 * Blockly.Tooltip.MARGINS) {
+    // Falling off the right edge of the screen;
+    // clamp the tooltip on the edge.
+    anchorX = svgSize.width - bBox.width - 2 * Blockly.Tooltip.MARGINS;
   }
   Blockly.Tooltip.svgGroup_.setAttribute('transform',
       'translate(' + anchorX + ',' + anchorY + ')');

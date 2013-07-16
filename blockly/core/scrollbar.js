@@ -351,9 +351,7 @@ Blockly.ScrollbarNative.prototype.resize = function(opt_metrics) {
     this.outerDiv_.style.width = outerLength + 'px';
     this.innerImg_.style.width = innerLength + 'px';
     this.xCoordinate = hostMetrics.absoluteLeft;
-    if (this.pair_ && Blockly.RTL) {
-      this.xCoordinate += Blockly.Scrollbar.scrollbarThickness;
-    }
+
     this.yCoordinate = hostMetrics.absoluteTop + hostMetrics.viewHeight -
         Blockly.Scrollbar.scrollbarThickness;
     this.foreignObject_.setAttribute('x', this.xCoordinate);
@@ -376,10 +374,9 @@ Blockly.ScrollbarNative.prototype.resize = function(opt_metrics) {
     this.outerDiv_.style.height = outerLength + 'px';
     this.innerImg_.style.height = innerLength + 'px';
     this.xCoordinate = hostMetrics.absoluteLeft;
-    if (!Blockly.RTL) {
-      this.xCoordinate += hostMetrics.viewWidth -
-          Blockly.Scrollbar.scrollbarThickness;
-    }
+
+    this.xCoordinate += hostMetrics.viewWidth -
+                        Blockly.Scrollbar.scrollbarThickness;
     this.yCoordinate = hostMetrics.absoluteTop;
     this.foreignObject_.setAttribute('x', this.xCoordinate);
     this.foreignObject_.setAttribute('y', this.yCoordinate);
@@ -659,10 +656,7 @@ Blockly.ScrollbarSvg.prototype.resize = function(opt_metrics) {
         this.ratio_;
     this.svgKnob_.setAttribute('width', Math.max(0, innerLength));
     this.xCoordinate = hostMetrics.absoluteLeft;
-    if (this.pair_ && Blockly.RTL) {
-      this.xCoordinate += hostMetrics.absoluteLeft +
-          Blockly.Scrollbar.scrollbarThickness;
-    }
+
     this.yCoordinate = hostMetrics.absoluteTop + hostMetrics.viewHeight -
         Blockly.Scrollbar.scrollbarThickness;
     this.svgGroup_.setAttribute('transform',
@@ -688,10 +682,10 @@ Blockly.ScrollbarSvg.prototype.resize = function(opt_metrics) {
         this.ratio_;
     this.svgKnob_.setAttribute('height', Math.max(0, innerLength));
     this.xCoordinate = hostMetrics.absoluteLeft;
-    if (!Blockly.RTL) {
-      this.xCoordinate += hostMetrics.viewWidth -
-          Blockly.Scrollbar.scrollbarThickness;
-    }
+
+    this.xCoordinate += hostMetrics.viewWidth -
+                        Blockly.Scrollbar.scrollbarThickness;
+
     this.yCoordinate = hostMetrics.absoluteTop;
     this.svgGroup_.setAttribute('transform',
         'translate(' + this.xCoordinate + ', ' + this.yCoordinate + ')');

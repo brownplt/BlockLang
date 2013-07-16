@@ -92,7 +92,7 @@ Blockly.createDom_ = function(container) {
   // then manually positions content in RTL as needed.
   container.setAttribute('dir', 'LTR');
   // Closure can be trusted to create HTML widgets with the proper direction.
-  goog.ui.Component.setDefaultRightToLeft(Blockly.RTL);
+  goog.ui.Component.setDefaultRightToLeft(false);
 
   // Load CSS.
   Blockly.Css.inject();
@@ -262,14 +262,9 @@ Blockly.createDom_ = function(container) {
             var bBox = block.getSvgRoot().getBBox();
             var offTop = xy.y < MARGIN - bBox.height;
             var offBottom = xy.y > svgSize.height - MARGIN;
-            var overFlyout = Blockly.RTL ?
-                xy.x > svgSize.width - flyout.width_ + MARGIN * 2 -
-                Blockly.mainWorkspace.scrollX :
-                xy.x < flyout.width_ - MARGIN * 2 -
-                Blockly.mainWorkspace.scrollX;
-            var offEdge = Blockly.RTL ?
-                xy.x < MARGIN - Blockly.mainWorkspace.scrollX :
-                xy.x > svgSize.width - MARGIN - Blockly.mainWorkspace.scrollX;
+            var overFlyout = xy.x < flyout.width_ - MARGIN * 2 -
+                                    Blockly.mainWorkspace.scrollX;
+            var offEdge = xy.x > svgSize.width - MARGIN - Blockly.mainWorkspace.scrollX;
             if (offTop || offBottom || overFlyout || offEdge) {
               block.dispose(false, true);
             }

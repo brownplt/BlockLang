@@ -140,15 +140,7 @@ Blockly.Warning.prototype.setVisible = function(visible) {
         /** @type {!Blockly.Workspace} */ (this.block_.workspace),
         paragraph, this.block_.svg_.svgGroup_,
         this.iconX_, this.iconY_, null, null);
-    if (Blockly.RTL) {
-      // Right-align the paragraph.
-      // This cannot be done until the bubble is rendered on screen.
-      var maxWidth = paragraph.getBBox().width;
-      for (var x = 0, textElement; textElement = paragraph.childNodes[x]; x++) {
-        textElement.setAttribute('text-anchor', 'end');
-        textElement.setAttribute('x', maxWidth + Blockly.Bubble.BORDER_WIDTH);
-      }
-    }
+
     this.updateColour();
     // Bump the warning into the right location.
     var size = this.bubble_.getBubbleSize();
@@ -230,17 +222,11 @@ Blockly.Warning.prototype.renderIcon = function(cursorX) {
 
   var TOP_MARGIN = 5;
   var diameter = 2 * Blockly.Warning.ICON_RADIUS;
-  if (Blockly.RTL) {
-    cursorX -= diameter;
-  }
+
   this.iconGroup_.setAttribute('transform',
       'translate(' + cursorX + ', ' + TOP_MARGIN + ')');
   this.computeIconLocation();
-  if (Blockly.RTL) {
-    cursorX -= Blockly.BlockSvg.SEP_SPACE_X;
-  } else {
-    cursorX += diameter + Blockly.BlockSvg.SEP_SPACE_X;
-  }
+  cursorX += diameter + Blockly.BlockSvg.SEP_SPACE_X;
   return cursorX;
 };
 

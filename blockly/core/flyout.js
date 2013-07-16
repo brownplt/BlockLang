@@ -232,29 +232,24 @@ Blockly.Flyout.prototype.position_ = function() {
     return;
   }
   var edgeWidth = this.width_ - this.CORNER_RADIUS;
-  if (Blockly.RTL) {
-    edgeWidth *= -1;
-  }
-  var path = ['M ' + (Blockly.RTL ? this.width_ : 0) + ',0'];
+
+  var path = ['M ' + ( 0) + ',0'];
   path.push('h', edgeWidth);
   path.push('a', this.CORNER_RADIUS, this.CORNER_RADIUS, 0, 0,
-      Blockly.RTL ? 0 : 1,
-      Blockly.RTL ? -this.CORNER_RADIUS : this.CORNER_RADIUS,
+       1,
+       this.CORNER_RADIUS,
       this.CORNER_RADIUS);
   path.push('v', Math.max(0, metrics.viewHeight - this.CORNER_RADIUS * 2));
   path.push('a', this.CORNER_RADIUS, this.CORNER_RADIUS, 0, 0,
-      Blockly.RTL ? 0 : 1,
-      Blockly.RTL ? this.CORNER_RADIUS : -this.CORNER_RADIUS,
+       1,
+       -this.CORNER_RADIUS,
       this.CORNER_RADIUS);
   path.push('h', -edgeWidth);
   path.push('z');
   this.svgBackground_.setAttribute('d', path.join(' '));
 
   var x = metrics.absoluteLeft;
-  if (Blockly.RTL) {
-    x += metrics.viewWidth;
-    x -= this.width_;
-  }
+
   this.svgGroup_.setAttribute('transform',
       'translate(' + x + ',' + metrics.absoluteTop + ')');
 
@@ -333,7 +328,7 @@ Blockly.Flyout.prototype.show = function(xmlList) {
     }
     block.render();
     var bBox = block.getSvgRoot().getBBox();
-    var x = Blockly.RTL ? 0 : margin + Blockly.BlockSvg.TAB_WIDTH;
+    var x =  margin + Blockly.BlockSvg.TAB_WIDTH;
     block.moveBy(x, cursorY);
     flyoutWidth = Math.max(flyoutWidth, bBox.width);
     cursorY += bBox.height + gaps[i];
@@ -346,10 +341,7 @@ Blockly.Flyout.prototype.show = function(xmlList) {
                  Blockly.Scrollbar.scrollbarThickness;
 
   for (var i = 0, block; block = blocks[i]; i++) {
-    if (Blockly.RTL) {
-      // With the flyoutWidth known, reposition the blocks to the right-aligned.
-      block.moveBy(flyoutWidth - margin - Blockly.BlockSvg.TAB_WIDTH, 0);
-    }
+
     // Create an invisible rectangle over the block to act as a button.  Just
     // using the block as a button is poor, since blocks have holes in them.
     var bBox = block.getSvgRoot().getBBox();

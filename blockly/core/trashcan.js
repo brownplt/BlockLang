@@ -203,12 +203,10 @@ Blockly.Trashcan.prototype.position_ = function() {
     // There are no metrics available (workspace is probably not visible).
     return;
   }
-  if (Blockly.RTL) {
-    this.left_ = this.MARGIN_SIDE_;
-  } else {
-    this.left_ = metrics.viewWidth + metrics.absoluteLeft -
-        this.WIDTH_ - this.MARGIN_SIDE_;
-  }
+
+  this.left_ = metrics.viewWidth + metrics.absoluteLeft -
+               this.WIDTH_ - this.MARGIN_SIDE_;
+
   this.top_ = metrics.viewHeight + metrics.absoluteTop -
       (this.BODY_HEIGHT_ + this.LID_HEIGHT_) - this.MARGIN_BOTTOM_;
   this.svgGroup_.setAttribute('transform',
@@ -264,8 +262,8 @@ Blockly.Trashcan.prototype.animateLid_ = function() {
   this.lidAngle_ += this.isOpen ? 10 : -10;
   this.lidAngle_ = Math.max(0, this.lidAngle_);
   this.svgLid_.setAttribute('transform', 'rotate(' +
-      (Blockly.RTL ? -this.lidAngle_ : this.lidAngle_) + ', ' +
-      (Blockly.RTL ? 4 : this.WIDTH_ - 4) + ', ' +
+      ( this.lidAngle_) + ', ' +
+      ( this.WIDTH_ - 4) + ', ' +
       (this.LID_HEIGHT_ - 2) + ')');
   if (this.isOpen ? (this.lidAngle_ < 45) : (this.lidAngle_ > 0)) {
     this.lidTask_ = goog.Timer.callOnce(this.animateLid_, 5, this);

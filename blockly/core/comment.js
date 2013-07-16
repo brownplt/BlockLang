@@ -128,7 +128,7 @@ Blockly.Comment.prototype.createEditor_ = function() {
   body.className = 'blocklyMinimalBody';
   this.textarea_ = document.createElementNS(Blockly.HTML_NS, 'textarea');
   this.textarea_.className = 'blocklyCommentTextarea';
-  this.textarea_.setAttribute('dir', Blockly.RTL ? 'RTL' : 'LTR');
+  this.textarea_.setAttribute('dir',  'LTR');
   body.appendChild(this.textarea_);
   this.foreignObject_.appendChild(body);
   Blockly.bindEvent_(this.textarea_, 'mouseup', this, this.textareaFocus_);
@@ -300,17 +300,13 @@ Blockly.Comment.prototype.renderIcon = function(cursorX) {
 
   var TOP_MARGIN = 5;
   var diameter = 2 * Blockly.Comment.ICON_RADIUS;
-  if (Blockly.RTL) {
-    cursorX -= diameter;
-  }
+
   this.iconGroup_.setAttribute('transform',
       'translate(' + cursorX + ', ' + TOP_MARGIN + ')');
   this.computeIconLocation();
-  if (Blockly.RTL) {
-    cursorX -= Blockly.BlockSvg.SEP_SPACE_X;
-  } else {
-    cursorX += diameter + Blockly.BlockSvg.SEP_SPACE_X;
-  }
+
+  cursorX += diameter + Blockly.BlockSvg.SEP_SPACE_X;
+
   return cursorX;
 };
 

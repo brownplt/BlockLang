@@ -55,11 +55,11 @@ Blockly.uidCounter_ = 0;
 /**
  * Class for one block.
  * @param {!Blockly.Workspace} workspace The new block's workspace.
- * @param {?string} prototypeName Name of the language object containing
+ * @param {?string} proto Either the prototype object for the block or the name of the language object containing
  *     type-specific functions for this block.
  * @constructor
  */
-Blockly.Block = function(workspace, prototypeName) {
+Blockly.Block = function(workspace, proto) {
   this.Blockly = Blockly;
 
   this.id = ++Blockly.uidCounter_;
@@ -85,12 +85,19 @@ Blockly.Block = function(workspace, prototypeName) {
   workspace.addTopBlock(this);
 
   // Copy the type-specific functions and data from the prototype.
-  if (prototypeName) {
-    this.type = prototypeName;
+  if (proto) {
     var prototype = null;
-    prototype = Blockly.Ray_.Shared.getBlockPrototype(Blockly, prototypeName);
-    if(!prototype) {
-      throw 'Error: "' + prototypeName + '" is an unknown language block.';
+    if(goog.isString(proto)) {
+      var prototypeName = proto;
+      this.type = prototypeName;
+      prototype = Blockly.Ray_.Shared.getBlockPrototype(Blockly, prototypeName);
+      if(!prototype) {
+        throw 'Error: "' + prototypeName + '" is an unknown language block.';
+      }
+    } else if(goog.isObject(proto)) {
+      prototype = proto;
+    } else {
+      throw 'Unknown value for proto!';
     }
     goog.mixin(this, prototype);
   }
@@ -349,7 +356,7 @@ Blockly.Block.prototype.unplug = function(healStack, bump) {
   }
   if (bump) {
     // Bump the block sideways.
-    var dx = Blockly.SNAP_RADIUS * (Blockly.RTL ? -1 : 1);
+    var dx = Blockly.SNAP_RADIUS * 1;
     var dy = Blockly.SNAP_RADIUS * 2;
     this.moveBy(dx, dy);
   }
@@ -519,11 +526,7 @@ Blockly.Block.prototype.duplicate_ = function() {
       /** @type {!Blockly.Workspace} */ (this.workspace), xmlBlock);
   // Move the duplicate next to the old block.
   var xy = this.getRelativeToSurfaceXY();
-  if (Blockly.RTL) {
-    xy.x -= Blockly.SNAP_RADIUS;
-  } else {
-    xy.x += Blockly.SNAP_RADIUS;
-  }
+  xy.x += Blockly.SNAP_RADIUS;
   xy.y += Blockly.SNAP_RADIUS * 2;
   newBlock.moveBy(xy.x, xy.y);
   return newBlock;

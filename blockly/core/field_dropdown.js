@@ -49,7 +49,7 @@ Blockly.FieldDropdown = function(menuGenerator, opt_changeHandler) {
   // Add dropdown arrow: "option ▾" (LTR) or "▾ אופציה" (RTL)
   this.arrow_ = Blockly.createSvgElement('tspan', {}, null);
   this.arrow_.appendChild(document.createTextNode(
-      Blockly.RTL ? '\u25BE ' : ' \u25BE'));
+       ' \u25BE'));
 
   // Call parent's constructor.
   Blockly.FieldDropdown.superClass_.constructor.call(this, firstTuple[0]);
@@ -180,24 +180,9 @@ Blockly.FieldDropdown.prototype.showEditor_ = function() {
   for (var x = 0; x < resizeList.length; x++) {
     resizeList[x].setAttribute('width', maxWidth);
   }
-  if (Blockly.RTL) {
-    // Right-align the text.
-    for (var x = 0, gElement; gElement = svgOptions.childNodes[x]; x++) {
-      var textElement = gElement.lastChild;
-      textElement.setAttribute('text-anchor', 'end');
-      textElement.setAttribute('x', maxWidth - Blockly.ContextMenu.X_PADDING);
-    }
-  }
+
   if (checkElement) {
-    if (Blockly.RTL) {
-      // Research indicates that RTL checkmarks are supposed to be drawn the
-      // same in the same direction as LTR checkmarks.  It's only the alignment
-      // that needs to change.
-      checkElement.setAttribute('text-anchor', 'end');
-      checkElement.setAttribute('x', maxWidth - 5);
-    } else {
-      checkElement.setAttribute('x', 5);
-    }
+    checkElement.setAttribute('x', 5);
   }
   var width = maxWidth + Blockly.FieldDropdown.CORNER_RADIUS * 2;
   var height = options.length * Blockly.ContextMenu.Y_HEIGHT +
@@ -212,12 +197,9 @@ Blockly.FieldDropdown.prototype.showEditor_ = function() {
   var xy = Blockly.getSvgXY_(/** @type {!Element} */ (this.borderRect_));
   var borderBBox = this.borderRect_.getBBox();
   var x;
-  if (Blockly.RTL) {
-    x = xy.x - maxWidth + Blockly.ContextMenu.X_PADDING + borderBBox.width -
-        Blockly.BlockSvg.SEP_SPACE_X / 2;
-  } else {
-    x = xy.x - Blockly.ContextMenu.X_PADDING + Blockly.BlockSvg.SEP_SPACE_X / 2;
-  }
+
+  x = xy.x - Blockly.ContextMenu.X_PADDING + Blockly.BlockSvg.SEP_SPACE_X / 2;
+
   svgGroup.setAttribute('transform',
       'translate(' + x + ', ' + (xy.y + borderBBox.height) + ')');
 };
@@ -329,11 +311,7 @@ Blockly.FieldDropdown.prototype.setText = function(text) {
   this.textElement_.appendChild(textNode);
 
   // Insert dropdown arrow.
-  if (Blockly.RTL) {
-    this.textElement_.insertBefore(this.arrow_, this.textElement_.firstChild);
-  } else {
-    this.textElement_.appendChild(this.arrow_);
-  }
+  this.textElement_.appendChild(this.arrow_);
 
   // Cached width is obsolete.  Clear it.
   this.size_.width = 0;
