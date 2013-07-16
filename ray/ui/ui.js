@@ -1,6 +1,7 @@
 goog.provide('Ray.UI');
 
 goog.require('Ray.Types');
+goog.require('Blockly');
 
 goog.require('goog.dom');
 goog.require('goog.dom.query');
@@ -215,15 +216,15 @@ ArgListContainer.prototype.getArgs = function() {
 };
 
 Ray.UI.makeTypeSelector_ = function() {
-  var select = new goog.ui.Select(null, null);//, goog.ui.FlatMenuButtonRenderer.getInstance());
-  goog.array.forEach(goog.object.getKeys(Ray.Types.atomicTypes_), function(type) {
-    select.addItem(new goog.ui.Option(type.toLocaleUpperCase(), type));
+  var select = new goog.ui.Select(null, null, goog.ui.FlatMenuButtonRenderer.getInstance());
+  goog.object.forEach(Ray.Types.atomicTypes_, function(type, typeName) {
+    select.addItem(new goog.ui.Option(typeName, new type()));
   });
   return select;
 };
 
 Ray.UI.makeButton_ = function(text) {
-  return new goog.ui.Button(text, goog.ui.CustomButtonRenderer.getInstance());
+  return new goog.ui.Button(text, goog.ui.FlatButtonRenderer.getInstance());
 };
 
 Ray.UI.makeFunDefDialog = function() {
@@ -266,12 +267,42 @@ Ray.UI.makeFunDefDialog = function() {
   dialog.addChild(argListContainer, true);
 
   goog.dom.append(elem, "This function produces:");
-  goog.dom.append(elem, goog.dom.createElement('br'));
   var returnType = Ray.UI.makeTypeSelector_();
   dialog.returnType_ = returnType;
   returnType.setSelectedIndex(0);
   returnType.setDefaultCaption('Pick a return type for this function');
   dialog.addChild(returnType, true);
+
+  goog.dom.append(elem, goog.dom.createElement('br'));
+  var blocklyContainer = goog.dom.createElement('div');
+  goog.dom.setProperties(blocklyContainer, {
+    'style': "height : 400px; width: 400px;"
+  });
+  goog.dom.append(elem, blocklyContainer);
+
+
+  dialog.addBlockly = function() {
+    Blockly.inject(blocklyContainer, {
+      'path': '../', 'readOnly': true
+    });
+    var blockProto = {
+      type: new Ray.Types.Unknown(),
+      init: function() {
+        this.appendDummyInput()
+          .appendTitle('hello')
+          .appendTitle(new Blockly.FieldTextInput('Hello'));
+      }
+    };
+
+    var block = new Blockly.Block(Blockly.mainWorkspace, blockProto);
+    block.initSvg();
+    block.render();
+
+    var xy = block.getRelativeToSurfaceXY();
+    block.moveBy(100 - xy.x, 100 - xy.y);
+    dialog.block = block;
+  };
+
   //dialog.render(document.body);
 
   return dialog;

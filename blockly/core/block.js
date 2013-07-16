@@ -152,8 +152,8 @@ Blockly.Block.prototype.warning = null;
 Blockly.Block.prototype.initSvg = function() {
   this.svg_ = new Blockly.BlockSvg(this);
   this.svg_.init();
-  Blockly.bindEvent_(this.svg_.getRootElement(), 'mousedown', this,
-                     this.onMouseDown_);
+  Blockly.editable && Blockly.bindEvent_(this.svg_.getRootElement(), 'mousedown', this,
+                                         this.onMouseDown_);
   this.workspace.getCanvas().appendChild(this.svg_.getRootElement());
 };
 

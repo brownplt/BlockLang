@@ -44,7 +44,7 @@ Blockly.inject = function(container, opt_options) {
     goog.mixin(Blockly, Blockly.parseOptions_(opt_options));
   }
   Blockly.createDom_(container);
-  Blockly.init_();
+  Blockly.editable && Blockly.init_();
 };
 
 /**
@@ -71,7 +71,6 @@ Blockly.parseOptions_ = function(options) {
     var tree = null;
   }
   return {
-    RTL: !!options['rtl'],
     editable: editable,
     maxBlocks: options['maxBlocks'] || Infinity,
     pathToBlockly: options['path'] || './',
@@ -266,6 +265,7 @@ Blockly.createDom_ = function(container) {
                                     Blockly.mainWorkspace.scrollX;
             var offEdge = xy.x > svgSize.width - MARGIN - Blockly.mainWorkspace.scrollX;
             if (offTop || offBottom || overFlyout || offEdge) {
+              console.log('disposing!');
               block.dispose(false, true);
             }
           }

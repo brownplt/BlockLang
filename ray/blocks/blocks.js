@@ -121,8 +121,8 @@ Ray.Blocks.defineArgBlocks = function(r, obj, args) {
   }
 
   goog.array.forEach(args, function(arg) {
-    var arg_block = new ArgumentBlock(arg.name_, arg.type_);
-    obj[Ray.Blocks.argBlockName(arg.name_)] = arg_block;
+    var arg_block = new ArgumentBlock(arg.getName(), arg.getType());
+    obj[Ray.Blocks.argBlockName(arg.getName())] = arg_block;
   });
   return obj;
 };

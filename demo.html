@@ -54,6 +54,7 @@
     var blocks = Ray.Main.createRayBlocks(r);
     Ray.Shared.setRayInstance(r);
     Ray.Shared.setBlocks(blocks);
+    Ray.Shared.attachToBlockly(Blockly);
     var dialog = Ray.UI.makeFunDefDialog();
     Ray.UI.testPopulateFunDefDialog_(dialog);
 
@@ -62,10 +63,15 @@
     tabbar.decorate(goog.dom.getElement('workspace_tabs'));
     tabbar.getSelectedTab().workspaceId_ = 'blockly_main';
 
+    dialog.addBlockly();
+
     var create_function_button = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
     create_function_button.decorate(goog.dom.getElement('create_function_button'));
     goog.events.listen(create_function_button, goog.ui.Component.EventType.ACTION, function(e) {
         dialog.setVisible(true);
+        Blockly.svgResize();
+        dialog.block.render();
+        //dialog.addBlockly();
     });
 
     var evaluate_button = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());

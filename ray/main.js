@@ -100,18 +100,17 @@ Ray.Main.atomicTypeToTypeInstance = function(typeName) {
   return new type();
 };
 
-Ray.Main.makeFunArgBlocks = function(r, blockDir, funParts) {
-  return Ray.Blocks.defineArgBlocks(r, blockDir, funParts.args);
+Ray.Main.makeFunArgBlocks = function(r, blockDir, args) {
+  return Ray.Blocks.defineArgBlocks(r, blockDir, args);
 };
 
-Ray.Main.makeFunAppBlock = function(r, blockDir, funParts) {
-  var return_type_instance = funParts.returnType;
-  var argSpec = funParts.argSpec;
+Ray.Main.makeFunAppBlock = function(r, blockDir, name, returnType, argSpec) {
+  // Leave body and envs empty here
   var f_value = new r.Value.Closure(argSpec,
                                     null,
                                     null,
-                                    return_type_instance);
-  return Ray.Blocks.generateBlock(r, funParts.name, f_value, blockDir, true);
+                                    returnType);
+  return Ray.Blocks.generateBlock(r, name, f_value, blockDir, true);
 };
 
 /**
@@ -120,42 +119,25 @@ Ray.Main.makeFunAppBlock = function(r, blockDir, funParts) {
  * @param funSpec
  * @param opt_asValue
  */
-Ray.Main.funSpecToParts = function(r, funSpec, opt_asValue) {
+Ray.Main.createFunArgSpec = function(r, funSpec, opt_asValue) {
   var asValue = goog.isDef(opt_asValue) ? opt_asValue : false;
-  var returnTypeName = funSpec.returnType;
-  var returnType = Ray.Types.getAtomicType(returnTypeName);
-  var returnTypeInstance = new returnType();
-  var argTypeNames = goog.array.map(funSpec.args, function(a) { return a.getType(); });
-  var argTypes = goog.array.map(argTypeNames, Ray.Main.atomicTypeToTypeInstance);
-
+  var argTypes = goog.array.map(funSpec.args, function(a) { return a.getType(); });
   var argNames = goog.array.map(funSpec.args, function(a)  {return a.getName(); });
-  var argTypesAndNames = goog.array.zip(argTypes, argNames);
-  var finalArgs = goog.array.map(argTypesAndNames, function(arg_type_and_name) {
-    return {
-      type_: arg_type_and_name[0],
-      name_: arg_type_and_name[1]
-    };
-  });
 
   var argsType = new Ray.Types.ArgumentsType(
-    new Ray.Types.ListOfTypes(argTypes));
-  var argSpec = asValue ?
-    new r.Value.ArgumentSpec(argNames, {}, null, argsType) :
-    new r.Expr.ArgumentSpec(argNames, {}, null, argsType);
-  return {
-    args: finalArgs,
-    argSpec: argSpec,
-    returnType: returnTypeInstance,
-    name: funSpec.name
-  };
+    new Ray.Types.ListOfTypes(argTypes), null);
+
+  return asValue ?
+         new r.Value.ArgumentSpec(argNames, {}, null, argsType) :
+         new r.Expr.ArgumentSpec(argNames, {}, null, argsType);
 };
 
 
 Ray.Main.makeFunAppAndArgBlocks = function(r, funSpec) {
   var blockDir = {};
-  var funParts = Ray.Main.funSpecToParts(r, funSpec, true);
-  var argBlocks = Ray.Main.makeFunArgBlocks(r, blockDir, funParts);
-  var appBlocks = Ray.Main.makeFunAppBlock(r, {}, funParts);
+  var argSpec = Ray.Main.createFunArgSpec(r, funSpec, true);
+  var argBlocks = Ray.Main.makeFunArgBlocks(r, blockDir, funSpec.args);
+  var appBlocks = Ray.Main.makeFunAppBlock(r, {}, funSpec.name, funSpec.returnType, argSpec);
   var funBlockName = Ray.Main.getFunBlockName(funSpec.name);
   return [argBlocks, appBlocks, funBlockName];
 };
@@ -211,7 +193,7 @@ Ray.Main.bindFunDefBlockly = function(Blockly) {
   var r = Ray.Shared.Ray;
   var body_block = Ray.Main.getFunBodyBlock(Blockly);
   var body = Ray.Main.blockToCode(body_block);
-  var function_parts = Ray.Main.funSpecToParts(r, Blockly.FunSpec, false);
+  var function_parts = Ray.Main.createFunArgSpec(r, Blockly.FunSpec, false);
   var fn = r.Expr.Lambda(function_parts.argSpec, body, function_parts.returnType);
   r.bindTopLevel(Blockly.FunName, fn);
 };
