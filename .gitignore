@@ -9,3 +9,4 @@ whalesong-gui
 *.svg~
 *.rkt~
 .DS_Store
+twistd.pid

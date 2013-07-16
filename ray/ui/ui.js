@@ -98,17 +98,15 @@ ArgUI.prototype.createDom = function() {
   var argType = Ray.UI.makeTypeSelector_();
   this.argType_ = argType;
 
+
   argType.setSelectedIndex(0);
   argType.setDefaultCaption('Pick a type for this argument');
   this.addChild(argType, true);
-  //argType.setSupportedState(goog.ui.Component.State.ALL, true);
-  //argType.setDispatchTransitionEvents(goog.ui.Component.State.HOVER, true);
+  this.arg_.setType(argType.getValue());
 
   goog.style.setInlineBlock(argType.getContentElement());
 
   var argRemoveButton = Ray.UI.makeButton_('-');
-  argRemoveButton.setSupportedState(goog.ui.Component.State.ALL, true);
-  argRemoveButton.setAutoStates(goog.ui.Component.State.ALL, true);
   this.argRemoveButton_ = argRemoveButton;
 
   this.addChild(argRemoveButton, true);
@@ -123,7 +121,9 @@ ArgUI.prototype.enterDocument = function() {
     this.arg_.setName(this.argName_.getValue());
   }, false, this);
   goog.events.listen(this.argType_, [goog.ui.Component.EventType.CHANGE, goog.ui.Component.EventType.ACTION], function(e) {
+
     this.arg_.setType(this.argType_.getValue());
+    goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
   }, false, this);
 };
 ArgUI.prototype.getName = function() {
@@ -186,6 +186,12 @@ ArgListContainer.prototype.enterDocument = function() {
     goog.events.listen(child,
                        ArgList.EventType.REMOVE_ARG_EVENT,
                        this.onRemoveArg_, true, this);
+    goog.events.listen(
+      child,
+      goog.ui.Component.EventType.CHANGE,
+      function(e) {
+        goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
+      }, false, this);
   }, this);
   goog.events.listen(this.argAddButton_, goog.ui.Component.EventType.ACTION, this.addArg, true, this);
 };
@@ -198,6 +204,10 @@ ArgListContainer.prototype.addArg = function(e, arg) {
   var argUI = new ArgUI(arg);
   this.addChild(argUI, true);
   goog.events.listen(argUI, ArgList.EventType.REMOVE_ARG_EVENT, this.onRemoveArg_, true, this);
+  goog.events.listen(argUI, goog.ui.Component.EventType.CHANGE, function(e) {
+    goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
+  }, false, this);
+  goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
 };
 ArgListContainer.prototype.onRemoveArg_ = function(e) {
   e.stopPropagation();
@@ -206,6 +216,7 @@ ArgListContainer.prototype.onRemoveArg_ = function(e) {
   this.forEachChild(function(child) {
     child.updateArgNameLabelIndex();
   });
+  goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
 };
 ArgListContainer.prototype.getArgs = function() {
   var args = [];
@@ -231,12 +242,12 @@ Ray.UI.makeFunDefDialog = function() {
   var dom = goog.dom.getDomHelper(document.body);
 
   var dialog = new goog.ui.Dialog(null, true, dom);
-  var dialog_buttons = new goog.ui.Dialog.ButtonSet();
-  dialog_buttons.set('create', 'Create Function');
-  dialog_buttons.set('cancel', 'Cancel');
-  dialog_buttons.setCancel('cancel');
-  dialog_buttons.setDefault('create');
-  dialog.setButtonSet(dialog_buttons);
+  var dialogButtons = new goog.ui.Dialog.ButtonSet();
+  dialogButtons.set('create', 'Create Function');
+  dialogButtons.set('cancel', 'Cancel');
+  dialogButtons.setCancel('cancel');
+  dialogButtons.setDefault('create');
+  dialog.setButtonSet(dialogButtons);
   dialog.setTitle("Define a new function");
 
   var elem = dialog.getContentElement();
@@ -248,6 +259,11 @@ Ray.UI.makeFunDefDialog = function() {
   var funName = new goog.ui.LabelInput('name');
   dialog.funName_ = funName;
   dialog.addChild(funName, true);
+  goog.events.listen(funName.getContentElement(), [goog.events.EventType.PROPERTYCHANGE,
+                                                   goog.events.EventType.KEYUP,
+                                                   goog.events.EventType.INPUT,
+                                                   goog.events.EventType.PASTE],
+                     Ray.UI.makeDemoBlock);
 
   goog.dom.append(elem, goog.dom.createElement('br'));
 
@@ -265,6 +281,7 @@ Ray.UI.makeFunDefDialog = function() {
   var argListContainer = new ArgListContainer(argList);
   dialog.argListContainer_ = argListContainer;
   dialog.addChild(argListContainer, true);
+  goog.events.listen(argListContainer, [goog.ui.Component.EventType.CHANGE], Ray.UI.makeDemoBlock);
 
   goog.dom.append(elem, "This function produces:");
   var returnType = Ray.UI.makeTypeSelector_();
@@ -272,6 +289,7 @@ Ray.UI.makeFunDefDialog = function() {
   returnType.setSelectedIndex(0);
   returnType.setDefaultCaption('Pick a return type for this function');
   dialog.addChild(returnType, true);
+  goog.events.listen(returnType, [goog.ui.Component.EventType.CHANGE, goog.ui.Component.EventType.ACTION], Ray.UI.makeDemoBlock);
 
   goog.dom.append(elem, goog.dom.createElement('br'));
   var blocklyContainer = goog.dom.createElement('div');
@@ -280,32 +298,42 @@ Ray.UI.makeFunDefDialog = function() {
   });
   goog.dom.append(elem, blocklyContainer);
 
+  Blockly.inject(blocklyContainer, {
+    'path': '../', 'readOnly': true
+  });
 
-  dialog.addBlockly = function() {
-    Blockly.inject(blocklyContainer, {
-      'path': '../', 'readOnly': true
-    });
-    var blockProto = {
-      type: new Ray.Types.Unknown(),
-      init: function() {
-        this.appendDummyInput()
-          .appendTitle('hello')
-          .appendTitle(new Blockly.FieldTextInput('Hello'));
-      }
-    };
-
-    var block = new Blockly.Block(Blockly.mainWorkspace, blockProto);
-    block.initSvg();
-    block.render();
-
-    var xy = block.getRelativeToSurfaceXY();
-    block.moveBy(100 - xy.x, 100 - xy.y);
-    dialog.block = block;
-  };
-
+  Ray.UI.dialog = dialog;
   //dialog.render(document.body);
 
   return dialog;
+};
+
+Ray.UI.makeDemoBlock = function(e) {
+  var dialog = Ray.UI.dialog;
+  if(dialog.block) {
+    dialog.block.dispose(true, false);
+  }
+  var funSpec = Ray.UI.getFunDefDialogValues(dialog);
+
+  var blockProto = {
+    outputType_: funSpec.returnType,
+    renderAsExpression_: true
+  };
+  blockProto.init = function() {
+    this.makeTitleRow(funSpec.name);
+    goog.array.forEach(funSpec.args, function(arg) {
+      this.appendValueInput(arg.getName())
+        .setType(arg.getType());
+    }, this);
+  };
+
+  var block = new Blockly.Block(Blockly.mainWorkspace, blockProto);
+  block.initSvg();
+  block.render();
+
+  var xy = block.getRelativeToSurfaceXY();
+  block.moveBy(Blockly.BlockSvg.SEP_SPACE_X + Blockly.BlockSvg.TAB_WIDTH - xy.x, Blockly.BlockSvg.SEP_SPACE_Y - xy.y);
+  dialog.block = block;
 };
 
 Ray.UI.testPopulateFunDefDialog_ = function(dialog) {
@@ -327,8 +355,8 @@ Ray.UI.getFunDefDialogValues = function(dialog) {
   var name = dialog.funName_.getValue();
   var desc = dialog.funDescription_.getValue();
   var args = dialog.argListContainer_.getArgs();
-  var return_type = dialog.returnType_.getSelectedItem().getValue();
-  return {name: name, desc: desc, args: args, returnType: return_type};
+  var returnType = dialog.returnType_.getSelectedItem().getValue();
+  return {name: name, desc: desc, args: args, returnType: returnType};
 };
 
 Ray.UI.switchDisplayedWorkspace = function(from, to) {

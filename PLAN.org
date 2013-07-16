@@ -38,3 +38,18 @@ I think the first thing to do is to get the live block in function
 definition dialog going! 
 
 So create a workspace, and just listen for changes to update things!
+
+* TODO
+rename 'demo' to 'preview'
+
+Make example blocks that have slots for expression and value, and can
+be added to function body space
+
+Set it up so that you can create a function then get a bubble into
+which you can put the function body and test cases, and you should be
+able drag, 
+
+Write up proposal for entire workflow for defining blocks. Also get
+workflow in a tab working correctly.
+
+Make some interface element for running tests.

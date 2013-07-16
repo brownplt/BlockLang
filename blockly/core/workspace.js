@@ -105,7 +105,7 @@ Blockly.Workspace.prototype.createDom = function() {
   this.svgGroup_ = Blockly.createSvgElement('g', {}, null);
   this.svgBlockCanvas_ = Blockly.createSvgElement('g', {}, this.svgGroup_);
   this.svgBubbleCanvas_ = Blockly.createSvgElement('g', {}, this.svgGroup_);
-  console.log('creatingDom');
+
   this.fireChangeEvent();
   return this.svgGroup_;
 };
@@ -162,7 +162,7 @@ Blockly.Workspace.prototype.getBubbleCanvas = function() {
  */
 Blockly.Workspace.prototype.addTopBlock = function(block) {
   this.topBlocks_.push(block);
-  console.log('adding TopBlock');
+  //console.log('adding TopBlock');
   this.fireChangeEvent();
 };
 
@@ -182,7 +182,7 @@ Blockly.Workspace.prototype.removeTopBlock = function(block) {
   if (!found) {
     throw 'Block not present in workspace\'s list of top-most blocks.';
   }
-  console.log('removeTopBlock');
+  //console.log('removeTopBlock');
   this.fireChangeEvent();
 };
 
@@ -304,7 +304,7 @@ Blockly.Workspace.prototype.highlightBlock = function(id) {
  * 'blocklyWorkspaceChange' on Blockly.mainWorkspace.getCanvas().
  */
 Blockly.Workspace.prototype.fireChangeEvent = function() {
-  console.log('workspace method fireChangeEvent is being called');
+  //console.log('workspace method fireChangeEvent is being called');
   if (this.fireChangeEventPid_) {
     window.clearTimeout(this.fireChangeEventPid_);
   }
