@@ -53,3 +53,5 @@ Write up proposal for entire workflow for defining blocks. Also get
 workflow in a tab working correctly.
 
 Make some interface element for running tests.
+
+Why is this connection thing going wrong?

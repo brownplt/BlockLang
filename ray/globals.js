@@ -66,6 +66,8 @@ Blocks.Rest = 8;
 Blocks.Empty = 9;
 Blocks.App = 10;
 Blocks.Argument = 11;
+Blocks.And = 12;
+Blocks.Or = 13;
 
 Ray.Globals.Priorities = {};
 var Priorities = Ray.Globals.Priorities;

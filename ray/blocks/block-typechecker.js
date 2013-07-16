@@ -193,6 +193,10 @@ var typecheckBlockExpr = function(block, type, typeEnv) {
     case Blocks.Argument:
       output_type = block.outputType_;
       break;
+    default:
+      // Don't actually typecheck when we don't have a block with a known class
+      output_type = block.outputType_;
+      break;
   }
 
   if(!output_type) {

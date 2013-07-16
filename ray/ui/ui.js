@@ -28,7 +28,7 @@ Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
 
 /** @typedef {{type:Ray.Types.*, name: string}} */
 var Arg = function(name, type) {
-  this.name_ = name || 'x';
+  this.name_ = name || null;
   this.type_ = type || null;
 };
 Arg.prototype.getName = function() {
@@ -88,7 +88,7 @@ ArgUI.prototype.createDom = function() {
 
   this.addChild(argName, true);
 
-  if(this.arg_.getName().length) {
+  if(this.arg_.getName() && this.arg_.getName().length) {
     argName.setValue(this.arg_.getName());
   }
 
@@ -117,11 +117,15 @@ ArgUI.prototype.enterDocument = function() {
   goog.events.listen(this.argRemoveButton_, goog.ui.Component.EventType.ACTION, function(e) {
     this.dispatchEvent(ArgList.EventType.REMOVE_ARG_EVENT);
   }, true, this);
-  goog.events.listen(this.argName_.getElement(), goog.ui.Component.EventType.BLUR, function(e) {
+  goog.events.listen(this.argName_.getContentElement(), [goog.events.EventType.PROPERTYCHANGE,
+                                     goog.events.EventType.KEYUP,
+                                     goog.events.EventType.INPUT,
+                                     goog.events.EventType.PASTE], function(e) {
     this.arg_.setName(this.argName_.getValue());
+    goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
   }, false, this);
-  goog.events.listen(this.argType_, [goog.ui.Component.EventType.CHANGE, goog.ui.Component.EventType.ACTION], function(e) {
 
+  goog.events.listen(this.argType_, goog.ui.Component.EventType.CHANGE, function(e) {
     this.arg_.setType(this.argType_.getValue());
     goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
   }, false, this);
@@ -263,7 +267,7 @@ Ray.UI.makeFunDefDialog = function() {
                                                    goog.events.EventType.KEYUP,
                                                    goog.events.EventType.INPUT,
                                                    goog.events.EventType.PASTE],
-                     Ray.UI.makeDemoBlock);
+                     Ray.UI.makeDemoBlocks);
 
   goog.dom.append(elem, goog.dom.createElement('br'));
 
@@ -281,7 +285,7 @@ Ray.UI.makeFunDefDialog = function() {
   var argListContainer = new ArgListContainer(argList);
   dialog.argListContainer_ = argListContainer;
   dialog.addChild(argListContainer, true);
-  goog.events.listen(argListContainer, [goog.ui.Component.EventType.CHANGE], Ray.UI.makeDemoBlock);
+  goog.events.listen(argListContainer, [goog.ui.Component.EventType.CHANGE], Ray.UI.makeDemoBlocks);
 
   goog.dom.append(elem, "This function produces:");
   var returnType = Ray.UI.makeTypeSelector_();
@@ -289,7 +293,7 @@ Ray.UI.makeFunDefDialog = function() {
   returnType.setSelectedIndex(0);
   returnType.setDefaultCaption('Pick a return type for this function');
   dialog.addChild(returnType, true);
-  goog.events.listen(returnType, [goog.ui.Component.EventType.CHANGE, goog.ui.Component.EventType.ACTION], Ray.UI.makeDemoBlock);
+  goog.events.listen(returnType, goog.ui.Component.EventType.CHANGE, Ray.UI.makeDemoBlocks);
 
   goog.dom.append(elem, goog.dom.createElement('br'));
   var blocklyContainer = goog.dom.createElement('div');
@@ -308,12 +312,29 @@ Ray.UI.makeFunDefDialog = function() {
   return dialog;
 };
 
-Ray.UI.makeDemoBlock = function(e) {
+Ray.UI.makeDemoBlocks = function(e) {
   var dialog = Ray.UI.dialog;
   if(dialog.block) {
     dialog.block.dispose(true, false);
   }
+  dialog.block = null;
+
   var funSpec = Ray.UI.getFunDefDialogValues(dialog);
+
+  var argNamesReady = true;
+  var argNames = [];
+  goog.array.forEach(funSpec.args, function(arg) {
+    var argName = arg.getName();
+    argNamesReady = argNamesReady &&
+                    argName && argName.length > 0 &&
+                    !goog.array.contains(argNames, arg.getName());
+    argNames.push(arg.getName());
+  });
+
+  if(!(funSpec.name.length > 0) || !argNamesReady) {
+    return;
+  }
+
 
   var blockProto = {
     outputType_: funSpec.returnType,
@@ -322,7 +343,7 @@ Ray.UI.makeDemoBlock = function(e) {
   blockProto.init = function() {
     this.makeTitleRow(funSpec.name);
     goog.array.forEach(funSpec.args, function(arg) {
-      this.appendValueInput(arg.getName())
+      var input = this.appendValueInput(arg.getName())
         .setType(arg.getType());
     }, this);
   };
@@ -330,6 +351,20 @@ Ray.UI.makeDemoBlock = function(e) {
   var block = new Blockly.Block(Blockly.mainWorkspace, blockProto);
   block.initSvg();
   block.render();
+
+  goog.array.forEach(funSpec.args, function(arg) {
+    var argBlockProto = {
+      outputType_: arg.getType(),
+      renderAsExpression_: true,
+      init: function() {
+        this.makeTitleRow(arg.getName());
+      }
+    };
+    var argBlock = new Blockly.Block(Blockly.mainWorkspace, argBlockProto);
+    argBlock.initSvg();
+    argBlock.render();
+    block.getInput(arg.getName()).connection.connect(argBlock.outputConnection);
+  });
 
   var xy = block.getRelativeToSurfaceXY();
   block.moveBy(Blockly.BlockSvg.SEP_SPACE_X + Blockly.BlockSvg.TAB_WIDTH - xy.x, Blockly.BlockSvg.SEP_SPACE_Y - xy.y);
@@ -355,7 +390,7 @@ Ray.UI.getFunDefDialogValues = function(dialog) {
   var name = dialog.funName_.getValue();
   var desc = dialog.funDescription_.getValue();
   var args = dialog.argListContainer_.getArgs();
-  var returnType = dialog.returnType_.getSelectedItem().getValue();
+  var returnType = dialog.returnType_.getValue();
   return {name: name, desc: desc, args: args, returnType: returnType};
 };
 
