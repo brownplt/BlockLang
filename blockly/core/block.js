@@ -1248,6 +1248,11 @@ Blockly.Block.prototype.makeTitleRow = function(name) {
   return input;
 };
 
+Blockly.Block.prototype.appendValueWithType = function(name, type) {
+  return this.appendValueInput(name)
+    .setType(type);
+};
+
 /**
  * Add a value input, statement input or local variable to this block.
  * @param {number} type Either Blockly.INPUT_VALUE or Blockly.NEXT_STATEMENT or

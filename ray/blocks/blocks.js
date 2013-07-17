@@ -74,10 +74,8 @@ Ray.Blocks.defineListBlocks = function(r, obj) {
   var consBlock = new ListBlock('cons', new Ray.Types.List(new Ray.Types.Unknown()));
   consBlock.init = function() {
     this.makeTitleRow('cons');
-    this.appendValueInput('car')
-      .setType(new Ray.Types.Unknown());
-    this.appendValueInput('cdr')
-      .setType(new Ray.Types.List(new Ray.Types.Unknown()));
+    this.appendValueWithType('car', new Ray.Types.Unknown());
+    this.appendValueWithType('cdr', new Ray.Types.List(new Ray.Types.Unknown()));
   };
   obj[Ray.Blocks.blockName('cons')] = consBlock;
 
@@ -90,16 +88,14 @@ Ray.Blocks.defineListBlocks = function(r, obj) {
   var firstBlock = new ListBlock('first', new Ray.Types.Unknown());
   firstBlock.init = function() {
     this.makeTitleRow('first');
-    this.appendValueInput('x')
-      .setType(new Ray.Types.List(new Ray.Types.Unknown()));
+    this.appendValueWithType('x', new Ray.Types.List(new Ray.Types.Unknown()));
   };
   obj[Ray.Blocks.blockName('first')] = firstBlock;
 
   var restBlock = new ListBlock('rest', new Ray.Types.List(new Ray.Types.Unknown()));
   restBlock.init = function() {
     this.makeTitleRow('rest');
-    this.appendValueInput('x')
-      .setType(new Ray.Types.List(new Ray.Types.Unknown()));
+    this.appendValueWithType('x', new Ray.Types.List(new Ray.Types.Unknown()));
   };
   obj[Ray.Blocks.blockName('rest')] = restBlock;
 
@@ -164,10 +160,8 @@ Ray.Blocks.defineConditionalBlocks = function(r, obj) {
   andBlock.inputTypes_ = [new Ray.Types.Boolean()];
   andBlock.init = function() {
     this.makeTitleRow('and');
-    this.appendValueInput('REST_ARG0')
-      .setType(new Ray.Types.Boolean());
-    this.appendValueInput('REST_ARG1')
-      .setType(new Ray.Types.Boolean());
+    this.appendValueWithType('REST_ARG0', new Ray.Types.Boolean());
+    this.appendValueWithType('REST_ARG1', new Ray.Types.Boolean());
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.restArgArgBlockName]));
     this.restArgCount_ = 2;
   };
@@ -180,10 +174,8 @@ Ray.Blocks.defineConditionalBlocks = function(r, obj) {
   orBlock.inputTypes_ = [new Ray.Types.Boolean()];
   orBlock.init = function() {
     this.makeTitleRow('or');
-    this.appendValueInput('REST_ARG0')
-      .setType(new Ray.Types.Boolean());
-    this.appendValueInput('REST_ARG1')
-      .setType(new Ray.Types.Boolean());
+    this.appendValueWithType('REST_ARG0', new Ray.Types.Boolean());
+    this.appendValueWithType('REST_ARG1', new Ray.Types.Boolean());
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.restArgArgBlockName]));
     this.restArgCount_ = 2;
   };
@@ -199,8 +191,7 @@ Ray.Blocks.defineConditionalBlocks = function(r, obj) {
     this.appendValueInput('CONDITION')
       .appendTitle('when')
       .setType(new Ray.Types.Boolean());
-    this.appendValueInput('BODY')
-      .setType(new Ray.Types.Unknown());
+    this.appendValueWithType('BODY', new Ray.Types.Unknown());
     this.setMutator(new this.Blockly.Mutator([Ray.Blocks.condTestBodyBlockName, Ray.Blocks.condElseBlockName]));
     this.testClauseCount_ = 0;
     this.elseClause_ = false;
@@ -504,14 +495,15 @@ Ray.Blocks.generateBlock = function(r, name, value, obj, opt_userFunction) {
       block.init = function() {
         this.makeTitleRow(block_title);
         for(var i = 0; i < arity; i++) {
-          this.appendValueInput(argSpec.positionalArgs[i])
-            .setType(argSpec.argsType.positionalArgTypes.list[i])
+          this.appendValueWithType(argSpec.positionalArgs[i],
+                                   argSpec.argsType.positionalArgTypes.list[i]);
         }
         if(restArg) {
-          this.appendValueInput('REST_ARG0')
-            .setType(argSpec.argsType.restArgType.elementType);
-          this.appendValueInput('REST_ARG1')
-            .setType(argSpec.argsType.restArgType.elementType);
+          this.appendValueWithType('REST_ARG0',
+                                   argSpec.argsType.restArgType.elementType);
+          this.appendValueWithType('REST_ARG1',
+                                   argSpec.argsType.restArgType.elementType);
+
           this.setMutator(new this.Blockly.Mutator([Ray.Blocks.restArgArgBlockName]));
           this.restArgCount_ = 2;
         }
@@ -572,8 +564,7 @@ Ray.Blocks.addRestArg = function(block, obj, restArg, type) {
     this.restArgCount_ = 0;
     var arg_block = container_block.getInputTargetBlock('STACK');
     while(arg_block) {
-      var arg = this.appendValueInput('REST_ARG' + String(this.restArgCount_))
-        .setType(type);
+      var arg = this.appendValueWithType('REST_ARG' + String(this.restArgCount_), type);
       // This should never be set!
       if(arg_block.value_connection_) {
         arg.connection.connect(arg_block.value_connection_);
@@ -595,8 +586,7 @@ Ray.Blocks.addRestArg = function(block, obj, restArg, type) {
     }
     this.restArgCount_ = window.parseInt(container.getAttribute('rest_args'), 10);
     for(var x = 0; x < this.restArgCount_; x++) {
-      this.appendValueInput('REST_ARG' + String(x))
-        .setType(type);
+      this.appendValueInput('REST_ARG' + String(x), type);
     }
   };
 };
