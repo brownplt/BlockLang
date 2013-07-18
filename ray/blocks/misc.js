@@ -166,6 +166,10 @@ Ray.Blocks.generateToolbox = function(blockDir, opt_includeArguments) {
   toolbox_categories.sort();
   var toolbox = goog.dom.createDom('xml', {id: 'toolbox'});
   goog.array.forEach(toolbox_categories, function(category) {
+    // Disabling these categories at the moment
+    if(category === 'arguments' || category === 'all') {
+      return;
+    }
     // Don't display arguments if false is passed in as opt_includeArguments
     if(category === 'arguments' && !include_arguments) {
       return;
@@ -221,8 +225,10 @@ Ray.Blocks.emptyBlockDir = function() {
   });
 
   block_dir['forms'] = [];
-  block_dir['arguments'] = [];
   block_dir['functions'] = [];
+  block_dir['arguments'] = [];
+  // Not including all, as per Emmanuel's email, since it would allow students not to use type-based reasoning
+  // I'm just leaving it out of the displayed toolbox, but still putting blocks in drawers
   block_dir['all'] = [];
   return block_dir;
 };

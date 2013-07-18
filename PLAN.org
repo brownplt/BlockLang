@@ -55,3 +55,7 @@ workflow in a tab working correctly.
 Make some interface element for running tests.
 
 Why is this connection thing going wrong?
+
+Why don't I have blocks just have a list of categories they are in,
+and look things up there, instead of having to build up this
+elaborate tree structure?

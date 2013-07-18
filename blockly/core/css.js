@@ -43,6 +43,7 @@ Blockly.Css.inject = function() {
 };
 
 Blockly.Css.FONT_COLOR = '#000';
+Blockly.Css.SIGNATURE_BACKGROUND_COLOR = '#4C516D';
 
 
 Blockly.Css.CONTENT = [
@@ -239,6 +240,10 @@ Blockly.Css.CONTENT = [
   '.blocklyFlyoutBackground {',
   '  fill: #ddd;',
   '  fill-opacity: 0.8;',
+  '}',
+  '.blocklySignatureBackground {',
+  '  fill: ' + Blockly.Css.SIGNATURE_BACKGROUND_COLOR + ';',
+  '  fill-opacity: 0.7;',
   '}',
   '.blocklyColourBackground {',
   '  fill: #666;',

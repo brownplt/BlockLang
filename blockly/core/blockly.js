@@ -47,6 +47,7 @@ goog.require('Blockly.FieldImage');
 goog.require('Blockly.FieldTextInput');
 goog.require('Blockly.FieldVariable');
 goog.require('Blockly.Procedures');
+goog.require('Blockly.Signature');
 goog.require('Blockly.Toolbox');
 goog.require('Blockly.utils');
 goog.require('Blockly.Workspace');

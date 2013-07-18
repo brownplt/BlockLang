@@ -2,7 +2,7 @@
 // Please do not edit.
 goog.addDependency('../../../blockly/core/block.js', ['Blockly.Block'], ['Blockly.BlockSvg', 'Blockly.Comment', 'Blockly.Connection', 'Blockly.ContextMenu', 'Blockly.Input', 'Blockly.Language', 'Blockly.Mutator', 'Blockly.Warning', 'Blockly.Workspace', 'Blockly.Xml', 'goog.Timer']);
 goog.addDependency('../../../blockly/core/block_svg.js', ['Blockly.BlockSvg'], ['goog.color', 'goog.userAgent']);
-goog.addDependency('../../../blockly/core/blockly.js', ['Blockly'], ['Blockly.Block', 'Blockly.Connection', 'Blockly.FieldCheckbox', 'Blockly.FieldColour', 'Blockly.FieldDropdown', 'Blockly.FieldImage', 'Blockly.FieldTextInput', 'Blockly.FieldVariable', 'Blockly.Generator', 'Blockly.Procedures', 'Blockly.Toolbox', 'Blockly.Workspace', 'Blockly.inject', 'Blockly.utils', 'goog.color', 'goog.dom', 'goog.events', 'goog.string', 'goog.ui.ColorPicker', 'goog.ui.tree.TreeControl', 'goog.userAgent']);
+goog.addDependency('../../../blockly/core/blockly.js', ['Blockly'], ['Blockly.Block', 'Blockly.Connection', 'Blockly.FieldCheckbox', 'Blockly.FieldColour', 'Blockly.FieldDropdown', 'Blockly.FieldImage', 'Blockly.FieldTextInput', 'Blockly.FieldVariable', 'Blockly.Generator', 'Blockly.Procedures', 'Blockly.Signature', 'Blockly.Toolbox', 'Blockly.Workspace', 'Blockly.inject', 'Blockly.utils', 'goog.color', 'goog.dom', 'goog.events', 'goog.string', 'goog.ui.ColorPicker', 'goog.ui.tree.TreeControl', 'goog.userAgent']);
 goog.addDependency('../../../blockly/core/bubble.js', ['Blockly.Bubble'], ['Blockly.Workspace']);
 goog.addDependency('../../../blockly/core/comment.js', ['Blockly.Comment'], []);
 goog.addDependency('../../../blockly/core/connection.js', ['Blockly.Connection', 'Blockly.ConnectionDB'], ['Blockly.Workspace']);
@@ -25,6 +25,7 @@ goog.addDependency('../../../blockly/core/mutator.js', ['Blockly.Mutator'], ['Bl
 goog.addDependency('../../../blockly/core/names.js', ['Blockly.Names'], []);
 goog.addDependency('../../../blockly/core/procedures.js', ['Blockly.Procedures'], ['Blockly.FieldVariable', 'Blockly.Names', 'Blockly.Workspace']);
 goog.addDependency('../../../blockly/core/scrollbar.js', ['Blockly.Scrollbar', 'Blockly.ScrollbarPair'], ['goog.userAgent']);
+goog.addDependency('../../../blockly/core/signature.js', ['Blockly.Signature'], ['Blockly.Block', 'Blockly.Comment']);
 goog.addDependency('../../../blockly/core/toolbox.js', ['Blockly.Toolbox'], ['Blockly.Flyout', 'goog.style', 'goog.ui.tree.TreeControl', 'goog.ui.tree.TreeNode']);
 goog.addDependency('../../../blockly/core/tooltip.js', ['Blockly.Tooltip'], []);
 goog.addDependency('../../../blockly/core/trashcan.js', ['Blockly.Trashcan'], ['goog.Timer']);
@@ -51,5 +52,6 @@ goog.addDependency('../../../ray/shared.js', ['Ray.Shared'], ['Blockly', 'Ray.Bl
 goog.addDependency('../../../ray/test.js', ['Ray.Test'], ['Ray.JQuery', 'Ray.Lib', 'Ray.Ray', 'Ray.Typechecker', 'Ray.Types', 'goog.array', 'goog.functions', 'goog.object', 'goog.string']);
 goog.addDependency('../../../ray/typechecker.js', ['Ray.Typechecker'], ['Ray.Env', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types']);
 goog.addDependency('../../../ray/types.js', ['Ray.Types'], ['goog.array', 'goog.string']);
-goog.addDependency('../../../ray/ui/ui.js', ['Ray.UI'], ['Blockly', 'Ray.Types', 'goog.dom', 'goog.dom.query', 'goog.events', 'goog.events.EventType', 'goog.object', 'goog.style', 'goog.ui.Button', 'goog.ui.Container', 'goog.ui.ContainerRenderer', 'goog.ui.Control', 'goog.ui.CustomButtonRenderer', 'goog.ui.Dialog', 'goog.ui.Dialog.ButtonSet', 'goog.ui.FlatButtonRenderer', 'goog.ui.FlatMenuButtonRenderer', 'goog.ui.LabelInput', 'goog.ui.Option', 'goog.ui.Select', 'goog.ui.Tab']);
+goog.addDependency('../../../ray/ui/fun-def-dialog.js', ['Ray.UI.FunDefDialog'], ['Blockly', 'Ray.Types', 'goog.dom', 'goog.dom.query', 'goog.events', 'goog.events.EventType', 'goog.object', 'goog.style', 'goog.ui.Button', 'goog.ui.Container', 'goog.ui.ContainerRenderer', 'goog.ui.Control', 'goog.ui.CustomButtonRenderer', 'goog.ui.Dialog', 'goog.ui.Dialog.ButtonSet', 'goog.ui.FlatButtonRenderer', 'goog.ui.FlatMenuButtonRenderer', 'goog.ui.LabelInput', 'goog.ui.Option', 'goog.ui.Select', 'goog.ui.Tab']);
+goog.addDependency('../../../ray/ui/ui.js', ['Ray.UI'], ['Ray.UI.FunDefDialog']);
 goog.addDependency('../../../ray/util.js', ['Ray.Util'], ['goog.array', 'goog.object']);

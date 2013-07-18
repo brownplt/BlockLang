@@ -45,22 +45,29 @@
             Ray.Shared.attachToBlockly(Blockly);
             Ray.Shared.registerFunDefBlockly(Blockly);
             var funDefInfo = window.parent.funDefInfo_;
-            Blockly.FunDefBlocks = funDefInfo.args;
+
+            Blockly.FunDefBlocks = funDefInfo.funArgBlocks;
+            Blockly.FunAppBlock = funDefInfo.funAppBlock;
             Blockly.FunName = funDefInfo.funName;
+            Blockly.FunBlockName = funDefInfo.funBlockName;
+            var initialBlockNames = funDefInfo.initialBlockNames;
             Blockly.FunSpec = funDefInfo.funSpec;
+
 
             Blockly.inject(document.body,
                            {path: "../../blockly/", toolbox:
                                    Ray.Shared.getToolbox(true)});
 
-            var initialBlocks = funDefInfo.initialBlocks;
-            if(initialBlocks) {
-                goog.array.map(initialBlocks, function(blockName) {
-                    var block = new Blockly.Block(Blockly.mainWorkspace, blockName);
-                    block.initSvg();
-                    block.render();
-                });
-            }
+            var signature = new Blockly.Signature(initialBlockNames);
+
+            Blockly.mainWorkspace.signature_ = signature;
+            var signatureSvg = signature.createDom();
+            Blockly.mainWorkspace.signature_.init(Blockly.mainWorkspace,
+                                                  Blockly.getMainWorkspaceMetrics,
+                                                  true);
+            goog.dom.insertSiblingAfter(signatureSvg, Blockly.mainWorkspace.getBubbleCanvas());
+            Blockly.mainWorkspace.signature_.show();
+
         }
     </script>
 </head>

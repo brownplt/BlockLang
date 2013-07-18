@@ -36,7 +36,7 @@ Ray.Main.initializeMainBlocklyDom = function() {
                                        id: Ray.Main.MAIN_BLOCKLY_ID,
                                        src: "Javascript:''"})));
 };
-Ray.Main.initializeFunctionDefinitionBlocklyDom = function() {
+Ray.Main.initializeFunDefBlocklyDom = function() {
   goog.dom.appendChild(document.body,
                        goog.dom.createDom('div', Ray.UI.HIDDEN_CONTAINER_CLASS,
                                           goog.dom.createDom('iframe', {
@@ -63,20 +63,10 @@ Ray.Main.loadMainBlockly = function(iframe) {
 /**
  *
  * @param {HTMLIFrameElement} iframe
- * @param {?Object=} argBlocks
- * @param {?string=} funName
- * @param {?Array.<string>=} initialBlocks
- * @param {Ray.Types} returnType
+ * @param {Object} funDefInfo
  */
-Ray.Main.loadFunDefBlockly = function(iframe, argBlocks, funName, funSpec, initialBlocks, returnType) {
-  var funDef = {
-    args: argBlocks,
-    funName: funName,
-    funSpec: funSpec,
-    initialBlocks: initialBlocks,
-    returnType: returnType
-  };
-  window.funDefInfo_ = funDef;
+Ray.Main.loadFunDefBlockly = function(iframe, funDefInfo) {
+  window.funDefInfo_ = funDefInfo;
   goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'fun_def_blockly.html'});
 };
 
@@ -88,6 +78,13 @@ Ray.Main.blockToWorkspaceXml = function(blockName, block) {
   element.setAttribute('y', 0);
   xml.appendChild(element);
   return xml;
+};
+
+Ray.Main.blocksToXml = function(blockNames) {
+  var toXml = function(blockName) {
+    return '<block type="' + blockName+ '"></block>';
+  };
+  return goog.array.map(blockNames, toXml).join('\n');
 };
 
 Ray.Main.createRayBlocks = function(r) {

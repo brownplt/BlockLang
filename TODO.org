@@ -141,6 +141,10 @@ then have it fill in the appropriate literal.
 - [X] Fix bug where disposing an expression with sub-expressions
   throws an error during typechecking
 - [X] Remove dependency on underscore.js 
+- [X] When dragging blocks with rest arguments, the rest arguments
+  revert to unknown color, they're fine if I add or remove arguments,
+  but initially they do have this problem.
+
 
 * Remaining Tasks
 - [ ] Make it possible to rename function arguments.
@@ -194,3 +198,4 @@ then have it fill in the appropriate literal.
 - [ ] Make drop targets simple rectangles
 - [ ] Build up support for vertical layouts, and convert 'if' and
   'cond' to use vertical layouts.
+- [ ] Main vertical scrollbar is broken.

@@ -758,6 +758,7 @@ Blockly.ScrollbarSvg.prototype.setVisible = function(visible) {
  * @private
  */
 Blockly.ScrollbarSvg.prototype.onMouseDownBar_ = function(e) {
+  console.log('hello');
   Blockly.hideChaff(true);
   if (Blockly.isRightButton(e)) {
     // Right-click.
@@ -799,6 +800,7 @@ Blockly.ScrollbarSvg.prototype.onMouseDownBar_ = function(e) {
  * @private
  */
 Blockly.ScrollbarSvg.prototype.onMouseDownKnob_ = function(e) {
+  console.log('googdbye');
   Blockly.hideChaff(true);
   this.onMouseUpKnob_();
   if (Blockly.isRightButton(e)) {

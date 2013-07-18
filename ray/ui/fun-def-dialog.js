@@ -1,4 +1,4 @@
-goog.provide('Ray.UI');
+goog.provide('Ray.UI.FunDefDialog');
 
 goog.require('Ray.Types');
 goog.require('Blockly');
@@ -23,9 +23,6 @@ goog.require('goog.ui.Option');
 goog.require('goog.ui.Select');
 goog.require('goog.ui.Tab');
 
-Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
-Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
-
 /** @typedef {{type:Ray.Types.*, name: string}} */
 var Arg = function(name, type) {
   this.name_ = name || null;
@@ -46,7 +43,7 @@ Arg.prototype.setType = function(type) {
 
 var ArgList = function(args) {
   /**
-   * @type {Array.<Ray.FuncDefDialog.Arg>}
+   * @type {Array.<*>}
    * @private
    */
   this.args_ = args ? goog.array.clone(args) : [];
@@ -60,7 +57,7 @@ ArgList.prototype.getArgs = function() {
 ArgList.prototype.removeArgAt = function(index) {
   if(this.args_.length > index && index >= 0) {
     var removed = this.args_.splice(index, 1);
-    return removed[0]
+    return removed[0];
   } else {
     throw "Index out of bounds!";
   }
@@ -95,7 +92,7 @@ ArgUI.prototype.createDom = function() {
   goog.dom.append(div, ' of type ');
   //goog.dom.append(div, goog.dom.createDom('br'));
 
-  var argType = Ray.UI.makeTypeSelector_();
+  var argType = Ray.UI.FunDefDialog.makeTypeSelector_();
   this.argType_ = argType;
 
 
@@ -106,7 +103,7 @@ ArgUI.prototype.createDom = function() {
 
   goog.style.setInlineBlock(argType.getContentElement());
 
-  var argRemoveButton = Ray.UI.makeButton_('-');
+  var argRemoveButton = Ray.UI.FunDefDialog.makeButton_('-');
   this.argRemoveButton_ = argRemoveButton;
 
   this.addChild(argRemoveButton, true);
@@ -179,7 +176,7 @@ ArgListContainer.prototype.createDom = function() {
     this.addChild(new ArgUI(arg), true);
   }, this);
 
-  var argAddButton = new Ray.UI.makeButton_('+');
+  var argAddButton = new Ray.UI.FunDefDialog.makeButton_('+');
   this.argAddButton_ = argAddButton;
   argAddButton.render(containerDiv);
   goog.style.setInlineBlock(argAddButton.getContentElement());
@@ -230,7 +227,7 @@ ArgListContainer.prototype.getArgs = function() {
   return args;
 };
 
-Ray.UI.makeTypeSelector_ = function() {
+Ray.UI.FunDefDialog.makeTypeSelector_ = function() {
   var select = new goog.ui.Select(null, null, goog.ui.FlatMenuButtonRenderer.getInstance());
   goog.object.forEach(Ray.Types.atomicTypes_, function(type, typeName) {
     select.addItem(new goog.ui.Option(typeName, new type()));
@@ -238,11 +235,11 @@ Ray.UI.makeTypeSelector_ = function() {
   return select;
 };
 
-Ray.UI.makeButton_ = function(text) {
+Ray.UI.FunDefDialog.makeButton_ = function(text) {
   return new goog.ui.Button(text, goog.ui.FlatButtonRenderer.getInstance());
 };
 
-Ray.UI.makeFunDefDialog = function() {
+Ray.UI.FunDefDialog.makeFunDefDialog = function() {
   var dom = goog.dom.getDomHelper(document.body);
 
   var dialog = new goog.ui.Dialog(null, true, dom);
@@ -267,7 +264,7 @@ Ray.UI.makeFunDefDialog = function() {
                                                    goog.events.EventType.KEYUP,
                                                    goog.events.EventType.INPUT,
                                                    goog.events.EventType.PASTE],
-                     Ray.UI.makeDemoBlocks);
+                     Ray.UI.FunDefDialog.makeDemoBlocks);
 
   goog.dom.append(elem, goog.dom.createElement('br'));
 
@@ -285,15 +282,15 @@ Ray.UI.makeFunDefDialog = function() {
   var argListContainer = new ArgListContainer(argList);
   dialog.argListContainer_ = argListContainer;
   dialog.addChild(argListContainer, true);
-  goog.events.listen(argListContainer, [goog.ui.Component.EventType.CHANGE], Ray.UI.makeDemoBlocks);
+  goog.events.listen(argListContainer, [goog.ui.Component.EventType.CHANGE], Ray.UI.FunDefDialog.makeDemoBlocks);
 
   goog.dom.append(elem, "This function produces:");
-  var returnType = Ray.UI.makeTypeSelector_();
+  var returnType = Ray.UI.FunDefDialog.makeTypeSelector_();
   dialog.returnType_ = returnType;
   returnType.setSelectedIndex(0);
   returnType.setDefaultCaption('Pick a return type for this function');
   dialog.addChild(returnType, true);
-  goog.events.listen(returnType, goog.ui.Component.EventType.CHANGE, Ray.UI.makeDemoBlocks);
+  goog.events.listen(returnType, goog.ui.Component.EventType.CHANGE, Ray.UI.FunDefDialog.makeDemoBlocks);
 
   goog.dom.append(elem, goog.dom.createElement('br'));
   var blocklyContainer = goog.dom.createElement('div');
@@ -306,20 +303,20 @@ Ray.UI.makeFunDefDialog = function() {
     'path': '../', 'readOnly': true
   });
 
-  Ray.UI.dialog = dialog;
+  Ray.UI.FunDefDialog.dialog = dialog;
   //dialog.render(document.body);
 
   return dialog;
 };
 
-Ray.UI.makeDemoBlocks = function(e) {
-  var dialog = Ray.UI.dialog;
+Ray.UI.FunDefDialog.makeDemoBlocks = function(e) {
+  var dialog = Ray.UI.FunDefDialog.dialog;
   if(dialog.block) {
     dialog.block.dispose(true, false);
   }
   dialog.block = null;
 
-  var funSpec = Ray.UI.getFunDefDialogValues(dialog);
+  var funSpec = Ray.UI.FunDefDialog.getFunDefDialogValues(dialog);
 
   var argNamesReady = true;
   var argNames = [];
@@ -371,7 +368,7 @@ Ray.UI.makeDemoBlocks = function(e) {
   dialog.block = block;
 };
 
-Ray.UI.testPopulateFunDefDialog_ = function(dialog) {
+Ray.UI.FunDefDialog.testPopulateFunDefDialog_ = function(dialog) {
   dialog.funName_.setValue('double_if');
   dialog.funDescription_.setValue('doubles x if y is true');
 
@@ -386,7 +383,7 @@ Ray.UI.testPopulateFunDefDialog_ = function(dialog) {
   dialog.returnType_.setSelectedIndex(1);
 };
 
-Ray.UI.getFunDefDialogValues = function(dialog) {
+Ray.UI.FunDefDialog.getFunDefDialogValues = function(dialog) {
   var name = dialog.funName_.getValue();
   var desc = dialog.funDescription_.getValue();
   var args = dialog.argListContainer_.getArgs();
@@ -394,50 +391,3 @@ Ray.UI.getFunDefDialogValues = function(dialog) {
   return {name: name, desc: desc, args: args, returnType: returnType};
 };
 
-Ray.UI.switchDisplayedWorkspace = function(from, to) {
-  goog.dom.classes.swap(goog.dom.getParentElement(from),
-                        Ray.UI.VISIBLE_CONTAINER_CLASS,
-                        Ray.UI.HIDDEN_CONTAINER_CLASS);
-  goog.dom.classes.swap(goog.dom.getParentElement(to),
-                        Ray.UI.HIDDEN_CONTAINER_CLASS,
-                        Ray.UI.VISIBLE_CONTAINER_CLASS);
-};
-
-Ray.UI.showWorkspaceForTab = function(tab, workspace_content) {
-  var currWorkspaceId = tab.workspaceId_;
-  var containers = goog.dom.getChildren(workspace_content);
-  goog.array.forEach(containers, function(container) {
-    var workspace = goog.dom.getFirstElementChild(container);
-    if(workspace.id === currWorkspaceId) {
-      goog.dom.classes.swap(container, Ray.UI.HIDDEN_CONTAINER_CLASS, Ray.UI.VISIBLE_CONTAINER_CLASS);
-    } else {
-      goog.dom.classes.swap(container, Ray.UI.VISIBLE_CONTAINER_CLASS, Ray.UI.HIDDEN_CONTAINER_CLASS);
-    }
-  });
-};
-
-Ray.UI.addFunDefWorkspaceDom = function(function_name, container) {
-  var funDefDiv = goog.dom.createDom('div', 'hidden_container');
-  var funDefIFrame = goog.dom.createDom('iframe', {
-    id: 'blockly_function_definition_' + function_name,
-    src: "Javascript:''"});
-  goog.dom.appendChild(funDefDiv, funDefIFrame);
-  goog.dom.appendChild(container, funDefDiv);
-  return funDefIFrame;
-};
-
-Ray.UI.addFunDefWorkspaceTab = function(funName, tabbar) {
-  /*var remove_fun_button = goog.dom.createDom('span', 'remove_function_button');
-  goog.style.setInlineBlock(remove_fun_button);
-  goog.events.listen(remove_fun_button, goog.events.EventType.CLICK, function(e) {
-    // TODO(fill in here)
-  });*/
-  var funDefContent = goog.dom.createDom('div', 'goog-inline-block',
-    [goog.dom.createTextNode('Edit ' + funName + ' ')]);//,
-     //remove_fun_button]);
-  var funDefTab = new goog.ui.Tab(funDefContent);
-  funDefTab.workspaceId_ = 'blockly_function_definition_' + funName;
-  //funDefTab.remove_fun_button = remove_fun_button;
-  tabbar.addChild(funDefTab, true);
-  return funDefTab;
-};
