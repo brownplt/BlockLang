@@ -586,7 +586,7 @@ Ray.Blocks.addRestArg = function(block, obj, restArg, type) {
     }
     this.restArgCount_ = window.parseInt(container.getAttribute('rest_args'), 10);
     for(var x = 0; x < this.restArgCount_; x++) {
-      this.appendValueInput('REST_ARG' + String(x), type);
+      this.appendValueWithType('REST_ARG' + String(x), type);
     }
   };
 };
