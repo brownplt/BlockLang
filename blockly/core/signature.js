@@ -33,7 +33,7 @@ goog.require('Blockly.Comment');
  * Class for a signature.
  * @constructor
  */
-Blockly.Signature = function(blockNames) {
+Blockly.Signature = function(argBlockNames, appBlockName) {
   /**
    * @type {!Blockly.Workspace}
    * @private
@@ -67,7 +67,8 @@ Blockly.Signature = function(blockNames) {
    */
   this.buttons_ = [];
 
-  this.blockNames_ = blockNames;
+  this.argBlockNames_ = argBlockNames;
+  this.appBlockName_ = appBlockName;
 };
 
 /**
@@ -288,6 +289,34 @@ Blockly.Signature.prototype.hide = function() {
   this.buttons_.splice(0);
 };
 
+Blockly.Signature.prototype.makeTextAt = function(text, cursorX, margin) {
+  var funTitle = Blockly.createSvgElement('text', {
+    'class': 'blocklyText blocklySignatureText',
+    'x': cursorX,
+    'y': margin + Blockly.BlockSvg.TAB_HEIGHT + Blockly.BlockSvg.MIN_BLOCK_Y
+  }, this.svgGroup_);
+  var funTitleText = document.createTextNode(text);
+  goog.dom.appendChild(funTitle, funTitleText);
+  return funTitle;
+};
+
+Blockly.Signature.prototype.advanceCursor = function(text, margin) {
+  return text.getComputedTextLength() + margin * 2;
+};
+
+Blockly.Signature.prototype.markChildrenInSignature = function(block) {
+  var allBlocks = block.getDescendants();
+  for (var j = 0, child; child = allBlocks[j]; j++) {
+    // Mark blocks as being inside a signature.  This is used to detect and prevent
+    // the closure of the signature if the user right-clicks on such a block.
+    child.isInSignature = true;
+    // There is no good way to handle comment bubbles inside the signature.
+    // Blocks shouldn't come with predefined comments, but someone will
+    // try this, I'm sure.  Kill the comment.
+    Blockly.Comment && child.setCommentText(null);
+  }
+};
+
 /**
  * Show and populate the signature.
  * @param {!Array|string} xmlList List of blocks to show.
@@ -298,46 +327,80 @@ Blockly.Signature.prototype.show = function() {
   var margin = this.CORNER_RADIUS;
   this.svgGroup_.style.display = 'block';
 
-  //this.svgGroup_
-
   // Create the blocks to be shown in this signature.
   var blocks = [];
   var gaps = [];
 
-  goog.array.forEach(this.blockNames_, function(blockName) {
-    var block = new Blockly.Block(this.workspace_, blockName);
+  goog.array.forEach(this.argBlockNames_, function(argBlockName) {
+    var block = new Blockly.Block(this.workspace_, argBlockName);
     block.initSvg();
     blocks.push(block);
-    gaps.push(margin * 2);
+    gaps.push(margin);
   }, this);
 
   // Lay out the blocks horizontally.
   var signatureHeight = 0;
   var cursorX = margin + Blockly.BlockSvg.NOTCH_WIDTH;
+
+  //var funTitle = this.makeTextAt(Blockly.FunName, cursorX, margin);
+  //cursorX += this.advanceCursor(funTitle, margin);
+
+  var appBlock = new Blockly.Block(this.workspace_, this.appBlockName_);
+  appBlock.initSvg();
+
+  this.markChildrenInSignature(appBlock);
+  appBlock.render();
+  var bBox = appBlock.getSvgRoot().getBBox();
+  var y = margin + Blockly.BlockSvg.TAB_HEIGHT;
+  appBlock.moveBy(cursorX, y);
+  signatureHeight = Math.max(signatureHeight, bBox.height);
+  cursorX += bBox.width;// + gaps[i];
+  Blockly.bindEvent_(appBlock.getSvgRoot(), 'mousedown', null,
+                     Blockly.Signature.createBlockFunc_(this,block));
+
+
+  var consumes = this.makeTextAt('consumes', cursorX, margin);
+  cursorX += this.advanceCursor(consumes, margin);
+
   for (var i = 0, block; block = blocks[i]; i++) {
-    var allBlocks = block.getDescendants();
-    for (var j = 0, child; child = allBlocks[j]; j++) {
-      // Mark blocks as being inside a signature.  This is used to detect and prevent
-      // the closure of the signature if the user right-clicks on such a block.
-      child.isInSignature = true;
-      // There is no good way to handle comment bubbles inside the signature.
-      // Blocks shouldn't come with predefined comments, but someone will
-      // try this, I'm sure.  Kill the comment.
-      Blockly.Comment && child.setCommentText(null);
-    }
+    this.markChildrenInSignature(block);
     block.render();
     var bBox = block.getSvgRoot().getBBox();
     var y = margin + Blockly.BlockSvg.TAB_HEIGHT;
     block.moveBy(cursorX, y);
     signatureHeight = Math.max(signatureHeight, bBox.height);
-    cursorX += bBox.width + gaps[i];
+    cursorX += bBox.width;// + gaps[i];
     if (!block.disabled) {
       Blockly.bindEvent_(block.getSvgRoot(), 'mousedown', null,
                          Blockly.Signature.createBlockFunc_(this, block));
     }
+
+    if(i != blocks.length - 1) {
+      var comma = this.makeTextAt(',', cursorX, margin);
+      cursorX += this.advanceCursor(comma, margin);
+    }
+
   }
+
+  var produces = this.makeTextAt('produces', cursorX, margin);
+  cursorX += this.advanceCursor(produces, margin);
+
+  var typeBlock = Blockly.Ray_.Blocks.typeNameBlock(Blockly.FunSpec.returnType);
+  block = new Blockly.Block(this.workspace_, typeBlock);
+  block.initSvg();
+
+  this.markChildrenInSignature(block);
+  block.render();
+  var bBox = block.getSvgRoot().getBBox();
+  var y = margin + Blockly.BlockSvg.TAB_HEIGHT;
+  block.moveBy(cursorX, y);
+  signatureHeight = Math.max(signatureHeight, bBox.height);
+  cursorX += bBox.width;// + gaps[i];
+
   signatureHeight += margin + Blockly.BlockSvg.TAB_HEIGHT + margin / 2 +
-                 Blockly.Scrollbar.scrollbarThickness;
+                     Blockly.Scrollbar.scrollbarThickness;
+
+
 
   for (var i = 0, block; block = blocks[i]; i++) {
 

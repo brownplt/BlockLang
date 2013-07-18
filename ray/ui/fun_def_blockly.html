@@ -50,7 +50,7 @@
             Blockly.FunAppBlock = funDefInfo.funAppBlock;
             Blockly.FunName = funDefInfo.funName;
             Blockly.FunBlockName = funDefInfo.funBlockName;
-            var initialBlockNames = funDefInfo.initialBlockNames;
+            Blockly.FunArgBlockNames = funDefInfo.funArgBlockNames;
             Blockly.FunSpec = funDefInfo.funSpec;
 
 
@@ -58,7 +58,7 @@
                            {path: "../../blockly/", toolbox:
                                    Ray.Shared.getToolbox(true)});
 
-            var signature = new Blockly.Signature(initialBlockNames);
+            var signature = new Blockly.Signature(Blockly.FunArgBlockNames, Blockly.FunBlockName);
 
             Blockly.mainWorkspace.signature_ = signature;
             var signatureSvg = signature.createDom();

@@ -134,9 +134,9 @@ Ray.Main.makeFunAppAndArgBlocks = function(r, funSpec) {
   var blockDir = {};
   var argSpec = Ray.Main.createFunArgSpec(r, funSpec, true);
   var argBlocks = Ray.Main.makeFunArgBlocks(r, blockDir, funSpec.args);
-  var appBlocks = Ray.Main.makeFunAppBlock(r, {}, funSpec.name, funSpec.returnType, argSpec);
+  var appBlock = Ray.Main.makeFunAppBlock(r, {}, funSpec.name, funSpec.returnType, argSpec);
   var funBlockName = Ray.Main.getFunBlockName(funSpec.name);
-  return [argBlocks, appBlocks, funBlockName];
+  return [argBlocks, appBlock, funBlockName];
 };
 
 Ray.Main.getFunBodyBlock = function(Blockly) {

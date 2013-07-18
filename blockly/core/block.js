@@ -102,7 +102,10 @@ Blockly.Block = function(workspace, proto) {
     goog.mixin(this, prototype);
   }
 
-  if(this.isRestArg_) {
+  if(this.preInit_) {
+    this.preInit_(); // This should eventually subsume the rest of these branches.
+    // I should just pass the appropriate function as preInit_ to each corresponding block
+  } else if(this.isRestArg_) {
     this.makeRestArg();
   } else if(this.restArgContainer_) {
     this.makeRestArgContainer();
@@ -987,10 +990,13 @@ Blockly.Block.prototype.getDescendants = function() {
  * @return {number} HSV hue value.
  */
 Blockly.Block.prototype.getColour = function() {
-  return goog.isDef(this.colourHue_) ?
-         this.colourHue_ :
-         Blockly.Ray_.Shared.getTypeColour(this.outputConnection.getType());
-
+  if(goog.isDef(this.colourHue_)) {
+    return this.colourHue_;
+  } else if(this.outputConnection) {
+    return Blockly.Ray_.Shared.getTypeColour(this.outputConnection.getType());
+  } else {
+    return Blockly.Ray_.Shared.getTypeColour(this.outputType_);
+  }
 };
 
 Blockly.Block.prototype.updateColour = function() {
