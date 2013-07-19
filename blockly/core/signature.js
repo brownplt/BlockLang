@@ -316,6 +316,7 @@ Blockly.Signature.prototype.isOpen = function() {
  * Close and empty the signature.
  */
 Blockly.Signature.prototype.close = function() {
+  Blockly.removeAllRanges();
   if (!this.isOpen()) {
     return;
   }
@@ -386,6 +387,7 @@ Blockly.Signature.prototype.markChildrenInSignature = function(block) {
  *     Variables and procedures have a custom set of blocks.
  */
 Blockly.Signature.prototype.open = function() {
+  Blockly.removeAllRanges();
   this.close();
   this.openGroupTextNodes_ = [];
   if(this.openWrapper_) {

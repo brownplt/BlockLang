@@ -89,6 +89,6 @@ div.hidden_container {
   border: 2px solid black;
   margin: 2px;
   padding: 2px;
-  height: 15px;
+  /* height: 15px; */
 
 }
