@@ -75,7 +75,7 @@ Blockly.Signature = function(argBlockNames, appBlockName) {
  * Does the signature automatically close when a block is created?
  * @type {boolean}
  */
-Blockly.Signature.prototype.autoClose = false;
+Blockly.Signature.prototype.autoClose = true;
 
 /**
  * Corner radius of the signature background.
@@ -103,10 +103,19 @@ Blockly.Signature.prototype.createDom = function() {
   </g>
   */
   this.svgGroup_ = Blockly.createSvgElement('g', {}, null);
-  this.svgBackground_ = Blockly.createSvgElement('path',
-      {'class': 'blocklySignatureBackground'}, this.svgGroup_);
-  this.svgOptions_ = Blockly.createSvgElement('g', {}, this.svgGroup_);
+  this.svgOpenGroup_ = Blockly.createSvgElement('g', {}, this.svgGroup_);
+  this.svgOpenGroup_.style.display = 'block';
+  this.svgBackground_ = Blockly.createSvgElement(
+    'path',
+    {'class': 'blocklySignatureBackground'}, this.svgOpenGroup_);
+  this.svgOptions_ = Blockly.createSvgElement('g', {}, this.svgOpenGroup_);
   this.svgOptions_.appendChild(this.workspace_.createDom());
+
+  this.svgClosedGroup_ = Blockly.createSvgElement('g', {}, this.svgGroup_);
+  this.svgClosedGroup_.style.display = 'block';
+  this.svgBackgroundHidden_ = Blockly.createSvgElement(
+    'path',
+    {'class': 'blocklySignatureBackground'}, this.svgClosedGroup_);
   return this.svgGroup_;
 };
 
@@ -152,7 +161,7 @@ Blockly.Signature.prototype.dispose = function() {
  * @return {Object} Contains size and position metrics of the signature.
  */
 Blockly.Signature.prototype.getMetrics = function() {
-  if (!this.isVisible()) {
+  if (!this.isOpen()) {
     // Signature is hidden.
     return null;
   }
@@ -190,6 +199,37 @@ Blockly.Signature.prototype.setMetrics = function(xRatio) {
   this.svgOptions_.setAttribute('transform', 'translate(' + x + ', 0)');
 };
 
+Blockly.Signature.prototype.positionClosed_ = function() {
+  var metrics = this.targetWorkspaceMetrics_();
+  if (!metrics) {
+    // Hidden components will return null.
+    return;
+  }
+  
+  var edgeHeight = 10 - this.CORNER_RADIUS;
+
+  var path = ['M ' + '0,0'];
+  path.push('v', edgeHeight);
+  path.push('a', this.CORNER_RADIUS, this.CORNER_RADIUS, 0, 0,
+            0,
+            this.CORNER_RADIUS,
+            this.CORNER_RADIUS);
+  path.push('h', Math.max(0, metrics.viewWidth - this.CORNER_RADIUS * 2));
+  path.push('a', this.CORNER_RADIUS, this.CORNER_RADIUS, 0, 0,
+            0,
+            this.CORNER_RADIUS,
+            -this.CORNER_RADIUS);
+  path.push('v', -edgeHeight);
+  path.push('z');
+  this.svgBackgroundHidden_.setAttribute('d', path.join(' '));
+
+  var y = metrics.absoluteTop;
+
+  this.svgGroup_.setAttribute('transform',
+                              'translate(' + metrics.absoluteLeft + ',' + y + ')');
+};
+
+
 /**
  * Initializes the signature.
  * @param {!Blockly.Workspace} workspace The workspace in which to create new
@@ -198,8 +238,7 @@ Blockly.Signature.prototype.setMetrics = function(xRatio) {
  *     regarding the signature's target workspace.
  * @param {boolean} withScrollbar True if a scrollbar should be displayed.
  */
-Blockly.Signature.prototype.init =
-    function(workspace, workspaceMetrics, withScrollbar) {
+Blockly.Signature.prototype.init = function(workspace, workspaceMetrics, withScrollbar) {
   this.targetWorkspace_ = workspace;
   this.targetWorkspaceMetrics_ = workspaceMetrics;
   // Add scrollbar.
@@ -209,9 +248,9 @@ Blockly.Signature.prototype.init =
         function() {return signature.getMetrics();},
         function(ratio) {return signature.setMetrics(ratio);},
         true, false); // Horizontal, not vertical
-  }
+  }      
 
-  this.hide();
+  this.close();
 
   // If the document resizes, reposition the signature.
   this.onResizeWrapper_ = Blockly.bindEvent_(window,
@@ -226,9 +265,14 @@ Blockly.Signature.prototype.init =
  * @private
  */
 Blockly.Signature.prototype.position_ = function() {
-  if (!this.isVisible()) {
-    return;
+  if (!this.isOpen()) {
+    this.positionClosed_();
+  } else {
+    this.positionOpen_();
   }
+};
+
+Blockly.Signature.prototype.positionOpen_ = function() {
   var metrics = this.targetWorkspaceMetrics_();
   if (!metrics) {
     // Hidden components will return null.
@@ -239,14 +283,14 @@ Blockly.Signature.prototype.position_ = function() {
   var path = ['M ' + '0,0'];
   path.push('v', edgeHeight);
   path.push('a', this.CORNER_RADIUS, this.CORNER_RADIUS, 0, 0,
-       0,
-       this.CORNER_RADIUS,
-       this.CORNER_RADIUS);
+            0,
+            this.CORNER_RADIUS,
+            this.CORNER_RADIUS);
   path.push('h', Math.max(0, metrics.viewWidth - this.CORNER_RADIUS * 2));
   path.push('a', this.CORNER_RADIUS, this.CORNER_RADIUS, 0, 0,
-       0,
-       this.CORNER_RADIUS,
-       -this.CORNER_RADIUS);
+            0,
+            this.CORNER_RADIUS,
+            -this.CORNER_RADIUS);
   path.push('v', -edgeHeight);
   path.push('z');
   this.svgBackground_.setAttribute('d', path.join(' '));
@@ -254,7 +298,7 @@ Blockly.Signature.prototype.position_ = function() {
   var y = metrics.absoluteTop;
 
   this.svgGroup_.setAttribute('transform',
-      'translate(' + metrics.absoluteLeft + ',' + y + ')');
+                              'translate(' + metrics.absoluteLeft + ',' + y + ')');
 
   // Record the height for Blockly.Signature.getMetrics.
   this.width_ = metrics.viewWidth;
@@ -264,18 +308,26 @@ Blockly.Signature.prototype.position_ = function() {
  * Is the signature visible?
  * @return {boolean} True if visible.
  */
-Blockly.Signature.prototype.isVisible = function() {
-  return this.svgGroup_.style.display == 'block';
+Blockly.Signature.prototype.isOpen = function() {
+  return this.svgOpenGroup_.style.display == 'block';
 };
 
 /**
- * Hide and empty the signature.
+ * Close and empty the signature.
  */
-Blockly.Signature.prototype.hide = function() {
-  if (!this.isVisible()) {
+Blockly.Signature.prototype.close = function() {
+  if (!this.isOpen()) {
     return;
   }
-  this.svgGroup_.style.display = 'none';
+
+  if(this.closeWrapper_) {
+    Blockly.unbindEvent_(this.closeWrapper_);
+    this.closeWrapper_ = null;
+  }
+
+  this.svgOpenGroup_.style.display = 'none';
+  this.svgClosedGroup_.style.display = 'block';
+  
   // Delete all the blocks.
   var blocks = this.workspace_.getTopBlocks(false);
   for (var x = 0, block; block = blocks[x]; x++) {
@@ -287,17 +339,28 @@ Blockly.Signature.prototype.hide = function() {
     goog.dom.removeNode(rect);
   }
   this.buttons_.splice(0);
+
+  if(this.openGroupTextNodes_) {
+    goog.array.forEach(this.openGroupTextNodes_, goog.dom.removeNode);
+    this.openGroupTextNodes_ = null;
+  }
+
+
+  this.positionClosed_();
+  this.openWrapper_ = Blockly.bindEvent_(this.svgBackgroundHidden_, 'mousedown', this, this.open);
+
 };
 
 Blockly.Signature.prototype.makeTextAt = function(text, cursorX, margin) {
-  var funTitle = Blockly.createSvgElement('text', {
+  var textElem = Blockly.createSvgElement('text', {
     'class': 'blocklyText blocklySignatureText',
     'x': cursorX,
     'y': margin + Blockly.BlockSvg.TAB_HEIGHT + Blockly.BlockSvg.MIN_BLOCK_Y
-  }, this.svgGroup_);
-  var funTitleText = document.createTextNode(text);
-  goog.dom.appendChild(funTitle, funTitleText);
-  return funTitle;
+  }, this.svgOpenGroup_);
+  var textNode = document.createTextNode(text);
+  goog.dom.appendChild(textElem, textNode);
+  this.openGroupTextNodes_.push(textElem);
+  return textElem;
 };
 
 Blockly.Signature.prototype.advanceCursor = function(text, margin) {
@@ -322,10 +385,16 @@ Blockly.Signature.prototype.markChildrenInSignature = function(block) {
  * @param {!Array|string} xmlList List of blocks to show.
  *     Variables and procedures have a custom set of blocks.
  */
-Blockly.Signature.prototype.show = function() {
-  this.hide();
+Blockly.Signature.prototype.open = function() {
+  this.close();
+  this.openGroupTextNodes_ = [];
+  if(this.openWrapper_) {
+    Blockly.unbindEvent_(this.openWrapper_);
+    this.openWrapper_ = null;
+  }
   var margin = this.CORNER_RADIUS;
-  this.svgGroup_.style.display = 'block';
+  this.svgOpenGroup_.style.display = 'block';
+  this.svgClosedGroup_.style.display = 'none';
 
   // Create the blocks to be shown in this signature.
   var blocks = [];
@@ -345,6 +414,7 @@ Blockly.Signature.prototype.show = function() {
   //var funTitle = this.makeTextAt(Blockly.FunName, cursorX, margin);
   //cursorX += this.advanceCursor(funTitle, margin);
 
+  // Function application block
   var appBlock = new Blockly.Block(this.workspace_, this.appBlockName_);
   appBlock.initSvg();
 
@@ -356,9 +426,10 @@ Blockly.Signature.prototype.show = function() {
   signatureHeight = Math.max(signatureHeight, bBox.height);
   cursorX += bBox.width;// + gaps[i];
   Blockly.bindEvent_(appBlock.getSvgRoot(), 'mousedown', null,
-                     Blockly.Signature.createBlockFunc_(this,block));
+                     Blockly.Signature.createBlockFunc_(this, appBlock));
 
 
+  // Now consumes and arguments
   var consumes = this.makeTextAt('consumes', cursorX, margin);
   cursorX += this.advanceCursor(consumes, margin);
 
@@ -382,6 +453,7 @@ Blockly.Signature.prototype.show = function() {
 
   }
 
+  // Now produces and type name block
   var produces = this.makeTextAt('produces', cursorX, margin);
   cursorX += this.advanceCursor(produces, margin);
 
@@ -396,6 +468,24 @@ Blockly.Signature.prototype.show = function() {
   block.moveBy(cursorX, y);
   signatureHeight = Math.max(signatureHeight, bBox.height);
   cursorX += bBox.width;// + gaps[i];
+
+  var comma = this.makeTextAt(',', cursorX, margin);
+  cursorX += this.advanceCursor(comma, margin);
+
+  var exampleBlock = Blockly.Ray_.Blocks.exampleBlock();
+  block = new Blockly.Block(this.workspace_, exampleBlock);
+  block.initSvg();
+  blocks.push(block);
+
+  this.markChildrenInSignature(block);
+  block.render();
+  var bBox = block.getSvgRoot().getBBox();
+  var y = margin + Blockly.BlockSvg.TAB_HEIGHT;
+  block.moveBy(cursorX, y);
+  signatureHeight = Math.max(signatureHeight, bBox.height);
+  cursorX += bBox.width;// + gaps[i];
+  Blockly.bindEvent_(block.getSvgRoot(), 'mousedown', null,
+                     Blockly.Signature.createBlockFunc_(this, block));
 
   signatureHeight += margin + Blockly.BlockSvg.TAB_HEIGHT + margin / 2 +
                      Blockly.Scrollbar.scrollbarThickness;
@@ -425,6 +515,9 @@ Blockly.Signature.prototype.show = function() {
 
   // Fire a resize event to update the signature's scrollbar.
   Blockly.fireUiEvent(window, 'resize');
+
+  this.closeWrapper_ = Blockly.bindEvent_(this.svgBackground_, 'mousedown', this, this.close);
+
 };
 
 /**
@@ -457,7 +550,7 @@ Blockly.Signature.createBlockFunc_ = function(signature, originBlock) {
     block.moveBy(xyOld.x - xyNew.x, xyOld.y - xyNew.y);
     block.render();
     if (signature.autoClose) {
-      signature.hide();
+      signature.close();
     } else {
       signature.filterForCapacity_();
     }

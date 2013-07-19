@@ -68,6 +68,7 @@ Blocks.App = 10;
 Blocks.Argument = 11;
 Blocks.And = 12;
 Blocks.Or = 13;
+Blocks.Example = 14;
 
 Ray.Globals.Priorities = {};
 var Priorities = Ray.Globals.Priorities;

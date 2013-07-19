@@ -169,6 +169,9 @@ Ray.Shared.typecheckBlock = function(block) {
 };
 
 Ray.Shared.getBlockPrototype = function(Blockly, prototypeName) {
+  if(prototypeName === 'example') {
+    return Ray.Blocks.exampleBlock();
+  }
   var prototype = null;
   if(Blockly.FunDefBlocks && Blockly.FunDefBlocks[prototypeName]) {
     prototype = Blockly.FunDefBlocks[prototypeName];

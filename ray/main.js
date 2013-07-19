@@ -181,9 +181,25 @@ Ray.Main.getMainExpressionBlock = function() {
   }
 };
 
-Ray.Main.go = function() {
+Ray.Main.go = function(evaluateButton) {
   goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Main.bindFunDefBlockly);
-  return Ray.Main.evaluateBlockAndFormat(Ray.Main.getMainExpressionBlock());
+  var originalContent = evaluateButton.getContent();
+  var originalTooltip = evaluateButton.getTooltip();
+  evaluateButton.setContent('Computing... click to stop');
+  evaluateButton.setTooltip('Click to interrupt the current computation');
+  goog.dom.classes.add(evaluateButton.getContentElement(), 'halt-button');
+  var result = null;
+
+  try {
+    result = Ray.Main.evaluateBlockAndFormat(Ray.Main.getMainExpressionBlock());
+  } catch(e) {
+    result = e;
+  }
+
+  evaluateButton.setContent(originalContent);
+  evaluateButton.getTooltip(originalTooltip);
+  goog.dom.classes.remove(evaluateButton.getContentElement(), 'halt-button');
+  return result;
 };
 
 Ray.Main.bindFunDefBlockly = function(Blockly) {

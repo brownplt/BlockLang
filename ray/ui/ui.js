@@ -3,6 +3,9 @@ goog.provide('Ray.UI');
 
 goog.require('Ray.UI.FunDefDialog');
 
+goog.require('goog.ui.ControlRenderer');
+goog.require('goog.ui.FlatButtonRenderer');
+
 Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
 Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
 
@@ -54,3 +57,5 @@ Ray.UI.addFunDefWorkspaceTab = function(funName, tabbar) {
   tabbar.addChild(funDefTab, true);
   return funDefTab;
 };
+
+Ray.UI.EvaluateButtonRenderer = goog.ui.ControlRenderer.getCustomRenderer(goog.ui.FlatButtonRenderer, 'evaluate-button');

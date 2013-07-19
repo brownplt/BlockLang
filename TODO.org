@@ -144,7 +144,10 @@ then have it fill in the appropriate literal.
 - [X] When dragging blocks with rest arguments, the rest arguments
   revert to unknown color, they're fine if I add or remove arguments,
   but initially they do have this problem.
-
+- [X] Show the function signature inside the canvas as well, so that you
+  can drag arguments from the signature into the function body.
+- [X] Add blocks for test cases 
+- [X] Get rid of 'all' drawer
 
 * Remaining Tasks
 - [ ] Make it possible to rename function arguments.
@@ -152,8 +155,6 @@ then have it fill in the appropriate literal.
   function. 
 - [ ] Show the function signature inside the function definition dialog,
   maybe as the header. 
-- [ ] Show the function signature inside the canvas as well, so that you
-  can drag arguments from the signature into the function body.
 - [ ] Inside function definition dialog, you should be able to drag a name
   and type into the signature to add an argument.
 - [ ] Use full name of types. num -> number, str -> string, char -> character.
@@ -192,10 +193,13 @@ then have it fill in the appropriate literal.
   [ ] multiple blocks in function definition window.
 - [ ] Have function definition be modal, so they can appear.
   simultaneously with canvas. Do this instead-of/as-well-as tabbed interface.
-- [ ] Get rid of 'all' drawer
 - [ ] Figure out how to get the workspace to fit in the available
   space exactly.
 - [ ] Make drop targets simple rectangles
 - [ ] Build up support for vertical layouts, and convert 'if' and
   'cond' to use vertical layouts.
 - [ ] Main vertical scrollbar is broken.
+- [ ] Add interface element for testing
+- [ ] Add interface element to halt computation
+
+Set up halt button, test button

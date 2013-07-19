@@ -45,12 +45,12 @@ Ray.Blocks.userFunctionBlockName = function(name) {
 };
 
 Ray.Blocks.TypeColourTable = {};
-var base_types = goog.object.getKeys(Ray.Types.atomicTypes_);
-var hue_distance = 270 / base_types.length;
-var current_hue = 0;
-goog.array.forEach(base_types, function(ty) {
-  Ray.Blocks.TypeColourTable[ty] = current_hue;
-  current_hue += hue_distance;
+var baseTypes = goog.object.getKeys(Ray.Types.atomicTypes_);
+var hueDistance = 270 / baseTypes.length;
+var currentHue = 0;
+goog.array.forEach(baseTypes, function(ty) {
+  Ray.Blocks.TypeColourTable[ty] = currentHue;
+  currentHue += hueDistance;
 });
 
 Ray.Blocks.DEFAULT_BLOCK_COLOR = { R: 187, G: 187, B: 187 };
@@ -62,15 +62,15 @@ Ray.Blocks.getColour = function(type) {
     return Ray.Blocks.DEFAULT_BLOCK_COLOR;
   }
   var key = type.outputType_;
-  var c = Ray.Blocks.TypeColourTable[key];
-  if(goog.isDef(c)) {
-    var rgb = goog.color.hsvToRgb(c, Blockly.HSV_SATURATION, Blockly.HSV_VALUE * 256);
+  var colour = Ray.Blocks.TypeColourTable[key];
+  if(goog.isDef(colour)) {
+    var rgb = goog.color.hsvToRgb(colour, Blockly.HSV_SATURATION, Blockly.HSV_VALUE * 256);
     return { R: rgb[0], G: rgb[1], B: rgb[2] };
 
   } else if(key === 'list') {
-    var orig_c = Ray.Blocks.getColour(type.elementType);
-    if(orig_c.R) {
-      var new_c = goog.color.lighten([orig_c.R, orig_c.G, orig_c.B], Ray.Blocks.LIGHTEN_FACTOR);
+    var originalColour = Ray.Blocks.getColour(type.elementType);
+    if(originalColour.R) {
+      var new_c = goog.color.lighten([originalColour.R, originalColour.G, originalColour.B], Ray.Blocks.LIGHTEN_FACTOR);
       return { R: new_c[0], G: new_c[1], B: new_c[2] };
     } else {
       throw 'Element type color wasn\'t an R G B object';
@@ -100,41 +100,41 @@ Ray.Blocks.getOutputType = function(block) {
  * @param block
  */
 Ray.Blocks.getInputTypes = function(block) {
-  var input_types = [];
+  var inputTypes = [];
   if(block.value_) {
     // If the block's value isn't a primitive or closure, then it shouldn't have any inputs
     var value = block.value_;
     if(!value.argSpec) {
-      return input_types;
+      return inputTypes;
     } else {
-      input_types = input_types.concat(Ray.Types.getAllArgumentTypes(value.argSpec.argsType));
+      inputTypes = inputTypes.concat(Ray.Types.getAllArgumentTypes(value.argSpec.argsType));
     }
   } else if(block.inputTypes_) {
-    input_types = input_types.concat(goog.array.clone(block.inputTypes_));
+    inputTypes = inputTypes.concat(goog.array.clone(block.inputTypes_));
   }
-  return input_types;
+  return inputTypes;
 };
 
 Ray.Blocks.getDrawers = function(block) {
   var drawers = [];
 
-  var output_type = Ray.Blocks.getOutputType(block);
-  var output_type_set = output_type.getAllBaseTypes();
+  var outputType = Ray.Blocks.getOutputType(block);
+  var outputTypes = outputType.getAllBaseTypes();
 
-  var input_type_list = goog.array.flatten(goog.array.map(Ray.Blocks.getInputTypes(block), function(type) {
+  var inputTypeList = goog.array.flatten(goog.array.map(Ray.Blocks.getInputTypes(block), function(type) {
     return type.getAllBaseTypes();
   }));
-  var input_type_set = [];
-  goog.array.forEach(input_type_list, function(type) {
-    if(!goog.array.contains(input_type_set, type)) {
-      input_type_set.push(type);
+  var inputTypeSet = [];
+  goog.array.forEach(inputTypeList, function(type) {
+    if(!goog.array.contains(inputTypeSet, type)) {
+      inputTypeSet.push(type);
     }
   });
 
-  goog.array.forEach(input_type_set, function(type) {
+  goog.array.forEach(inputTypeSet, function(type) {
     drawers.push(type + '_input');
   });
-  goog.array.forEach(output_type_set, function(type) {
+  goog.array.forEach(outputTypes, function(type) {
     drawers.push(type + '_output');
   });
   if(block.isUserFunction_) {
@@ -161,17 +161,17 @@ Ray.Blocks.getDrawers = function(block) {
  * @param {?boolean=} opt_includeArguments Should we include arguments blocks in this block directory?
  */
 Ray.Blocks.generateToolbox = function(blockDir, opt_includeArguments) {
-  var include_arguments = goog.isDef(opt_includeArguments) ? opt_includeArguments : true;
-  var toolbox_categories = goog.object.getKeys(blockDir);
-  toolbox_categories.sort();
+  var includeArguments = goog.isDef(opt_includeArguments) ? opt_includeArguments : true;
+  var toolboxCategories = goog.object.getKeys(blockDir);
+  toolboxCategories.sort();
   var toolbox = goog.dom.createDom('xml', {id: 'toolbox'});
-  goog.array.forEach(toolbox_categories, function(category) {
+  goog.array.forEach(toolboxCategories, function(category) {
     // Disabling these categories at the moment
     if(category === 'arguments' || category === 'all') {
       return;
     }
     // Don't display arguments if false is passed in as opt_includeArguments
-    if(category === 'arguments' && !include_arguments) {
+    if(category === 'arguments' && !includeArguments) {
       return;
     }
     // Otherwise, display category, even if it is empty!
@@ -200,13 +200,13 @@ Ray.Blocks.generateToolbox = function(blockDir, opt_includeArguments) {
 Ray.Blocks.addToBlockDir = function(blockDir, blockName, block) {
   var drawers = Ray.Blocks.getDrawers(block);
   goog.array.forEach(drawers, function(drawer) {
-    var end_index = drawer.search(/(input|output)/);
-    if(end_index < 0) {
+    var endIndex = drawer.search(/(input|output)/);
+    if(endIndex < 0) {
       blockDir[drawer].push(blockName);
     } else {
-      var in_or_out = drawer.substring(end_index);
-      var type = drawer.substring(0, end_index - 1);
-      blockDir[type][in_or_out].push(blockName);
+      var inOrOut = drawer.substring(endIndex);
+      var type = drawer.substring(0, endIndex - 1);
+      blockDir[type][inOrOut].push(blockName);
     }
   });
   blockDir['all'].push(blockName);
@@ -214,38 +214,38 @@ Ray.Blocks.addToBlockDir = function(blockDir, blockName, block) {
 };
 
 Ray.Blocks.emptyBlockDir = function() {
-  var block_dir  = {};
-  var base_types = goog.array.map(Ray.Types.getBaseTypes(), function(ty) {
+  var blockDir  = {};
+  var baseTypes = goog.array.map(Ray.Types.getBaseTypes(), function(ty) {
     return ty.key();
   });
-  goog.array.forEach(base_types, function(ty)   {
-    block_dir[ty] = {};
-    block_dir[ty]['input'] = [];
-    block_dir[ty]['output'] = [];
+  goog.array.forEach(baseTypes, function(ty)   {
+    blockDir[ty] = {};
+    blockDir[ty]['input'] = [];
+    blockDir[ty]['output'] = [];
   });
 
-  block_dir['forms'] = [];
-  block_dir['functions'] = [];
-  block_dir['arguments'] = [];
+  blockDir['forms'] = [];
+  blockDir['functions'] = [];
+  blockDir['arguments'] = [];
   // Not including all, as per Emmanuel's email, since it would allow students not to use type-based reasoning
   // I'm just leaving it out of the displayed toolbox, but still putting blocks in drawers
-  block_dir['all'] = [];
-  return block_dir;
+  blockDir['all'] = [];
+  return blockDir;
 };
 
 Ray.Blocks.generateBlockDir = function(blocks) {
-  var block_dir = Ray.Blocks.emptyBlockDir();
+  var blockDir = Ray.Blocks.emptyBlockDir();
 
   var block_names = goog.array.filter(goog.object.getKeys(blocks), function(name) {
-    var is_cond_cond = name.indexOf(Ray.Blocks.CONDITIONAL_PREFIX + 'cond_') === 0;
-    var is_rest_arg = name.indexOf(Ray.Blocks.REST_ARG_PREFIX) === 0;
-    return !(is_cond_cond || is_rest_arg);
+    var isCondCond = name.indexOf(Ray.Blocks.CONDITIONAL_PREFIX + 'cond_') === 0;
+    var isRestArg = name.indexOf(Ray.Blocks.REST_ARG_PREFIX) === 0;
+    return !(isCondCond || isRestArg);
   });
   goog.array.forEach(block_names, function(block_name) {
     var block = blocks[block_name];
-    Ray.Blocks.addToBlockDir(block_dir, block_name, block);
+    Ray.Blocks.addToBlockDir(blockDir, block_name, block);
   });
-  return block_dir;
+  return blockDir;
 
 };
 
@@ -264,3 +264,26 @@ Ray.Blocks.typeNameBlock = function(type) {
   };
   return typeBlock;
 };
+
+Ray.Blocks.exampleBlock = function() {
+  var exampleBlock = {};
+  exampleBlock.name_ = 'example';
+  exampleBlock.renderAsExpression_ = true;
+  exampleBlock.type = 'example';
+  exampleBlock.blockClass_ = Ray.Globals.Blocks.Example;
+  exampleBlock.preInit_ = function() {
+    if(this.outputConnection) {
+      this.outputConnection.dispose();
+      this.outputConnection = null;
+    }
+  };
+  exampleBlock.init = function() {
+    this.appendDummyInput()
+      .appendTitle('example:');
+    this.appendValueWithType('EXPR', new Ray.Types.Unknown());
+    this.appendDummyInput()
+      .appendTitle('evaluates to');
+    this.appendValueWithType('RESULT', new Ray.Types.Unknown());
+  };
+  return exampleBlock;
+}

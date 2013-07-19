@@ -32,7 +32,7 @@
         Create a new function
     </div>
     <div id="evaluate_expression_button"
-         class="goog-flat-button goog-inline-block"
+         class="evaluate-button goog-inline-block"
          title="Evaluate the program in the main workspace">
         Evaluate expression in Main Workspace
     </div>
@@ -74,7 +74,7 @@
         //dialog.addBlockly();
     });
 
-    var evaluateButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
+    var evaluateButton = new goog.ui.Button(undefined, Ray.UI.EvaluateButtonRenderer);
     evaluateButton.decorate(goog.dom.getElement('evaluate_expression_button'));
 
     var evaluationResults = goog.dom.getElement('evaluation_results');
@@ -82,7 +82,7 @@
     goog.dom.setTextContent(evaluationResults, 'Results of last evaluation...');
 
     goog.events.listen(evaluateButton, goog.ui.Component.EventType.ACTION, function(e) {
-        var result = Ray.Main.go();
+        var result = Ray.Main.go(evaluateButton);
         goog.dom.setTextContent(evaluationResults, result);
     });
 

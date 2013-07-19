@@ -43,7 +43,7 @@ Blockly.Css.inject = function() {
 };
 
 Blockly.Css.FONT_COLOR = '#000';
-Blockly.Css.SIGNATURE_BACKGROUND_COLOR = '#4C516D';
+Blockly.Css.SIGNATURE_BACKGROUND_COLOR = '#bbb';
 
 
 Blockly.Css.CONTENT = [
@@ -131,7 +131,7 @@ Blockly.Css.CONTENT = [
   '}',
   '.blocklySignatureText {',
   '  fill: #fff;',
-  '  font-size: 13pt;',
+  '  font-size: 12pt;',
   '}',
   '/*',
   ' * Don\'t allow users to select text.  It gets annoying when trying to',
