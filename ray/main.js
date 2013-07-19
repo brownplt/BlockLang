@@ -190,11 +190,11 @@ Ray.Main.go = function(evaluateButton) {
   goog.dom.classes.add(evaluateButton.getContentElement(), 'halt-button');
   var result = null;
 
-  try {
+  //try {
     result = Ray.Main.evaluateBlockAndFormat(Ray.Main.getMainExpressionBlock());
-  } catch(e) {
-    result = e;
-  }
+  //} catch(e) {
+  //  result = e;
+  //}
 
   evaluateButton.setContent(originalContent);
   evaluateButton.getTooltip(originalTooltip);

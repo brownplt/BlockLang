@@ -148,6 +148,7 @@ then have it fill in the appropriate literal.
   can drag arguments from the signature into the function body.
 - [X] Add blocks for test cases 
 - [X] Get rid of 'all' drawer
+- [X] Add interface element to halt computation
 
 * Remaining Tasks
 - [ ] Make it possible to rename function arguments.
@@ -200,6 +201,6 @@ then have it fill in the appropriate literal.
   'cond' to use vertical layouts.
 - [ ] Main vertical scrollbar is broken.
 - [ ] Add interface element for testing
-- [ ] Add interface element to halt computation
 
-Set up halt button, test button
+
+Set up halt button, test button!!!!!!

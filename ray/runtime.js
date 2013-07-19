@@ -317,7 +317,7 @@ var CharExpr = product(['c']);
 CharExpr.proto = {
   clone: clone_constructor,
   interp: function() {
-    return new R.Char(this.c);
+    return new R.Value.Char(this.c);
   },
   display: function() {
     return "'" + this.c + "'";
@@ -587,6 +587,7 @@ attachValueNode(Closure,'Closure',Closure.proto);
 attachValueNode(ArgumentSpec,'ArgumentSpec',ArgumentSpec.proto);
 attachValueNode(Arguments,'Arguments',Arguments.proto);
 attachValueNode(Str,'Str',Str.proto);
+attachValueNode(Char,'Char',Char.proto);
 
 Ray.Runtime.Expr = {};
 attachExprNode(PairExpr,'Pair',PairExpr.proto);
@@ -595,6 +596,7 @@ attachExprNode(NumExpr,'Num',NumExpr.proto);
 attachExprNode(BooleanExpr,'Boolean',BooleanExpr.proto);
 attachExprNode(PrimitiveExpr,'Primitive',PrimitiveExpr.proto);
 attachExprNode(StrExpr,'Str',StrExpr.proto);
+attachExprNode(CharExpr,'Char',CharExpr.proto);
 attachExprNode(Lambda,'Lambda',Lambda.proto);
 
 attachExprNode(Name,'Name',Name.proto);
