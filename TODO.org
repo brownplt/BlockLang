@@ -206,6 +206,27 @@ then have it fill in the appropriate literal.
 - [ ] Fix weird rendering issue with statement blocks.
 - [ ] Make it so functions are bound any time you edit any part of
   them
+- [ ] Make pasting happen at cursor, not just at location of copy
+- [ ] Connect example blocks to testing functionality
 
+I guess that maybe the scrollbar isn't broken, because it simply
+won't let me make the canvas larger than it already was.
+
+Put examples in 'forms'
+
+When you change a function and that causes type error, make the block
+that doesn't fit turn red or something, and then also have the
+workspaces which use that block turn red as well
+
+You could have definitions that have holes, be indicated with a hole
+icon that would make it clear that you have to finish filling it in.
+
+Double clicking is like using a repl, and is immediate evaluation,
+while running a program is the formal version which triggers tests to
+be run. (Even if you don't use something, all the tests should be run)
+
+Get function definition interface nailed down.
+
+** Alpha renaming, testing, editing arguments and function types ** 
 
 Set up halt button, test button!!!!!!

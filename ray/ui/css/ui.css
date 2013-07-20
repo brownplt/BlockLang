@@ -90,5 +90,8 @@ div.hidden_container {
   margin: 2px;
   padding: 2px;
   /* height: 15px; */
+}
 
+.invalid-state-message {
+    color: #f00;
 }

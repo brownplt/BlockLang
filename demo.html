@@ -55,8 +55,9 @@
     Ray.Shared.setRayInstance(r);
     Ray.Shared.setBlocks(blocks);
     Ray.Shared.attachToBlockly(Blockly);
-    var dialog = Ray.UI.FunDefDialog.makeFunDefDialog();
-    Ray.UI.FunDefDialog.testPopulateFunDefDialog_(dialog);
+    var dialog = new Ray.UI.FunDef.Dialog(goog.dom.getDomHelper(document.body));
+    dialog.createDom();
+    dialog.testPopulate_();
 
     var workspaceContent = goog.dom.getElement('workspace_content');
     var tabbar = new goog.ui.TabBar();
@@ -69,9 +70,7 @@
     createFunctionButton.decorate(goog.dom.getElement('create_function_button'));
     goog.events.listen(createFunctionButton, goog.ui.Component.EventType.ACTION, function(e) {
         dialog.setVisible(true);
-        Blockly.svgResize();
-        dialog.block.render();
-        //dialog.addBlockly();
+        dialog.updatePreviewAndValidate(e);
     });
 
     var evaluateButton = new goog.ui.Button(undefined, Ray.UI.EvaluateButtonRenderer);
@@ -87,7 +86,7 @@
     });
 
     goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
-        var funSpec = Ray.UI.FunDefDialog.getFunDefDialogValues(dialog);
+        var funSpec = dialog.getFunSpec();
         var results = Ray.Main.makeFunAppAndArgBlocks(r, funSpec);
         var funArgBlocks = results[0];
         var funArgBlockNames = goog.object.getKeys(funArgBlocks);

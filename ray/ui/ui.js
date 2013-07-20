@@ -1,7 +1,7 @@
 
 goog.provide('Ray.UI');
 
-goog.require('Ray.UI.FunDefDialog');
+goog.require('Ray.UI.FunDef');
 
 goog.require('goog.ui.ControlRenderer');
 goog.require('goog.ui.FlatButtonRenderer');
