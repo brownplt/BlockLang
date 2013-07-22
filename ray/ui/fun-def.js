@@ -49,6 +49,9 @@ Arg.prototype.setName = function(name) {
 Arg.prototype.setType = function(type) {
   this.type_ = type;
 };
+Arg.prototype.clone = function() {
+  return new Arg(this.name_, this.type_);
+};
 
 
 ///////// ArgList
@@ -59,7 +62,7 @@ var ArgList = function(args) {
    * @type {Array.<*>}
    * @private
    */
-  this.args_ = args ? goog.array.clone(args) : [];
+  this.args_ = args ? goog.array.map(args, function(arg) { return arg.clone(); }) : [];
 };
 ArgList.EventType = {
   REMOVE_ARG_EVENT: 'REMOVE_ARG'
@@ -194,7 +197,7 @@ ArgListContainer.prototype.createDom = function() {
     this.addChild(new ArgUI(arg), true);
   }, this);
 
-  var argAddButton = new Ray.UI.FunDef.makeButton_('+');
+  var argAddButton = Ray.UI.FunDef.makeButton_('+');
   this.argAddButton_ = argAddButton;
   argAddButton.render(containerDiv);
   goog.style.setInlineBlock(argAddButton.getContentElement());

@@ -229,4 +229,17 @@ Get function definition interface nailed down.
 
 ** Alpha renaming, testing, editing arguments and function types ** 
 
+X to remove argument
+
+Pre populate example block with function on left, and fill in the
+color for the hole on the right
+
+Have failed tests change color to red upon failure, and successful
+ones to turn green upon success, and then have a tooltip that
+explains what went wrong that is active over the whole area of the
+test block. 
+
+Also have the run button run the tests in a function's workspace when
+you have the function workspace visible.
+
 Set up halt button, test button!!!!!!
