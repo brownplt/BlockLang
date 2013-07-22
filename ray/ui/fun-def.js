@@ -252,13 +252,8 @@ Ray.UI.FunDef.Dialog = function(opt_domHelper) {
 goog.inherits(Ray.UI.FunDef.Dialog, goog.ui.Dialog);
 Ray.UI.FunDef.Dialog.prototype.createDom = function() {
   goog.base(this, 'createDom');
-  var dialogButtons = new goog.ui.Dialog.ButtonSet();
-  dialogButtons.set('create', 'Create Function');
-  dialogButtons.set('cancel', 'Cancel');
-  dialogButtons.setCancel('cancel');
-  dialogButtons.setDefault('create');
-  this.setButtonSet(dialogButtons);
-  this.setTitle("Define a new function");
+
+  this.asCreate();
 
   var elem = this.getContentElement();
 
@@ -311,6 +306,84 @@ Ray.UI.FunDef.Dialog.prototype.createDom = function() {
   this.blocklyContainer_ = blocklyContainer;
   return this;
 };
+
+Ray.UI.FunDef.Dialog.prototype.asCreate = function() {
+  if(this.getButtonSet().getButton('apply')) {
+    this.getHandler().unlisten(this.getButtonSet().getButton('apply') || null, goog.events.EventType.CLICK, this.onApplyChangesFun_);
+  }
+  if(this.getButtonSet().getButton('delete')) {
+    this.getHandler().unlisten(this.getButtonSet().getButton('delete') || null, goog.events.EventType.CLICK, this.onDeleteFun_);
+  }
+  var dialogButtons = new goog.ui.Dialog.ButtonSet();
+  dialogButtons.set('create', 'Create function');
+  dialogButtons.set('cancel', 'Cancel');
+  dialogButtons.setCancel('cancel');
+  dialogButtons.setDefault('create');
+  this.setButtonSet(dialogButtons);
+  this.setTitle("Define a new function");
+  if(this.onCreateFun_) {
+    this.getHandler().listen(this.getButtonSet().getButton('create'), goog.events.EventType.CLICK, this.onCreateFun_);
+  }
+
+};
+
+Ray.UI.FunDef.Dialog.prototype.asEdit = function() {
+  if(this.getButtonSet().getButton('create')) {
+    this.getHandler().unlisten(this.getButtonSet().getButton('create') || null, goog.events.EventType.CLICK, this.onCreateFun_);
+  }
+  var dialogButtons = new goog.ui.Dialog.ButtonSet();
+  dialogButtons.set('apply', 'Apply changes');
+  dialogButtons.set('delete', 'Delete this function');
+  dialogButtons.set('cancel', 'Cancel');
+  dialogButtons.setCancel('cancel');
+  dialogButtons.setDefault('apply');
+  this.setButtonSet(dialogButtons);
+  this.setTitle("Edit this function");
+  if(this.onApplyChangesFun_) {
+    this.getHandler().listen(this.getButtonSet().getButton('apply'), goog.events.EventType.CLICK, this.onApplyChangesFun_);
+  }
+  if(this.onDeleteFun_) {
+    this.getHandler().listen(this.getButtonSet().getButton('delete'), goog.events.EventType.CLICK, this.onDeleteFun_);
+  }
+
+};
+
+Ray.UI.FunDef.Dialog.prototype.onCreate = function(onCreateFun) {  
+  if(this.getButtonSet().getButton('create')) {
+    if(this.onCreateFun_) {
+      this.getHandler().unlisten(this.getButtonSet().getButton('create'), goog.events.EventType.CLICK, this.onCreateFun_);
+    }
+    this.onCreateFun_ = onCreateFun;
+    this.getHandler().listen(this.getButtonSet().getButton('create'), goog.events.EventType.CLICK, this.onCreateFun_);
+  } else { 
+    this.onCreateFun_ = onCreateFun;
+  }
+};
+
+Ray.UI.FunDef.Dialog.prototype.onApplyChanges = function(onApplyChangesFun) {
+  if(this.getButtonSet().getButton('apply')) {
+    if(this.onApplyChangesFun_) {
+      this.getHandler().unlisten(this.getButtonSet().getButton('apply'), goog.events.EventType.CLICK, this.onApplyChangesFun_);
+    }
+    this.onApplyChangesFun_ = onApplyChangesFun;
+    this.getHandler().listen(this.getButtonSet().getButton('apply'), goog.events.EventType.CLICK, this.onApplyChangesFun_);
+  } else {
+    this.onApplyChangesFun_ = onApplyChangesFun;
+  }
+};
+
+Ray.UI.FunDef.Dialog.prototype.onDelete = function(onDeleteFun) {
+  if(this.getButtonSet().getButton('delete')) {
+    if(this.onDeleteFun_) {
+      this.getHandler().unlisten(this.getButtonSet().getButton('delete'), goog.events.EventType.CLICK, this.onDeleteFun_);
+    }
+    this.onDeleteFun_ = onDeleteFun;
+    this.getHandler().listen(this.getButtonSet().getButton('delete'), goog.events.EventType.CLICK, this.onDeleteFun_);
+  } else {
+    this.onDeleteFun_ = onDeleteFun;
+  }
+};
+
 Ray.UI.FunDef.Dialog.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
   this.getHandler().listen(this.funName_.getContentElement(),
@@ -412,6 +485,7 @@ Ray.UI.FunDef.Dialog.prototype.isInvalid = function() {
 };
 Ray.UI.FunDef.Dialog.prototype.setVisible = function(visible) {
   goog.base(this, 'setVisible', visible);
+  this.updatePreviewAndValidate();
   if(visible) {
     Blockly.svgResize();
   }

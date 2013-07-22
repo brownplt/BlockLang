@@ -69,8 +69,9 @@
     var createFunctionButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
     createFunctionButton.decorate(goog.dom.getElement('create_function_button'));
     goog.events.listen(createFunctionButton, goog.ui.Component.EventType.ACTION, function(e) {
+        dialog.asCreate();
         dialog.setVisible(true);
-        dialog.updatePreviewAndValidate(e);
+
     });
 
     var evaluateButton = new goog.ui.Button(undefined, Ray.UI.EvaluateButtonRenderer);
@@ -85,7 +86,7 @@
         goog.dom.setTextContent(evaluationResults, result);
     });
 
-    goog.events.listen(dialog.getButtonSet().getButton('create'), goog.events.EventType.CLICK, function(e) {
+    dialog.onCreate(function(e) {
         var funSpec = dialog.getFunSpec();
         var results = Ray.Main.makeFunAppAndArgBlocks(r, funSpec);
         var funArgBlocks = results[0];

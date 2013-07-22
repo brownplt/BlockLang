@@ -71,6 +71,9 @@ Ray.UI.addFunDefWorkspaceTab = function(id, funName, tabbar) {
 
 Ray.UI.openFunDefEditor = function(Blockly) {
   var dialog = Ray.UI.dialog;
+  dialog.asEdit();
+  dialog.onApplyChanges(function(e) { console.log('\'Apply changes\' clicked!'); });
+  dialog.onDelete(function(e) { console.log('\'Delete\' clicked!'); });
   dialog.setFunSpec(Blockly.funSpec);
   dialog.setVisible(true);
 };
