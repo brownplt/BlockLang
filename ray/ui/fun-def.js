@@ -42,7 +42,7 @@ Arg.prototype.getName = function() {
 };
 Arg.prototype.getType = function() {
   return this.type_;
-}
+};
 Arg.prototype.setName = function(name) {
   this.name_ = name;
 };
@@ -566,8 +566,3 @@ Ray.UI.FunDef.makeDialog = function(opt_domHelper) {
   Ray.UI.dialog = dialog;
   return dialog;
 };
-
-/*
- * In the middle of figuring out why it is that text fields are broken again, so that changes I make in them aren't reflected in the preview.
- *
- */

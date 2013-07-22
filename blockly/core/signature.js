@@ -476,11 +476,18 @@ Blockly.Signature.prototype.open = function() {
 
   var exampleBlock = Blockly.Ray_.Blocks.exampleBlock();
   block = new Blockly.Block(this.workspace_, exampleBlock);
+  var exampleAppBlock = new Blockly.Block(this.workspace_, this.appBlockName_);
+  exampleAppBlock.initSvg();
+  exampleAppBlock.render();
+
   block.initSvg();
   blocks.push(block);
 
   this.markChildrenInSignature(block);
   block.render();
+
+  block.getInput('EXPR').connection.connect(exampleAppBlock.outputConnection);
+
   var bBox = block.getSvgRoot().getBBox();
   var y = margin + Blockly.BlockSvg.TAB_HEIGHT;
   block.moveBy(cursorX, y);
