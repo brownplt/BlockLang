@@ -53,5 +53,5 @@ goog.addDependency('../../../ray/test.js', ['Ray.Test'], ['Ray.JQuery', 'Ray.Lib
 goog.addDependency('../../../ray/typechecker.js', ['Ray.Typechecker'], ['Ray.Env', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types']);
 goog.addDependency('../../../ray/types.js', ['Ray.Types'], ['goog.array', 'goog.string']);
 goog.addDependency('../../../ray/ui/fun-def.js', ['Ray.UI.FunDef'], ['Blockly', 'Ray.Types', 'goog.array', 'goog.dom', 'goog.dom.query', 'goog.events', 'goog.events.EventType', 'goog.object', 'goog.style', 'goog.ui.Button', 'goog.ui.Container', 'goog.ui.ContainerRenderer', 'goog.ui.Control', 'goog.ui.CustomButtonRenderer', 'goog.ui.Dialog', 'goog.ui.Dialog.ButtonSet', 'goog.ui.FlatButtonRenderer', 'goog.ui.FlatMenuButtonRenderer', 'goog.ui.LabelInput', 'goog.ui.Option', 'goog.ui.Select', 'goog.ui.Tab']);
-goog.addDependency('../../../ray/ui/ui.js', ['Ray.UI'], ['Ray.UI.FunDef', 'goog.ui.ControlRenderer', 'goog.ui.FlatButtonRenderer']);
+goog.addDependency('../../../ray/ui/ui.js', ['Ray.UI'], ['Ray.UI.FunDef', 'goog.ui.Button', 'goog.ui.ControlRenderer', 'goog.ui.CustomButton', 'goog.ui.FlatButtonRenderer', 'goog.ui.LinkButtonRenderer']);
 goog.addDependency('../../../ray/util.js', ['Ray.Util'], ['goog.array', 'goog.object']);

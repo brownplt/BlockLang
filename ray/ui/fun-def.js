@@ -24,7 +24,14 @@ goog.require('goog.ui.Option');
 goog.require('goog.ui.Select');
 goog.require('goog.ui.Tab');
 
-/** @typedef {{type:*, name: string}} */
+
+Ray.UI.FunDef.CHANGE_EVENTS = [goog.events.EventType.PROPERTYCHANGE,
+                               goog.events.EventType.KEYUP,
+                               goog.events.EventType.INPUT,
+                               goog.events.EventType.PASTE];
+
+////////// Arg
+
 // Arg
 var Arg = function(name, type) {
   this.name_ = name || null;
@@ -42,6 +49,9 @@ Arg.prototype.setName = function(name) {
 Arg.prototype.setType = function(type) {
   this.type_ = type;
 };
+
+
+///////// ArgList
 
 // ArgList
 var ArgList = function(args) {
@@ -68,6 +78,8 @@ ArgList.prototype.removeArgAt = function(index) {
 ArgList.prototype.addArg = function(arg) {
   this.args_.push(arg);
 };
+
+///////// ArgUI
 
 // ArgUI
 var ArgUI = function(arg) {
@@ -99,11 +111,12 @@ ArgUI.prototype.createDom = function() {
   var argType = Ray.UI.FunDef.makeTypeSelector_();
   this.argType_ = argType;
 
+  if(this.arg_.getType()) {
+    Ray.UI.FunDef.setSelectedType(argType, this.arg_.getType());
+  }
 
-  argType.setSelectedIndex(0);
-  argType.setDefaultCaption('Pick a type for this argument');
+  argType.setDefaultCaption('pick a type...');
   this.addChild(argType, true);
-  this.arg_.setType(argType.getValue());
 
   goog.style.setInlineBlock(argType.getContentElement());
 
@@ -115,20 +128,17 @@ ArgUI.prototype.createDom = function() {
 };
 ArgUI.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
-  goog.events.listen(this.argRemoveButton_, goog.ui.Component.EventType.ACTION, function(e) {
+  this.getHandler().listen(this.argRemoveButton_, goog.ui.Component.EventType.ACTION, function(e) {
     this.dispatchEvent(ArgList.EventType.REMOVE_ARG_EVENT);
   }, true, this);
-  goog.events.listen(this.argName_.getContentElement(), [goog.events.EventType.PROPERTYCHANGE,
-                                     goog.events.EventType.KEYUP,
-                                     goog.events.EventType.INPUT,
-                                     goog.events.EventType.PASTE], function(e) {
+  this.getHandler().listen(this.argName_.getContentElement(), Ray.UI.FunDef.CHANGE_EVENTS, function(e) {
     this.arg_.setName(this.argName_.getValue());
-    goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
+    this.dispatchEvent(goog.ui.Component.EventType.CHANGE);
   }, false, this);
 
-  goog.events.listen(this.argType_, goog.ui.Component.EventType.CHANGE, function(e) {
+  this.getHandler().listen(this.argType_, goog.ui.Component.EventType.CHANGE, function(e) {
     this.arg_.setType(this.argType_.getValue());
-    goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
+    this.dispatchEvent(goog.ui.Component.EventType.CHANGE);
   }, false, this);
 };
 ArgUI.prototype.getName = function() {
@@ -152,6 +162,8 @@ ArgUI.prototype.updateArgNameLabelIndex = function() {
   var index = this.getParent().indexOfChild(this);
   this.argName_.setLabel('arg' + String(index));
 };
+
+////////// ArgListContainer
 
 // ArgListContainer
 var ArgListContainer = function(argList, opt_domHelper) {
@@ -190,17 +202,18 @@ ArgListContainer.prototype.createDom = function() {
 ArgListContainer.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
   this.forEachChild(function(child) {
-    goog.events.listen(child,
-                       ArgList.EventType.REMOVE_ARG_EVENT,
-                       this.onRemoveArg_, true, this);
-    goog.events.listen(
-      child,
-      goog.ui.Component.EventType.CHANGE,
-      function(e) {
-        goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
-      }, false, this);
+    this.getHandler().listen(child,
+                             ArgList.EventType.REMOVE_ARG_EVENT,
+                             this.onRemoveArg_, true, this);
+    this.getHandler().listen(child,
+                             goog.ui.Component.EventType.CHANGE,
+                             this.dispatchChange, false, this);
   }, this);
-  goog.events.listen(this.argAddButton_, goog.ui.Component.EventType.ACTION, this.addArg, true, this);
+  this.getHandler().listen(this.argAddButton_, goog.ui.Component.EventType.ACTION, this.addArg, true, this);
+};
+
+ArgListContainer.prototype.dispatchChange = function(e) {
+  this.dispatchEvent(goog.ui.Component.EventType.CHANGE);
 };
 
 ArgListContainer.prototype.addArg = function(e, arg) {
@@ -210,11 +223,9 @@ ArgListContainer.prototype.addArg = function(e, arg) {
   this.argList_.addArg(arg);
   var argUI = new ArgUI(arg);
   this.addChild(argUI, true);
-  goog.events.listen(argUI, ArgList.EventType.REMOVE_ARG_EVENT, this.onRemoveArg_, true, this);
-  goog.events.listen(argUI, goog.ui.Component.EventType.CHANGE, function(e) {
-    goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
-  }, false, this);
-  goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
+  this.getHandler().listen(argUI, ArgList.EventType.REMOVE_ARG_EVENT, this.onRemoveArg_, true, this);
+  this.getHandler().listen(argUI, goog.ui.Component.EventType.CHANGE, this.dispatchChange, false, this);
+  this.dispatchEvent(goog.ui.Component.EventType.CHANGE);
 };
 ArgListContainer.prototype.onRemoveArg_ = function(e) {
   e.stopPropagation();
@@ -223,7 +234,7 @@ ArgListContainer.prototype.onRemoveArg_ = function(e) {
   this.forEachChild(function(child) {
     child.updateArgNameLabelIndex();
   });
-  goog.events.dispatchEvent(this, goog.ui.Component.EventType.CHANGE);
+  this.dispatchEvent(goog.ui.Component.EventType.CHANGE);
 };
 ArgListContainer.prototype.getArgs = function() {
   var args = [];
@@ -232,6 +243,8 @@ ArgListContainer.prototype.getArgs = function() {
   });
   return args;
 };
+
+/////////// Ray.UI.FunDef.Dialog
 
 Ray.UI.FunDef.Dialog = function(opt_domHelper) {
   goog.base(this, null, true, opt_domHelper);
@@ -273,7 +286,9 @@ Ray.UI.FunDef.Dialog.prototype.createDom = function() {
   this.argListContainer_ = argListContainer;
   this.addChild(argListContainer, true);
 
-  goog.dom.append(elem, "This function produces:");
+  var producesStart = goog.dom.createTextNode("This function produces:");
+  this.producesStart_ = producesStart;
+  goog.dom.append(elem, producesStart);
   var returnType = Ray.UI.FunDef.makeTypeSelector_();
   this.returnType_ = returnType;
   returnType.setSelectedIndex(0);
@@ -298,19 +313,13 @@ Ray.UI.FunDef.Dialog.prototype.createDom = function() {
 };
 Ray.UI.FunDef.Dialog.prototype.enterDocument = function() {
   goog.base(this, 'enterDocument');
-
-  var updatePreviewAndValidate = goog.bind(this.updatePreviewAndValidate, this);
-
-  goog.events.listen(this.funName_.getContentElement(), [goog.events.EventType.PROPERTYCHANGE,
-                                                         goog.events.EventType.KEYUP,
-                                                         goog.events.EventType.INPUT,
-                                                         goog.events.EventType.PASTE],
-                     updatePreviewAndValidate);
-  goog.events.listen(this.argListContainer_, [goog.ui.Component.EventType.CHANGE],
-                     updatePreviewAndValidate);
-  goog.events.listen(this.returnType_, goog.ui.Component.EventType.CHANGE,
-                     updatePreviewAndValidate);
-
+  this.getHandler().listen(this.funName_.getContentElement(),
+                           Ray.UI.FunDef.CHANGE_EVENTS,
+                           this.updatePreviewAndValidate);
+  this.getHandler().listen(this.argListContainer_, goog.ui.Component.EventType.CHANGE,
+                           this.updatePreviewAndValidate);
+  this.getHandler().listen(this.returnType_, goog.ui.Component.EventType.CHANGE,
+                           this.updatePreviewAndValidate);
   Blockly.inject(this.blocklyContainer_, {
     'path': '../', 'readOnly': true
   });
@@ -377,15 +386,18 @@ Ray.UI.FunDef.Dialog.prototype.updatePreviewAndValidate = function(e) {
   this.block = block;
 };
 Ray.UI.FunDef.Dialog.prototype.isInvalid = function() {
-
   var funSpec = this.getFunSpec();
 
   var argNames = [];
   for(var i = 0; i < funSpec.args.length; i++) {
     var arg = funSpec.args[i];
+    var argType = arg.getType();
     var argName = arg.getName();
     if(!argName || argName.length === 0) {
       return 'all argument names must contain at least one character';
+    }
+    if(!argType) {
+      return 'all arguments must have a type';
     }
     if(goog.array.contains(argNames, arg.getName())) {
       return 'all arguments names must be distinct';
@@ -398,6 +410,13 @@ Ray.UI.FunDef.Dialog.prototype.isInvalid = function() {
   }
   return false;
 };
+Ray.UI.FunDef.Dialog.prototype.setVisible = function(visible) {
+  goog.base(this, 'setVisible', visible);
+  if(visible) {
+    Blockly.svgResize();
+  }
+};
+
 
 Ray.UI.FunDef.Dialog.prototype.testPopulate_ = function() {
   this.funName_.setValue('double_if');
@@ -422,6 +441,23 @@ Ray.UI.FunDef.Dialog.prototype.getFunSpec = function() {
   return {name: name, desc: desc, args: args, returnType: returnType};
 };
 
+Ray.UI.FunDef.Dialog.prototype.setFunSpec = function(funSpec) {
+  this.funName_.setValue(funSpec.name);
+  this.funDescription_.setValue(funSpec.desc);
+
+  var ix = this.indexOfChild(this.argListContainer_);
+  this.removeChild(this.argListContainer_, true);
+  this.getHandler().unlisten(this.argListContainer_, goog.ui.Component.EventType.CHANGE,
+                             this.updatePreviewAndValidate);
+
+  this.argListContainer_ = new ArgListContainer(new ArgList(funSpec.args));
+  this.addChildAt(this.argListContainer_, ix, false);
+  this.argListContainer_.renderBefore(this.producesStart_);
+  this.getHandler().listen(this.argListContainer_, goog.ui.Component.EventType.CHANGE,
+                           this.updatePreviewAndValidate);
+
+  Ray.UI.FunDef.setSelectedType(this.returnType_, funSpec.returnType);
+};
 
 Ray.UI.FunDef.makeTypeSelector_ = function() {
   var select = new goog.ui.Select(null, null, goog.ui.FlatMenuButtonRenderer.getInstance());
@@ -431,6 +467,30 @@ Ray.UI.FunDef.makeTypeSelector_ = function() {
   return select;
 };
 
+Ray.UI.FunDef.setSelectedType = function(typeSelector, type) {
+  var i = 0;
+  var item;
+  while(item = typeSelector.selectionModel_.getItemAt(i)) {
+    if (item && Ray.Types.areSameType(item.getValue(), type)) {
+      typeSelector.setSelectedItem(/** @type {goog.ui.MenuItem} */ (item));
+      return;
+    }
+    i++;
+  }
+  typeSelector.setSelectedItem(null);
+};
+
 Ray.UI.FunDef.makeButton_ = function(text) {
   return new goog.ui.Button(text, goog.ui.FlatButtonRenderer.getInstance());
 };
+
+Ray.UI.FunDef.makeDialog = function(opt_domHelper) {
+  var dialog =  new Ray.UI.FunDef.Dialog(opt_domHelper);
+  Ray.UI.dialog = dialog;
+  return dialog;
+};
+
+/*
+ * In the middle of figuring out why it is that text fields are broken again, so that changes I make in them aren't reflected in the preview.
+ *
+ */

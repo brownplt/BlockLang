@@ -46,19 +46,20 @@
             Ray.Shared.registerFunDefBlockly(Blockly);
             var funDefInfo = window.parent.funDefInfo_;
 
-            Blockly.FunDefBlocks = funDefInfo.funArgBlocks;
-            Blockly.FunAppBlock = funDefInfo.funAppBlock;
-            Blockly.FunName = funDefInfo.funName;
-            Blockly.FunBlockName = funDefInfo.funBlockName;
-            Blockly.FunArgBlockNames = funDefInfo.funArgBlockNames;
-            Blockly.FunSpec = funDefInfo.funSpec;
+            Blockly.funDefBlocks = funDefInfo.funArgBlocks;
+            Blockly.funAppBlock = funDefInfo.funAppBlock;
+            Blockly.funName = funDefInfo.funName;
+            Blockly.funBlockName = funDefInfo.funBlockName;
+            Blockly.funArgBlockNames = funDefInfo.funArgBlockNames;
+            Blockly.funSpec = funDefInfo.funSpec;
+            Blockly.funId = funDefInfo.funId;
 
 
             Blockly.inject(document.body,
                            {path: "../../blockly/", toolbox:
                                    Ray.Shared.getToolbox(true)});
 
-            var signature = new Blockly.Signature(Blockly.FunArgBlockNames, Blockly.FunBlockName);
+            var signature = new Blockly.Signature(Blockly.funArgBlockNames, Blockly.funBlockName);
 
             Blockly.mainWorkspace.signature_ = signature;
             var signatureSvg = signature.createDom();

@@ -45,6 +45,12 @@ Ray.Shared.registerFunDefBlockly = function(Blockly) {
   Ray.Shared.FunDefBlocklys.push(Blockly);
 };
 
+Ray.Shared.lookupFunDefBlockly = function(id) {
+  return goog.array.find(Ray.Shared.FunDefBlocklys, function(Blockly) {
+    return Blockly.funId === id;
+  });
+};
+
 Ray.Shared.setBlocks = function(blocks) {
   Ray.Shared.savedBlocks_ = blocks;
   Ray.Shared.blockDir_ = Ray.Blocks.generateBlockDir(blocks);
@@ -96,7 +102,7 @@ Ray.Shared.lookupInSharedBlockDir_ = function(key) {
 
 Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Blockly) {
   var allBlocks = [];
-  var funDefBlocks = Blockly.FunDefBlocks;
+  var funDefBlocks = Blockly.funDefBlocks;
   if(funDefBlocks) {
     var funDefDir = Ray.Blocks.generateBlockDir(funDefBlocks);
     var funDefCategory = Ray.Shared.lookupInBlockDir_(key, funDefDir);
@@ -173,8 +179,8 @@ Ray.Shared.getBlockPrototype = function(Blockly, prototypeName) {
     return Ray.Blocks.exampleBlock();
   }
   var prototype = null;
-  if(Blockly.FunDefBlocks && Blockly.FunDefBlocks[prototypeName]) {
-    prototype = Blockly.FunDefBlocks[prototypeName];
+  if(Blockly.funDefBlocks && Blockly.funDefBlocks[prototypeName]) {
+    prototype = Blockly.funDefBlocks[prototypeName];
   } else if(Ray.Shared.savedBlocks_[prototypeName]) {
     prototype = Ray.Shared.savedBlocks_[prototypeName];
   }

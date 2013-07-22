@@ -413,7 +413,7 @@ Blockly.Signature.prototype.open = function() {
   var signatureHeight = 0;
   var cursorX = margin + Blockly.BlockSvg.NOTCH_WIDTH;
 
-  //var funTitle = this.makeTextAt(Blockly.FunName, cursorX, margin);
+  //var funTitle = this.makeTextAt(Blockly.funName, cursorX, margin);
   //cursorX += this.advanceCursor(funTitle, margin);
 
   // Function application block
@@ -459,7 +459,7 @@ Blockly.Signature.prototype.open = function() {
   var produces = this.makeTextAt('produces', cursorX, margin);
   cursorX += this.advanceCursor(produces, margin);
 
-  var typeBlock = Blockly.Ray_.Blocks.typeNameBlock(Blockly.FunSpec.returnType);
+  var typeBlock = Blockly.Ray_.Blocks.typeNameBlock(Blockly.funSpec.returnType);
   block = new Blockly.Block(this.workspace_, typeBlock);
   block.initSvg();
 

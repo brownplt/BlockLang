@@ -1,0 +1,146 @@
+/*
+ * Copyright 2009 The Closure Library Authors. All Rights Reserved.
+ *
+ * Use of this source code is governed by the Apache License, Version 2.0.
+ * See the COPYING file for details.
+ */
+
+/*
+ * Styling for custom buttons rendered by goog.ui.CustomButtonRenderer.
+ *
+ * @author attila@google.com (Attila Bodis)
+ */
+
+.edit-button {
+  border: 0;
+  margin-left: 2px;
+  padding: 0;
+  vertical-align: middle;
+}
+
+/* Pseudo-rounded corners. */
+.edit-button-outer-box,
+.edit-button-inner-box {
+}
+
+.edit-button-outer-box {
+}
+
+.edit-button-inner-box {
+  /* By default in FF2, block elements inside a moz-inline-box are stacked
+   * horizontally next to each other.  This stops that weird behavior. */
+  -moz-box-orient: vertical;
+  white-space: nowrap; /* Prevents buttons from line breaking on android. */
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .edit-button-inner-box {
+  /* IE6 needs to have the box shifted to make the borders line up. */
+  left: -1px;
+}
+/* Pre-IE7 BiDi fixes. */
+* html .edit-button-rtl .edit-button-outer-box {
+  /* @noflip */ left: -1px;
+}
+* html .edit-button-rtl .edit-button-inner-box {
+  /* @noflip */ right: auto;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child+html .edit-button-inner-box {
+  /* IE7 needs to have the box shifted to make the borders line up. */
+  left: -1px;
+}
+/* IE7 BiDi fix. */
+*:first-child+html .edit-button-rtl .edit-button-inner-box {
+  /* @noflip */ left: 1px;
+}
+
+/* Safari-only hacks. */
+::root .edit-button,
+::root .edit-button-outer-box {
+  /* Required to make pseudo-rounded corners work on Safari. */
+  line-height: 0;
+}
+
+::root .edit-button-inner-box {
+  /* Required to make pseudo-rounded corners work on Safari. */
+  line-height: normal;
+}
+
+/* State: disabled. */
+.edit-button-disabled {
+  background-image: none !important;
+  opacity: 0.3;
+  -moz-opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+
+.edit-button-disabled .edit-button-outer-box,
+.edit-button-disabled .edit-button-inner-box {
+  color: #333 !important;
+  border-color: #999 !important;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .edit-button-disabled {
+  margin: 2px 1px !important;
+  padding: 0 1px !important;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child+html .edit-button-disabled {
+  margin: 2px 1px !important;
+  padding: 0 1px !important;
+}
+
+/* State: hover. */
+.edit-button-hover .edit-button-outer-box,
+.edit-button-hover .edit-button-inner-box {
+}
+
+/* State: active, checked. */
+.edit-button-active,
+.edit-button-checked {
+  background-color: #bbb;
+  background-position: bottom left;
+}
+
+/* State: focused. */
+.edit-button-focused .edit-button-outer-box,
+.edit-button-focused .edit-button-inner-box {
+  border-color: orange;
+}
+
+/* Pill (collapsed border) styles. */
+.edit-button-collapse-right,
+.edit-button-collapse-right .edit-button-outer-box,
+.edit-button-collapse-right .edit-button-inner-box {
+  margin-right: 0;
+}
+
+.edit-button-collapse-left,
+.edit-button-collapse-left .edit-button-outer-box,
+.edit-button-collapse-left .edit-button-inner-box {
+  margin-left: 0;
+}
+
+.edit-button-collapse-left .edit-button-inner-box  {
+  border-left: 1px solid #fff;
+}
+
+.edit-button-collapse-left.edit-button-checked
+.edit-button-inner-box {
+  border-left: 1px solid #ddd;
+}
+
+/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
+* html .edit-button-collapse-left .edit-button-inner-box {
+  left: 0;
+}
+
+/* IE7-only hack; ignored by all other browsers. */
+*:first-child+html .edit-button-collapse-left
+.edit-button-inner-box {
+  left: 0;
+}

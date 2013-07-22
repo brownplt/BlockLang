@@ -55,7 +55,7 @@
     Ray.Shared.setRayInstance(r);
     Ray.Shared.setBlocks(blocks);
     Ray.Shared.attachToBlockly(Blockly);
-    var dialog = new Ray.UI.FunDef.Dialog(goog.dom.getDomHelper(document.body));
+    var dialog = Ray.UI.FunDef.makeDialog(goog.dom.getDomHelper(document.body));
     dialog.createDom();
     dialog.testPopulate_();
 
@@ -94,13 +94,13 @@
         var funBlockName = results[2];
         Ray.Shared.addToSavedBlocks(funBlockName, funAppBlock);
 
-        var funDefWorkspace = Ray.UI.addFunDefWorkspaceDom(funSpec.name,
+        var funId = Ray.UI.getFunId();
+        var funDefWorkspace = Ray.UI.addFunDefWorkspaceDom(funId,
                                                            workspaceContent);
-        var funDefTab = Ray.UI.addFunDefWorkspaceTab(funSpec.name, tabbar);
-
-
+        var funDefTab = Ray.UI.addFunDefWorkspaceTab(funId, funSpec.name, tabbar);
 
         var funDefInfo = {
+            funId: funId,
             funArgBlocks: funArgBlocks,
             funAppBlock: funAppBlock,
             funName: funSpec.name,
@@ -117,7 +117,6 @@
     });
 
     goog.events.listen(tabbar, goog.ui.Component.EventType.SELECT, function(e) {
-        console.log('Hello');
         Ray.UI.showWorkspaceForTab(e.target, workspaceContent);
     });
 

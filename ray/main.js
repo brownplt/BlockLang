@@ -206,9 +206,9 @@ Ray.Main.bindFunDefBlockly = function(Blockly) {
   var r = Ray.Shared.Ray;
   var body_block = Ray.Main.getFunBodyBlock(Blockly);
   var body = Ray.Main.blockToCode(body_block);
-  var function_parts = Ray.Main.createFunArgSpec(r, Blockly.FunSpec, false);
+  var function_parts = Ray.Main.createFunArgSpec(r, Blockly.funSpec, false);
   var fn = r.Expr.Lambda(function_parts.argSpec, body, function_parts.returnType);
-  r.bindTopLevel(Blockly.FunName, fn);
+  r.bindTopLevel(Blockly.funName, fn);
 };
 
 Ray.Main.getFunBlockName = function(name) {
