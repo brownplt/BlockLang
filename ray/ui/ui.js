@@ -3,6 +3,9 @@ goog.provide('Ray.UI');
 
 goog.require('Ray.UI.FunDef');
 
+goog.require('goog.array');
+goog.require('goog.dom');
+goog.require('goog.dom.classes');
 goog.require('goog.ui.ControlRenderer');
 goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.FlatButtonRenderer');
@@ -12,6 +15,18 @@ goog.require('goog.ui.LinkButtonRenderer');
 Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
 Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
 
+
+Ray.UI.functionDefinitionDom = function(id) {
+  var iframe = goog.dom.getElementById('blockly_function_definition_' + String(id));
+};
+
+Ray.UI.isDisplayedContainer = function(workspace) {
+  return goog.dom.classes.has(goog.dom.getParentElement(workspace), 'container');
+};
+
+Ray.UI.mainDom = function() {
+  return goog.dom.getElementById('blockly_main');
+}
 
 Ray.UI.switchDisplayedWorkspace = function(from, to) {
   goog.dom.classes.swap(goog.dom.getParentElement(from),
@@ -61,19 +76,38 @@ Ray.UI.addFunDefWorkspaceTab = function(id, funName, tabbar) {
   funDefTab.workspaceId_ = 'blockly_function_definition_' + String(id);
   tabbar.addChild(funDefTab, true);
 
+  var Blockly = Ray.Shared.lookupFunDefBlockly(id);
+  Blockly.funDefTab = funDefTab;
+
   goog.events.listen(button.getElement(), goog.events.EventType.CLICK, function(e) {
     console.log('hello');
-    var Blockly = Ray.Shared.lookupFunDefBlockly(id);
     Ray.UI.openFunDefEditor(Blockly);
   });
   return funDefTab;
+};
+
+Ray.UI.removeFunDef = function(id, funDefTab) {
+  var tabbar = funDefTab.getParent();
+  tabbar.removeChild(funDefTab, true);
+  funDefTab.dispose();
+
+  var funDefWorkspace = Ray.UI.functionDefinitionDom(id);
+  if(Ray.UI.isDisplayedContainer(funDefWorkspace)) {
+    Ray.UI.switchDisplayedWorkspace(funDefWorkspace, Ray.UI.mainDom());
+  }
+
+  goog.dom.removeNode(goog.dom.getParentElement(funDefWorkspace));
+
 };
 
 Ray.UI.openFunDefEditor = function(Blockly) {
   var dialog = Ray.UI.dialog;
   dialog.asEdit();
   dialog.onApplyChanges(function(e) { console.log('\'Apply changes\' clicked!'); });
-  dialog.onDelete(function(e) { console.log('\'Delete\' clicked!'); });
+  dialog.onDelete(function(e) {
+    console.log('\'Delete\' clicked!');
+    Ray.UI.removeFunDef(Blockly.funId, Blockly.funDefTab);
+  });
   dialog.setFunSpec(Blockly.funSpec);
   dialog.setVisible(true);
 };

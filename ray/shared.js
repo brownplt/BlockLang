@@ -152,6 +152,43 @@ Ray.Shared.precedesOtherBlock_ = function(block1, block2) {
   }
 };
 
+Ray.Shared.funBlockInstanceDB = {};
+
+
+Ray.Shared.addArgToDB = function(block) {
+  var funId = block.funId_;
+  if(!goog.isDef(Ray.Shared.funBlockInstanceDB[funId])) {
+    Ray.Shared.funBlockInstanceDB[funId] = {'app': [], 'args': []};
+  }
+  var instanceDB = Ray.Shared.funBlockInstanceDB[funId];
+  instanceDB.args.push(block);
+};
+
+Ray.Shared.addAppToDB = function(block) {
+  var funId = block.funId_;
+  if(!goog.isDef(Ray.Shared.funBlockInstanceDB[funId])) {
+    Ray.Shared.funBlockInstanceDB[funId] = {'app': [], 'args': []};
+  }
+  var instanceDB = Ray.Shared.funBlockInstanceDB[funId];
+  instanceDB.app.push(block);
+};
+
+Ray.Shared.getInstanceDBForFunId = function(funId) {
+  return Ray.Shared.funBlockInstanceDB[funId] || null;
+};
+
+Ray.Shared.removeArgFromDB = function(block) {
+  var funId = block.funId_;
+  var instanceDB = Ray.Shared.funBlockInstanceDB[funId];
+  goog.array.remove(instanceDB.arg, block);
+};
+
+Ray.Shared.removeAppFromDB = function(block) {
+  var funId = block.funId_;
+  var instanceDB = Ray.Shared.funBlockInstanceDB[funId];
+  goog.array.remove(instanceDB.app, block);
+};
+
 Ray.Shared.getTypeColour = function(type) {
   return Ray.Blocks.getColour(type);
 };

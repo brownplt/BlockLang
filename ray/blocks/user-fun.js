@@ -26,6 +26,13 @@ var ArgumentBlock = function(name, type, funId, argIx) {
   this.renderAsExpression_ = true;
   this.blockClass_ = Blocks.Argument;
   this.priority_ = Priorities.ARGUMENT;
+  this.preInit_ = function() {
+    this.setOutputType(this.outputType_);
+    this.Blockly.Ray_.Shared.addArgToDB(this);
+  };
+  this.postDispose_ = function() {
+    this.Blockly.Ray_.Shared.removeArgFromDB(this);
+  };
   this.init = function() {
     this.makeTitleRow(this.name_);
   };
@@ -58,6 +65,13 @@ Ray.Blocks.UserFun.generateAppBlock = function(name, value, funId) {
   var arity = argSpec.positionalArgs.length;
 
   block = new UserFunctionBlock(name, value, funId);
+  block.preInit_ = function() {
+    this.setOutputType(this.outputType_);
+    this.Blockly.Ray_.Shared.addAppToDB(this);
+  };
+  block.postDispose_ = function() {
+    this.Blockly.Ray_.Shared.removeAppFromDB(this);
+  };
   block.init = function() {
     this.makeTitleRow(name);
     for(var i = 0; i < arity; i++) {
@@ -65,6 +79,7 @@ Ray.Blocks.UserFun.generateAppBlock = function(name, value, funId) {
                                argSpec.argsType.positionalArgTypes.list[i]);
     }
   };
+
   return block;
 };
 

@@ -90,28 +90,22 @@
         var funSpec = dialog.getFunSpec();
         funSpec.funId = Ray.UI.getFunId();
         var funBlocks = Ray.Main.makeFunAppAndArgBlocks(r, funSpec);
-        var funArgBlock = funBlocks.args;
+        var funArgBlocks = funBlocks.args;
         var funAppBlock = funBlocks.app;
         Ray.Shared.addToSavedBlocks(funAppBlock);
 
-
-        var funDefWorkspace = Ray.UI.addFunDefWorkspaceDom(funSpec.funId,
-                                                           workspaceContent);
-        var funDefTab = Ray.UI.addFunDefWorkspaceTab(funSpec.funId, funSpec.name, tabbar);
-
+        var funDefWorkspace = Ray.UI.addFunDefWorkspaceDom(funSpec.funId, workspaceContent);
         var funDefInfo = {
             funId: funSpec.funId,
-            funArgBlockProtos: funArgBlock,
+            funArgBlockProtos: funArgBlocks,
             funAppBlockProto: funAppBlock,
             funName: funSpec.name,
             funSpec: funSpec
         };
-
         Ray.Main.loadFunDefBlockly(funDefWorkspace,
-                                   funDefInfo);
+                                   funDefInfo, tabbar, workspaceContent);
 
-        tabbar.setSelectedTab(funDefTab);
-        Ray.UI.showWorkspaceForTab(funDefTab, workspaceContent);
+        // We will create the tab and load it from the iframe
     });
 
     goog.events.listen(tabbar, goog.ui.Component.EventType.SELECT, function(e) {

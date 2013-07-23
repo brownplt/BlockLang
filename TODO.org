@@ -248,3 +248,8 @@ Because the flyout and signature create new blocks by going through
 XML (block->xml->block), I need to have all the prototype names
 registered and available for lookup.
 
+Ok, in order to register tab with the Blockly, I need to wait until
+the Blockly is registered with Ray.Shared, so I need to move all the
+tab creation stuff to inside fun-def-blockly.html or something like
+that. This is way more involved than I thought it would
+be. Basically the problem is setting everything up to communicate correctly.

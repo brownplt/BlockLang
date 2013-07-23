@@ -44,7 +44,10 @@
             var Ray = window.parent.Ray;
             Ray.Shared.attachToBlockly(Blockly);
             Ray.Shared.registerFunDefBlockly(Blockly);
-            var funDefInfo = window.parent.funDefInfo_;
+            var funDefInfo = window.parent._funDefInfo;
+
+            var workspaceContent = window.parent._workspaceContent;
+            var tabbar = window.parent._tabbar;
 
             Blockly.funArgBlockProtos = funDefInfo.funArgBlockProtos;
             Blockly.funAppBlockProto = funDefInfo.funAppBlockProto;
@@ -66,6 +69,9 @@
             goog.dom.insertSiblingAfter(signatureSvg, Blockly.mainWorkspace.getBubbleCanvas());
             Blockly.mainWorkspace.signature_.open();
 
+            var funDefTab = Ray.UI.addFunDefWorkspaceTab(Blockly.funSpec.funId, Blockly.funSpec.name, tabbar);
+            tabbar.setSelectedTab(funDefTab);
+            Ray.UI.showWorkspaceForTab(funDefTab, workspaceContent);
         }
     </script>
 </head>

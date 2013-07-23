@@ -65,9 +65,13 @@ Ray.Main.loadMainBlockly = function(iframe) {
  *
  * @param {HTMLIFrameElement} iframe
  * @param {Object} funDefInfo
+ * @param {goog.ui.TabBar} tabbar
+ * @param {Element} workspaceContent
  */
-Ray.Main.loadFunDefBlockly = function(iframe, funDefInfo) {
-  window.funDefInfo_ = funDefInfo;
+Ray.Main.loadFunDefBlockly = function(iframe, funDefInfo, tabbar, workspaceContent) {
+  window._funDefInfo = funDefInfo;
+  window._workspaceContent = workspaceContent;
+  window._tabbar = tabbar;
   goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'fun_def_blockly.html'});
 };
 
