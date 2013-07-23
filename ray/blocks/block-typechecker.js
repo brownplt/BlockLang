@@ -191,12 +191,13 @@ var typecheckBlockExpr = function(block, type, typeEnv) {
       break;
 
     case Blocks.Argument:
-      outputType = block.outputType_;
+      outputType = block.getOutputType();
       break;
 
     default:
       // Don't actually typecheck when we don't have a block with a known class
-      outputType = block.outputType_;
+      // We can get the current type for the block, if somehow something more specific has been inferred.
+      outputType = block.getOutputType(true);
       break;
   }
 

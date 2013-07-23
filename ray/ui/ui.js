@@ -103,7 +103,11 @@ Ray.UI.removeFunDef = function(id, funDefTab) {
 Ray.UI.openFunDefEditor = function(Blockly) {
   var dialog = Ray.UI.dialog;
   dialog.asEdit();
-  dialog.onApplyChanges(function(e) { console.log('\'Apply changes\' clicked!'); });
+  dialog.onApplyChanges(function(e) {
+    console.log('\'Apply changes\' clicked!');
+    var funSpec = this.getFunSpec();
+    Ray.Shared.applyFunDefChanges(Blockly.funId, funSpec);
+  });
   dialog.onDelete(function(e) {
     console.log('\'Delete\' clicked!');
     Ray.UI.removeFunDef(Blockly.funId, Blockly.funDefTab);

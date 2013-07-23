@@ -252,4 +252,20 @@ Ok, in order to register tab with the Blockly, I need to wait until
 the Blockly is registered with Ray.Shared, so I need to move all the
 tab creation stuff to inside fun-def-blockly.html or something like
 that. This is way more involved than I thought it would
-be. Basically the problem is setting everything up to communicate correctly.
+be. Basically the problem is setting everything up to communicate
+correctly.
+
+I can't get rid of block.value_ since it is used by the generators,
+but I should probably do a more fine-grained dispatch on block type,
+and generate according to that. Oops, it also is used by the
+block-typechecker as well. 
+
+* Blocks have an outputType field in two different places.
+1. a this.outputType_ field, which is used to set the
+   outputConnection's output type,
+2. Which is the 2nd type. this.outputConnection.outputType_
+
+I'm going to simplify this by removing the block outputType field,
+and renaming it colourType, and just using for blocks that don't have
+an output connection, to determine their colour.
+

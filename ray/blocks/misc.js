@@ -255,12 +255,12 @@ Ray.Blocks.generateBlockDirectory = function(blocks) {
 
 Ray.Blocks.typeNameBlock = function(type) {
   var typeBlock = {};
+  typeBlock.colourType_ = type;
   typeBlock.preInit_ = function() {
     if(this.outputConnection) {
       this.outputConnection.dispose();
       this.outputConnection = null;
     }
-    this.outputType_ = type;
   };
   typeBlock.init = function() {
     this.appendDummyInput()

@@ -73,7 +73,7 @@ Ray.Blocks.UserFun.generateAppBlock = function(name, value, funId) {
     this.Blockly.Ray_.Shared.removeAppFromDB(this);
   };
   block.init = function() {
-    this.makeTitleRow(name);
+    this.makeTitleRow(this.name_);
     for(var i = 0; i < arity; i++) {
       this.appendValueWithType(argSpec.positionalArgs[i],
                                argSpec.argsType.positionalArgTypes.list[i]);

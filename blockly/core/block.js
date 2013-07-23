@@ -113,6 +113,7 @@ Blockly.Block = function(workspace, proto) {
     this.makeRestArgContainer();
   } else {
     this.setOutputType(this.outputType_);
+    this.outputType_ = null;
   }
 
   // Call an initialization function, if it exists.
@@ -999,9 +1000,9 @@ Blockly.Block.prototype.getColour = function() {
   if(goog.isDef(this.colourHue_)) {
     return this.colourHue_;
   } else if(this.outputConnection) {
-    return Blockly.Ray_.Shared.getTypeColour(this.outputConnection.getType());
+    return Blockly.Ray_.Shared.getTypeColour(this.getOutputType());
   } else {
-    return Blockly.Ray_.Shared.getTypeColour(this.outputType_);
+    return Blockly.Ray_.Shared.getTypeColour(this.colourType_);
   }
 };
 
@@ -1118,9 +1119,13 @@ Blockly.Block.prototype.makeRestArgContainer = function() {
  * @param {*} type Type returned by this block
  */
 Blockly.Block.prototype.setOutputType = function(type) {
-  this.outputConnection =
-    new Blockly.Connection(this, Blockly.OUTPUT_VALUE);
+  if(!this.outputConnection) {
+    this.outputConnection = new Blockly.Connection(this, Blockly.OUTPUT_VALUE);
+  }
   this.outputConnection.setType(type);
+  if(this.rendered) {
+    this.updateColour();
+  }
 };
 
 Blockly.Block.prototype.getOutputType = function(opt_initial) {
@@ -1253,11 +1258,16 @@ Blockly.Block.prototype.appendDummyInput = function(opt_name) {
  * @returns {!Blockly.Input} The input object created.
  */
 Blockly.Block.prototype.makeTitleRow = function(name) {
-  var input = this.appendDummyInput();
-  input.appendTitle(name)
+  var input = this.appendDummyInput('TITLE_INPUT');
+  input.appendTitle(name, 'TITLE')
     .setAlign(Blockly.ALIGN_CENTRE);
   input.__title__ = true;
   return input;
+};
+
+Blockly.Block.prototype.changeBlockTitle = function(newTitle) {
+  var titleInput = this.getTitle_('TITLE');
+  titleInput.setText(newTitle);
 };
 
 Blockly.Block.prototype.appendValueWithType = function(name, type) {

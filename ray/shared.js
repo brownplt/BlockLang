@@ -1,5 +1,6 @@
 goog.provide('Ray.Shared');
 
+goog.require('Ray.Main');
 goog.require('Ray.Blocks');
 goog.require('Ray.Blocks.TypeChecker');
 goog.require('Ray.Types');
@@ -105,7 +106,7 @@ Ray.Shared.lookupInSharedBlockDirectory_ = function(key) {
 Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Blockly) {
   var allBlocks = [];
   if(Blockly.funDef) {
-    var funDefBlocks = Blockly.funDefBlocks;
+    var funDefBlocks = Blockly.funArgBlockProtos;
     var funDefDir = Ray.Blocks.generateBlockDirectory(funDefBlocks);
     var funDefCategory = Ray.Shared.lookupInBlockDirectory(key, funDefDir);
     if(funDefCategory) {
@@ -187,6 +188,55 @@ Ray.Shared.removeAppFromDB = function(block) {
   var funId = block.funId_;
   var instanceDB = Ray.Shared.funBlockInstanceDB[funId];
   goog.array.remove(instanceDB.app, block);
+};
+
+Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
+  var funDefBlockly = Ray.Shared.lookupFunDefBlockly(funId);
+  var funAppBlockProto = funDefBlockly.funAppBlockProto;
+  var oldFunSpec = funDefBlockly.funSpec;
+  if(oldFunSpec.name !== funSpec.name) {
+    funAppBlockProto.name_ = funSpec.name;
+    Ray.Shared.updateFunAppBlockNames(funId, funSpec.name);
+    console.log('Names changed!');
+  }
+
+  var R = Ray.Shared.Ray;
+  var argSpec = Ray.Main.createFunArgSpec(R, funSpec, true);
+  // Creating placeholder closure!
+  var value = new R.Value.Closure(argSpec, null, null, funSpec.returnType);
+
+  // I should change the value only once in one place!!
+  funDefBlockly.mainWorkspace.signature_.close();
+  // If I change arguments as well, I don't want to change value again
+  if(!Ray.Shared.areSameTypes(oldFunSpec.returnType, funSpec.returnType)) {
+    funAppBlockProto.outputType_ = funSpec.returnType;
+    funAppBlockProto.value_ = value;
+    Ray.Shared.updateFunAppBlockOutputType(funId, value);
+    console.log('Return type changed');
+  }
+
+  funDefBlockly.funSpec = funSpec;
+  funDefBlockly.mainWorkspace.signature_.open();
+
+};
+
+Ray.Shared.getFunAppBlocksFromDB = function(funId) {
+  return Ray.Shared.getInstanceDBForFunId(funId)['app'];
+};
+
+Ray.Shared.updateFunAppBlockNames = function(funId, newName) {
+  goog.array.forEach(Ray.Shared.getFunAppBlocksFromDB(funId), function(block) {
+    block.changeBlockTitle(newName);
+  });
+};
+
+Ray.Shared.updateFunAppBlockOutputType = function(funId, value) {
+  goog.array.forEach(Ray.Shared.getFunAppBlocksFromDB(funId), function(block) {
+    block.value_ = value;
+    block.outputConnection.clearInferredType();
+    block.setOutputType(value.bodyType);
+    block.updateColour();
+  });
 };
 
 Ray.Shared.getTypeColour = function(type) {

@@ -116,7 +116,6 @@ Ray.Blocks.defineConditionalBlocks = function(r) {
   var conditionalBlocks = [];
   function ConditionalBlock(name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
-    this.value_ = null;
     this.form_ = name;
     this.name_ = name;
     this.externalName_ = Ray.Blocks.conditionalBlockName(name);
@@ -332,7 +331,6 @@ Ray.Blocks.definePrimitiveDataBlocks = function(r) {
   var primitiveDataBlocks = [];
   function PrimitiveDataBlock(typeName, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
-    this.value_ = null;
     this.datatype_ = typeName;
     this.outputType_ = type;
     this.externalName_ = Ray.Blocks.primitiveDataBlockName(typeName);
@@ -489,8 +487,8 @@ Ray.Blocks.addRestArg = function(block, restArg, type) {
   // The arguments themselves will be shared by any blocks with rest args.
   var restArgContainer = new RestArgContainerBlock();
   restArgContainer.externalName_ = Ray.Blocks.restArgBlockName(block.name_);
+  restArgContainer.colourType_ = Ray.Blocks.DEFAULT_BLOCK_COLOR;
   restArgContainer.init = function() {
-    this.setColour(Ray.Blocks.DEFAULT_BLOCK_COLOR);
     this.appendDummyInput()
       .appendTitle(restArg);
     this.appendStatementInput('STACK');
