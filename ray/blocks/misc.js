@@ -36,8 +36,8 @@ Ray.Blocks.primitiveDataBlockName = function(name) {
 Ray.Blocks.conditionalBlockName = function(name) {
   return Ray.Blocks.CONDITIONAL_PREFIX + goog.string.htmlEscape(name);
 };
-Ray.Blocks.argBlockName = function(name) {
-  return Ray.Blocks.ARG_PREFIX + goog.string.htmlEscape(name);
+Ray.Blocks.argBlockName = function(funId, argIx) {
+  return 'ray_function_' + String(funId) + '_arg_' + String(argIx);
 };
 Ray.Blocks.userFunctionBlockName = function(name) {
   return Ray.Blocks.FUNCTION_DEF_PREFIX + goog.string.htmlEscape(name);
@@ -272,6 +272,7 @@ Ray.Blocks.typeNameBlock = function(type) {
 Ray.Blocks.exampleBlock = function() {
   var exampleBlock = {};
   exampleBlock.name_ = 'example';
+  exampleBlock.externalName_ = 'example';
   exampleBlock.renderAsExpression_ = true;
   exampleBlock.type = 'example';
   exampleBlock.blockClass_ = Ray.Globals.Blocks.Example;

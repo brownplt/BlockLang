@@ -180,7 +180,7 @@ Ray.Shared.getInstanceDBForFunId = function(funId) {
 Ray.Shared.removeArgFromDB = function(block) {
   var funId = block.funId_;
   var instanceDB = Ray.Shared.funBlockInstanceDB[funId];
-  goog.array.remove(instanceDB.arg, block);
+  goog.array.remove(instanceDB.args, block);
 };
 
 Ray.Shared.removeAppFromDB = function(block) {
@@ -218,12 +218,20 @@ Ray.Shared.getBlockPrototype = function(Blockly, prototypeName) {
     return Ray.Blocks.exampleBlock();
   }
   var prototype = null;
-  if(Blockly.funDefBlocks && Blockly.funDefBlocks[prototypeName]) {
-    prototype = Blockly.funDefBlocks[prototypeName];
-  } else {
+  if(Blockly.funDef) {
+    var proto = goog.array.find(Blockly.funArgBlockProtos, function(block) {
+      return block.externalName_ === prototypeName;
+    });
+    if(proto) {
+      prototype = proto;
+    }
+  }
+
+  if(!prototype) {
     prototype = goog.array.find(Ray.Shared.savedBlocks_, function(blockProto) {
       return blockProto.externalName_ === prototypeName;
     }) || null;
   }
+
   return prototype;
 };

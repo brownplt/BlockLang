@@ -89,7 +89,7 @@ Blockly.Block = function(workspace, proto) {
     var prototype = null;
     if(goog.isString(proto)) {
       var prototypeName = proto;
-      this.type = prototypeName;
+
       prototype = Blockly.Ray_.Shared.getBlockPrototype(Blockly, prototypeName);
       if(!prototype) {
         throw 'Error: "' + prototypeName + '" is an unknown language block.';
@@ -101,6 +101,8 @@ Blockly.Block = function(workspace, proto) {
     }
     goog.mixin(this, prototype);
   }
+
+  this.type = prototype.externalName_;
 
   if(this.preInit_) {
     this.preInit_(); // This should eventually subsume the rest of these branches.
