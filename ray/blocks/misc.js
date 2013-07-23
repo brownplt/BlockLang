@@ -16,7 +16,6 @@ goog.require('goog.string');
 var Blocks = Ray.Globals.Blocks;
 var R = Ray.Runtime;
 
-//Ray.Blocks.BLOCK_COLOUR = 173;
 Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
 Ray.Blocks.BLOCK_PREFIX = "ray_";
 Ray.Blocks.PRIMITIVE_DATA_PREFIX = "ray_data_create_";
@@ -157,12 +156,12 @@ Ray.Blocks.getDrawers = function(block) {
 
 /**
  * Generates an xml string representing the toolbox of blocks that will be available on a Blockly page.
- * @param {Object} blockDir the block directory for which we will generate the toolbox
+ * @param {Object} blockDirectory the block directory for which we will generate the toolbox
  * @param {?boolean=} opt_includeArguments Should we include arguments blocks in this block directory?
  */
-Ray.Blocks.generateToolbox = function(blockDir, opt_includeArguments) {
+Ray.Blocks.generateToolbox = function(blockDirectory, opt_includeArguments) {
   var includeArguments = goog.isDef(opt_includeArguments) ? opt_includeArguments : true;
-  var toolboxCategories = goog.object.getKeys(blockDir);
+  var toolboxCategories = goog.object.getKeys(blockDirectory);
   toolboxCategories.sort();
   var toolbox = goog.dom.createDom('xml', {id: 'toolbox'});
   goog.array.forEach(toolboxCategories, function(category) {
@@ -178,8 +177,8 @@ Ray.Blocks.generateToolbox = function(blockDir, opt_includeArguments) {
     var cat = goog.dom.createDom('category');
     goog.dom.xml.setAttributes(cat, {name: category});
 
-    if(!goog.isArray(blockDir[category])) {
-      goog.array.forEach(goog.object.getKeys(blockDir[category]), function(subcategory) {
+    if(!goog.isArray(blockDirectory[category])) {
+      goog.array.forEach(goog.object.getKeys(blockDirectory[category]), function(subcategory) {
         var attributes = {};
         attributes.name = (subcategory === 'input' ? 'consumes' : 'produces');
         attributes.key = subcategory;
@@ -197,55 +196,60 @@ Ray.Blocks.generateToolbox = function(blockDir, opt_includeArguments) {
   return goog.dom.xml.serialize(toolbox);
 };
 
-Ray.Blocks.addToBlockDir = function(blockDir, blockName, block) {
+Ray.Blocks.addToBlockDirectory = function(blockDirectory, blockName, block) {
   var drawers = Ray.Blocks.getDrawers(block);
   goog.array.forEach(drawers, function(drawer) {
     var endIndex = drawer.search(/(input|output)/);
     if(endIndex < 0) {
-      blockDir[drawer].push(blockName);
+      blockDirectory[drawer].push(blockName);
     } else {
       var inOrOut = drawer.substring(endIndex);
       var type = drawer.substring(0, endIndex - 1);
-      blockDir[type][inOrOut].push(blockName);
+      blockDirectory[type][inOrOut].push(blockName);
     }
   });
-  blockDir['all'].push(blockName);
-  return blockDir;
+  blockDirectory['all'].push(blockName);
+  return blockDirectory;
 };
 
-Ray.Blocks.emptyBlockDir = function() {
-  var blockDir  = {};
+Ray.Blocks.emptyBlockDirectory = function() {
+  var blockDirectory  = {};
   var baseTypes = goog.array.map(Ray.Types.getBaseTypes(), function(ty) {
     return ty.key();
   });
   goog.array.forEach(baseTypes, function(ty)   {
-    blockDir[ty] = {};
-    blockDir[ty]['input'] = [];
-    blockDir[ty]['output'] = [];
+    blockDirectory[ty] = {};
+    blockDirectory[ty]['input'] = [];
+    blockDirectory[ty]['output'] = [];
   });
 
-  blockDir['forms'] = [];
-  blockDir['functions'] = [];
-  blockDir['arguments'] = [];
+  blockDirectory['forms'] = [];
+  blockDirectory['functions'] = [];
+  blockDirectory['arguments'] = [];
   // Not including all, as per Emmanuel's email, since it would allow students not to use type-based reasoning
   // I'm just leaving it out of the displayed toolbox, but still putting blocks in drawers
-  blockDir['all'] = [];
-  return blockDir;
+  blockDirectory['all'] = [];
+  return blockDirectory;
 };
 
-Ray.Blocks.generateBlockDir = function(blocks) {
-  var blockDir = Ray.Blocks.emptyBlockDir();
+Ray.Blocks.generateBlockDirectory = function(blocks) {
+  var blockDirectory = Ray.Blocks.emptyBlockDirectory();
 
-  var block_names = goog.array.filter(goog.object.getKeys(blocks), function(name) {
+  var blockMap = {};
+  goog.array.forEach(blocks, function(block) {
+    blockMap[block.externalName_] = block;
+  });
+
+  var blockNames = goog.array.filter(goog.object.getKeys(blockMap), function(name) {
     var isCondCond = name.indexOf(Ray.Blocks.CONDITIONAL_PREFIX + 'cond_') === 0;
     var isRestArg = name.indexOf(Ray.Blocks.REST_ARG_PREFIX) === 0;
     return !(isCondCond || isRestArg);
   });
-  goog.array.forEach(block_names, function(block_name) {
-    var block = blocks[block_name];
-    Ray.Blocks.addToBlockDir(blockDir, block_name, block);
+  goog.array.forEach(blockNames, function(blockName) {
+    var block = blockMap[blockName];
+    Ray.Blocks.addToBlockDirectory(blockDirectory, blockName, block);
   });
-  return blockDir;
+  return blockDirectory;
 
 };
 

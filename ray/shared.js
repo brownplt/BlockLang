@@ -11,18 +11,18 @@ Ray.Shared.setRayInstance = function(r) {
 };
 
 Ray.Shared.saveBlockXml = function(block) {
-  var block_xml = Blockly.Xml.blockToDom_(block);
+  var blockXml = Blockly.Xml.blockToDom_(block);
   var xy = block.getRelativeToSurfaceXY();
-  block_xml.setAttribute('x', Blockly.RTL ? -xy.x : xy.x);
-  block_xml.setAttribute('y', xy.y);
-  Ray.Shared.savedBlockXml_ = block_xml;
+  blockXml.setAttribute('x', Blockly.RTL ? -xy.x : xy.x);
+  blockXml.setAttribute('y', xy.y);
+  Ray.Shared.savedBlockXml_ = blockXml;
 };
 
 Ray.Shared.loadBlockXml = function(Blockly, workspace) {
-  var block_xml = Ray.Shared.savedBlockXml_;
-  var block = Blockly.Xml.domToBlock_(workspace, block_xml);
-  var blockX = parseInt(block_xml.getAttribute('x'), 10);
-  var blockY = parseInt(block_xml.getAttribute('y'), 10);
+  var blockXml = Ray.Shared.savedBlockXml_;
+  var block = Blockly.Xml.domToBlock_(workspace, blockXml);
+  var blockX = parseInt(blockXml.getAttribute('x'), 10);
+  var blockY = parseInt(blockXml.getAttribute('y'), 10);
   if (!isNaN(blockX) && !isNaN(blockY)) {
     block.moveBy(Blockly.RTL ? -blockX : blockX, blockY);
   }
@@ -53,7 +53,7 @@ Ray.Shared.lookupFunDefBlockly = function(id) {
 
 Ray.Shared.setBlocks = function(blocks) {
   Ray.Shared.savedBlocks_ = blocks;
-  Ray.Shared.blockDir_ = Ray.Blocks.generateBlockDir(blocks);
+  Ray.Shared.blockDirectory_ = Ray.Blocks.generateBlockDirectory(blocks);
 };
 
 /**
@@ -62,15 +62,17 @@ Ray.Shared.setBlocks = function(blocks) {
  * @returns {*}
  */
 Ray.Shared.getToolbox = function(opt_includeArguments) {
-  return Ray.Blocks.generateToolbox(Ray.Shared.blockDir_, opt_includeArguments);
+  return Ray.Blocks.generateToolbox(Ray.Shared.blockDirectory_, opt_includeArguments);
 };
 
-Ray.Shared.addToSavedBlocks = function(blockName, block) {
-  if(Ray.Shared.savedBlocks_[blockName]) {
+Ray.Shared.addToSavedBlocks = function(block) {
+  if(goog.array.find(Ray.Shared.savedBlocks_, function(savedBlock) {
+    return savedBlock.externalName_ === block.externalName_;
+  })) {
     throw 'Would overwrite pre-existing block!';
   }
-  Ray.Shared.savedBlocks_[blockName] = block;
-  Ray.Blocks.addToBlockDir(Ray.Shared.blockDir_, blockName, block);
+  Ray.Shared.savedBlocks_.push(block);
+  Ray.Blocks.addToBlockDirectory(Ray.Shared.blockDirectory_, block.externalName_, block);
 };
 
 /**
@@ -79,39 +81,39 @@ Ray.Shared.addToSavedBlocks = function(blockName, block) {
  * @param blockDir
  * @returns {*}
  */
-Ray.Shared.lookupInBlockDir_ = function(key, blockDir) {
+Ray.Shared.lookupInBlockDirectory = function(key, blockDir) {
   var keys = key.split('_');
-  var curr_category = blockDir;
+  var currCategory = blockDir;
   for(var i = 0; i < keys.length; i++) {
-    curr_category = curr_category[keys[i]];
-    if(!curr_category) {
+    currCategory = currCategory[keys[i]];
+    if(!currCategory) {
       return null;
     }
   }
-  return curr_category;
+  return currCategory;
 };
 
-Ray.Shared.lookupInSharedBlockDir_ = function(key) {
-  var category_blocks = Ray.Shared.lookupInBlockDir_(key, Ray.Shared.blockDir_);
-  if(!category_blocks) {
+Ray.Shared.lookupInSharedBlockDirectory_ = function(key) {
+  var categoryBlocks = Ray.Shared.lookupInBlockDirectory(key, Ray.Shared.blockDirectory_);
+  if(!categoryBlocks) {
     throw 'Unknown category!';
   } else {
-    return category_blocks;
+    return categoryBlocks;
   }
 };
 
 Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Blockly) {
   var allBlocks = [];
-  var funDefBlocks = Blockly.funDefBlocks;
-  if(funDefBlocks) {
-    var funDefDir = Ray.Blocks.generateBlockDir(funDefBlocks);
-    var funDefCategory = Ray.Shared.lookupInBlockDir_(key, funDefDir);
+  if(Blockly.funDef) {
+    var funDefBlocks = Blockly.funDefBlocks;
+    var funDefDir = Ray.Blocks.generateBlockDirectory(funDefBlocks);
+    var funDefCategory = Ray.Shared.lookupInBlockDirectory(key, funDefDir);
     if(funDefCategory) {
       allBlocks = allBlocks.concat(funDefCategory);
     }
   }
 
-  var categoryBlocks = Ray.Shared.lookupInSharedBlockDir_(key);
+  var categoryBlocks = Ray.Shared.lookupInSharedBlockDirectory_(key);
   if(categoryBlocks) {
     allBlocks = allBlocks.concat(categoryBlocks);
   }
@@ -120,14 +122,14 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
     throw 'Nothing in category!';
   }
 
-  goog.array.stableSort(allBlocks, function(block_name1, block_name2) {
-    var block1 = Ray.Shared.getBlockPrototype(Blockly, block_name1);
-    var block2 = Ray.Shared.getBlockPrototype(Blockly, block_name2);
+  goog.array.stableSort(allBlocks, function(blockName1, blockName2) {
+    var block1 = Ray.Shared.getBlockPrototype(Blockly, blockName1);
+    var block2 = Ray.Shared.getBlockPrototype(Blockly, blockName2);
     return Ray.Shared.precedesOtherBlock_(block1, block2);
   });
 
-  goog.array.forEach(allBlocks, function(block_name) {
-    var block = new Blockly.Block(workspace, block_name);
+  goog.array.forEach(allBlocks, function(blockName) {
+    var block = new Blockly.Block(workspace, blockName);
     block.initSvg();
     blocks.push(block);
     gaps.push(margin * 2);
@@ -137,13 +139,13 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
 Ray.Shared.precedesOtherBlock_ = function(block1, block2) {
   var priority1 = block1.priority_;
   var priority2 = block2.priority_;
-  var is_num1 = goog.isNumber(priority1);
-  var is_num2 = goog.isNumber(priority2);
-  if(is_num1 && is_num2) {
+  var isNum1 = goog.isNumber(priority1);
+  var isNum2 = goog.isNumber(priority2);
+  if(isNum1 && isNum2) {
     return block1.priority_ - block2.priority_;
-  } else if(is_num1) {
+  } else if(isNum1) {
     return -1;
-  } else if(is_num2) {
+  } else if(isNum2) {
     return 1;
   } else {
     return 0;
@@ -181,8 +183,10 @@ Ray.Shared.getBlockPrototype = function(Blockly, prototypeName) {
   var prototype = null;
   if(Blockly.funDefBlocks && Blockly.funDefBlocks[prototypeName]) {
     prototype = Blockly.funDefBlocks[prototypeName];
-  } else if(Ray.Shared.savedBlocks_[prototypeName]) {
-    prototype = Ray.Shared.savedBlocks_[prototypeName];
+  } else {
+    prototype = goog.array.find(Ray.Shared.savedBlocks_, function(blockProto) {
+      return blockProto.externalName_ === prototypeName;
+    }) || null;
   }
   return prototype;
 };

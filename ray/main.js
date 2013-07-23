@@ -4,6 +4,7 @@ goog.provide('Ray.Main');
  * Ray Imports
  */
 goog.require('Ray.Blocks');
+goog.require('Ray.Blocks.UserFun');
 goog.require('Ray.Generator');
 goog.require('Ray.Lib');
 goog.require('Ray.Ray');
@@ -88,7 +89,7 @@ Ray.Main.blocksToXml = function(blockNames) {
 };
 
 Ray.Main.createRayBlocks = function(r) {
-  var blocks = Ray.Blocks.generateAllBlocks(r, {});
+  var blocks = Ray.Blocks.generateAllBlocks(r);
   return blocks;
 };
 
@@ -97,17 +98,16 @@ Ray.Main.atomicTypeToTypeInstance = function(typeName) {
   return new type();
 };
 
-Ray.Main.makeFunArgBlocks = function(r, blockDir, args) {
-  return Ray.Blocks.defineArgBlocks(r, blockDir, args);
+Ray.Main.makeFunArgBlocks = function(args, funId) {
+  return Ray.Blocks.UserFun.generateArgBlocks(args, funId);
 };
 
-Ray.Main.makeFunAppBlock = function(r, blockDir, name, returnType, argSpec) {
+Ray.Main.makeFunAppBlock = function(r, name, returnType, argSpec, funId) {
   // Leave body and envs empty here
-  var f_value = new r.Value.Closure(argSpec,
-                                    null,
-                                    null,
-                                    returnType);
-  return Ray.Blocks.generateBlock(r, name, f_value, blockDir, true);
+  var value = new r.Value.Closure(argSpec,
+                                  null, null,
+                                  returnType);
+  return Ray.Blocks.UserFun.generateAppBlock(name, value, funId);
 };
 
 /**
@@ -131,12 +131,10 @@ Ray.Main.createFunArgSpec = function(r, funSpec, opt_asValue) {
 
 
 Ray.Main.makeFunAppAndArgBlocks = function(r, funSpec) {
-  var blockDir = {};
   var argSpec = Ray.Main.createFunArgSpec(r, funSpec, true);
-  var argBlocks = Ray.Main.makeFunArgBlocks(r, blockDir, funSpec.args);
-  var appBlock = Ray.Main.makeFunAppBlock(r, {}, funSpec.name, funSpec.returnType, argSpec);
-  var funBlockName = Ray.Main.getFunBlockName(funSpec.name);
-  return [argBlocks, appBlock, funBlockName];
+  var argBlocks = Ray.Main.makeFunArgBlocks(funSpec.args, funSpec.funId);
+  var appBlock = Ray.Main.makeFunAppBlock(r, funSpec.name, funSpec.returnType, argSpec, funSpec.funId);
+  return { 'args': argBlocks, 'app': appBlock };
 };
 
 Ray.Main.getFunBodyBlock = function(Blockly) {

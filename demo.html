@@ -88,25 +88,22 @@
 
     dialog.onCreate(function(e) {
         var funSpec = dialog.getFunSpec();
-        var results = Ray.Main.makeFunAppAndArgBlocks(r, funSpec);
-        var funArgBlocks = results[0];
-        var funArgBlockNames = goog.object.getKeys(funArgBlocks);
-        var funAppBlock = results[1];
-        var funBlockName = results[2];
-        Ray.Shared.addToSavedBlocks(funBlockName, funAppBlock);
+        funSpec.funId = Ray.UI.getFunId();
+        var funBlocks = Ray.Main.makeFunAppAndArgBlocks(r, funSpec);
+        var funArgBlock = funBlocks.args;
+        var funAppBlock = funBlocks.app;
+        Ray.Shared.addToSavedBlocks(funAppBlock);
 
-        var funId = Ray.UI.getFunId();
-        var funDefWorkspace = Ray.UI.addFunDefWorkspaceDom(funId,
+
+        var funDefWorkspace = Ray.UI.addFunDefWorkspaceDom(funSpec.funId,
                                                            workspaceContent);
-        var funDefTab = Ray.UI.addFunDefWorkspaceTab(funId, funSpec.name, tabbar);
+        var funDefTab = Ray.UI.addFunDefWorkspaceTab(funSpec.funId, funSpec.name, tabbar);
 
         var funDefInfo = {
-            funId: funId,
-            funArgBlocks: funArgBlocks,
-            funAppBlock: funAppBlock,
+            funId: funSpec.funId,
+            funArgBlockProtos: funArgBlock,
+            funAppBlockProto: funAppBlock,
             funName: funSpec.name,
-            funBlockName: funBlockName,
-            funArgBlockNames: funArgBlockNames,
             funSpec: funSpec
         };
 

@@ -33,7 +33,7 @@ goog.require('Blockly.Comment');
  * Class for a signature.
  * @constructor
  */
-Blockly.Signature = function(argBlockNames, appBlockName) {
+Blockly.Signature = function() {
   /**
    * @type {!Blockly.Workspace}
    * @private
@@ -66,9 +66,6 @@ Blockly.Signature = function(argBlockNames, appBlockName) {
    * @private
    */
   this.buttons_ = [];
-
-  this.argBlockNames_ = argBlockNames;
-  this.appBlockName_ = appBlockName;
 };
 
 /**
@@ -402,8 +399,8 @@ Blockly.Signature.prototype.open = function() {
   var blocks = [];
   var gaps = [];
 
-  goog.array.forEach(this.argBlockNames_, function(argBlockName) {
-    var block = new Blockly.Block(this.workspace_, argBlockName);
+  goog.array.forEach(Blockly.funArgBlockProtos, function(argBlockProto) {
+    var block = new Blockly.Block(this.workspace_, argBlockProto);
     block.initSvg();
     blocks.push(block);
     gaps.push(margin);
@@ -417,7 +414,7 @@ Blockly.Signature.prototype.open = function() {
   //cursorX += this.advanceCursor(funTitle, margin);
 
   // Function application block
-  var appBlock = new Blockly.Block(this.workspace_, this.appBlockName_);
+  var appBlock = new Blockly.Block(this.workspace_, Blockly.funAppBlockProto);
   appBlock.initSvg();
 
   this.markChildrenInSignature(appBlock);
@@ -476,7 +473,7 @@ Blockly.Signature.prototype.open = function() {
 
   var exampleBlock = Blockly.Ray_.Blocks.exampleBlock();
   block = new Blockly.Block(this.workspace_, exampleBlock);
-  var exampleAppBlock = new Blockly.Block(this.workspace_, this.appBlockName_);
+  var exampleAppBlock = new Blockly.Block(this.workspace_, Blockly.funAppBlockProto);
   exampleAppBlock.initSvg();
   exampleAppBlock.render();
 

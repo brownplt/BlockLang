@@ -243,3 +243,8 @@ Also have the run button run the tests in a function's workspace when
 you have the function workspace visible.
 
 Set up halt button, test button!!!!!!
+
+Because the flyout and signature create new blocks by going through
+XML (block->xml->block), I need to have all the prototype names
+registered and available for lookup.
+

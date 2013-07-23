@@ -13,6 +13,7 @@
 
 goog.provide('Ray.Blocks');
 
+goog.require('Ray.Blocks.UserFun');
 goog.require('Ray.Blocks.misc');
 goog.require('Ray.Runtime');
 goog.require('Ray.Types');
@@ -31,44 +32,55 @@ var Blocks = Ray.Globals.Blocks;
 var Priorities = Ray.Globals.Priorities;
 var R = Ray.Runtime;
 
-Ray.Blocks.restArgArgBlockName = "ray_rest_arg_arg_";
-Ray.Blocks.restArgArgBlock = {
-  init: function() {
-    this.setColour(Ray.Blocks.DEFAULT_BLOCK_COLOR);
-    this.appendDummyInput()
-      .appendTitle('arg');
-  },
-  isRestArg_: true,
-  renderAsExpression_: false
-};
 Ray.Blocks.condTestBodyBlockName = "ray_conditional_cond_test_body";
 Ray.Blocks.condElseBlockName = "ray_conditional_cond_else";
 
+var RestArgContainerBlock = function() {
+  this.restArgContainer_ = true;
+  this.renderAsExpression_ = false;
+};
+
+var RestArgBlock = function() {
+  this.isRestArg_ = true;
+  this.renderAsExpression_ = false;
+};
+
+Ray.Blocks.restArgArgBlockName = "ray_rest_arg_arg_";
+Ray.Blocks.restArgArgBlock = new RestArgBlock();
+Ray.Blocks.restArgArgBlock.init = function() {
+    this.setColour(Ray.Blocks.DEFAULT_BLOCK_COLOR);
+    this.appendDummyInput()
+      .appendTitle('arg');
+};
+Ray.Blocks.restArgArgBlock.externalName_ = Ray.Blocks.restArgArgBlockName;
+
+
 /**
- * Generates all the blocks for a given instance of Ray.
- * Right now, this just sequentially generates all the primitive data blocks,
- * and then all the blocks for builtin procedures.
- * @param r
- * @returns {{}}
+ * Generates all the standard library blocks, including list blocks, primitive data blocks, and conditionals
+ * @param r Ray.Runtime
+ * @returns {Array.<*>}
  */
 Ray.Blocks.generateAllBlocks = function(r) {
-  var obj = {};
-  Ray.Blocks.definePrimitiveDataBlocks(r, obj);
-  Ray.Blocks.defineListBlocks(r, obj);
-  Ray.Blocks.defineBuiltinBlocks(r, obj);
-  Ray.Blocks.defineConditionalBlocks(r, obj);
-  return obj;
+  var blocks = [];
+  blocks = blocks.concat(Ray.Blocks.definePrimitiveDataBlocks(r));
+  blocks = blocks.concat(Ray.Blocks.defineListBlocks(r));
+  blocks = blocks.concat(Ray.Blocks.defineConditionalBlocks(r));
+  blocks = blocks.concat(Ray.Blocks.defineBuiltinBlocks(r, blocks));
+  return blocks;
 };
 
 // Cons, first, rest, empty
-Ray.Blocks.defineListBlocks = function(r, obj) {
+Ray.Blocks.defineListBlocks = function(r) {
+  var listBlocks = [];
   var ListBlock = function(name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
     this.value_ = r.builtins.lookup(name);
     this.outputType_ = type;
     this.name_ = name;
+    this.externalName_ = Ray.Blocks.blockName(name);
     this.blockClass_ = Blocks[goog.string.toTitleCase(name)];
     this.renderAsExpression_ = true;
+    listBlocks.push(this);
   };
 
   var consBlock = new ListBlock('cons', new Ray.Types.List(new Ray.Types.Unknown()));
@@ -77,61 +89,41 @@ Ray.Blocks.defineListBlocks = function(r, obj) {
     this.appendValueWithType('car', new Ray.Types.Unknown());
     this.appendValueWithType('cdr', new Ray.Types.List(new Ray.Types.Unknown()));
   };
-  obj[Ray.Blocks.blockName('cons')] = consBlock;
 
   var emptyBlock = new ListBlock('empty', new Ray.Types.List(new Ray.Types.Unknown()));
   emptyBlock.init = function() {
     this.makeTitleRow('empty');
   };
-  obj[Ray.Blocks.blockName('empty')] = emptyBlock;
 
   var firstBlock = new ListBlock('first', new Ray.Types.Unknown());
   firstBlock.init = function() {
     this.makeTitleRow('first');
     this.appendValueWithType('x', new Ray.Types.List(new Ray.Types.Unknown()));
   };
-  obj[Ray.Blocks.blockName('first')] = firstBlock;
 
   var restBlock = new ListBlock('rest', new Ray.Types.List(new Ray.Types.Unknown()));
   restBlock.init = function() {
     this.makeTitleRow('rest');
     this.appendValueWithType('x', new Ray.Types.List(new Ray.Types.Unknown()));
   };
-  obj[Ray.Blocks.blockName('rest')] = restBlock;
+
+  return listBlocks;
 
 };
 
-Ray.Blocks.defineArgBlocks = function(r, obj, args) {
-  function ArgumentBlock(name, type) {
-    this.helpUrl = Ray.Blocks.HELP_URL;
-    this.value_ = null;
-    this.name_ = name;
-    this.outputType_ = type;
-    this.arguments_ = true;
-    this.renderAsExpression_ = true;
-    this.blockClass_ = Blocks.Argument;
-    this.priority_ = Priorities.ARGUMENT;
-    this.init = function() {
-      this.makeTitleRow(this.name_);
-    };
-  }
-
-  goog.array.forEach(args, function(arg) {
-    var arg_block = new ArgumentBlock(arg.getName(), arg.getType());
-    obj[Ray.Blocks.argBlockName(arg.getName())] = arg_block;
-  });
-  return obj;
-};
-
-Ray.Blocks.defineConditionalBlocks = function(r, obj) {
+// if, or, and, cond
+Ray.Blocks.defineConditionalBlocks = function(r) {
+  var conditionalBlocks = [];
   function ConditionalBlock(name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
     this.value_ = null;
     this.form_ = name;
     this.name_ = name;
+    this.externalName_ = Ray.Blocks.conditionalBlockName(name);
     this.outputType_ = type;
     this.blockClass_ = Blocks[goog.string.toTitleCase(name)];
     this.renderAsExpression_ = true;
+    conditionalBlocks.push(this);
   }
 
   // If
@@ -153,39 +145,26 @@ Ray.Blocks.defineConditionalBlocks = function(r, obj) {
 
   };
 
-  obj[Ray.Blocks.conditionalBlockName('if')] = ifBlock;
-
   // And
   var andBlock = new ConditionalBlock('and', new Ray.Types.Boolean());
   andBlock.inputTypes_ = [new Ray.Types.Boolean()];
   andBlock.init = function() {
     this.makeTitleRow('and');
-    this.appendValueWithType('REST_ARG0', new Ray.Types.Boolean());
-    this.appendValueWithType('REST_ARG1', new Ray.Types.Boolean());
-    this.setMutator(new this.Blockly.Mutator([Ray.Blocks.restArgArgBlockName]));
-    this.restArgCount_ = 2;
   };
-
-  Ray.Blocks.addRestArg(andBlock, obj, 'and', new Ray.Types.Boolean());
-  obj[Ray.Blocks.conditionalBlockName('and')] = andBlock;
+  conditionalBlocks.push(Ray.Blocks.addRestArg(andBlock, 'and', new Ray.Types.Boolean()));
 
   // Or
   var orBlock = new ConditionalBlock('or', new Ray.Types.Boolean());
   orBlock.inputTypes_ = [new Ray.Types.Boolean()];
   orBlock.init = function() {
     this.makeTitleRow('or');
-    this.appendValueWithType('REST_ARG0', new Ray.Types.Boolean());
-    this.appendValueWithType('REST_ARG1', new Ray.Types.Boolean());
-    this.setMutator(new this.Blockly.Mutator([Ray.Blocks.restArgArgBlockName]));
-    this.restArgCount_ = 2;
   };
-
-  Ray.Blocks.addRestArg(orBlock, obj, 'or', new Ray.Types.Boolean());
-  obj[Ray.Blocks.conditionalBlockName('or')] = orBlock;
+  conditionalBlocks.push(Ray.Blocks.addRestArg(orBlock, 'or', new Ray.Types.Boolean()));
 
   // Cond
   var condBlock = new ConditionalBlock('cond', new Ray.Types.Unknown());
   condBlock.inputTypes_ = [new Ray.Types.Unknown(), new Ray.Types.Boolean()];
+  condBlock.mutatorBlockTypes_ = { 'TEST_BODY': 1, 'ELSE': 2 };
   condBlock.init = function() {
     this.makeTitleRow('cond');
     this.appendValueInput('CONDITION')
@@ -229,32 +208,32 @@ Ray.Blocks.defineConditionalBlocks = function(r, obj) {
     }
   };
   condBlock.decompose = function(workspace) {
-    var container_block = new this.Blockly.Block(workspace, Ray.Blocks.conditionalBlockName('cond_cond'));
-    container_block.initSvg();
-    var connection = container_block.getInput('STACK').connection;
+    var containerBlock = new this.Blockly.Block(workspace, this.condCondBlockProto);
+    containerBlock.initSvg();
+    var connection = containerBlock.getInput('STACK').connection;
     for(var x = 0; x < this.testClauseCount_; x++) {
       var conditionConnection = this.getInput('CONDITION' + String(x)).connection;
       var bodyConnection = this.getInput('BODY' + String(x)).connection;
-      var test_body_block = new this.Blockly.Block(workspace, Ray.Blocks.condTestBodyBlockName);
-      test_body_block.initSvg();
-      test_body_block.conditionConnection_ = conditionConnection.targetConnection;
-      test_body_block.bodyConnection_ = bodyConnection.targetConnection;
-      connection.connect(test_body_block.previousConnection);
-      connection = test_body_block.nextConnection;
+      var testBodyBlock = new this.Blockly.Block(workspace, this.testBodyBlockProto);
+      testBodyBlock.initSvg();
+      testBodyBlock.conditionConnection_ = conditionConnection.targetConnection;
+      testBodyBlock.bodyConnection_ = bodyConnection.targetConnection;
+      connection.connect(testBodyBlock.previousConnection);
+      connection = testBodyBlock.nextConnection;
     }
 
     if(this.elseClause_) {
       var elseConnection = this.getInput('ELSE').connection;
-      var else_block = new this.Blockly.Block(workspace, Ray.Blocks.condElseBlockName);
-      else_block.initSvg();
-      else_block.elseConnection_ = elseConnection.targetConnection;
-      connection.connect(else_block.previousConnection);
+      var elseBlock = new this.Blockly.Block(workspace, this.elseBlockProto);
+      elseBlock.initSvg();
+      elseBlock.elseConnection_ = elseConnection.targetConnection;
+      connection.connect(elseBlock.previousConnection);
 
     }
-    return container_block;
+    return containerBlock;
 
   };
-  condBlock.compose = function(container_block) {
+  condBlock.compose = function(containerBlock) {
     if(this.elseClause_) {
       this.elseClause_ = false;
       this.removeInput('ELSE');
@@ -266,50 +245,45 @@ Ray.Blocks.defineConditionalBlocks = function(r, obj) {
       this.removeInput('BODY' + String(x));
     }
 
-    var clause_block = container_block.getInputTargetBlock('STACK');
-    while(clause_block) {
-      switch(clause_block.outputType_) {
-        case Ray.Blocks.condTestBodyBlockName:
-          var condition_input = this.appendValueInput('CONDITION' + String(this.testClauseCount_))
+    var clauseBlock = containerBlock.getInputTargetBlock('STACK');
+    while(clauseBlock) {
+      switch(clauseBlock.mutatorBlockType_) {
+        case condBlock.mutatorBlockTypes_.TEST_BODY:
+          var conditionInput = this.appendValueInput('CONDITION' + String(this.testClauseCount_))
             .appendTitle('when')
             .setType(new Ray.Types.Boolean());
-          if(clause_block.conditionConnection_) {
-            condition_input.connection.connect(clause_block.conditionConnection_);
+          if(clauseBlock.conditionConnection_) {
+            conditionInput.connection.connect(clauseBlock.conditionConnection_);
           }
 
-          var body_input = this.appendValueInput('BODY' + String(this.testClauseCount_))
+          var bodyInput = this.appendValueInput('BODY' + String(this.testClauseCount_))
             .setType(new Ray.Types.Unknown());
-          if(clause_block.bodyConnection_) {
-            body_input.connection.connect(clause_block.bodyConnection_);
+          if(clauseBlock.bodyConnection_) {
+            bodyInput.connection.connect(clauseBlock.bodyConnection_);
           }
           this.testClauseCount_++;
           break;
-        case Ray.Blocks.condElseBlockName:
+        case condBlock.mutatorBlockTypes_.ELSE:
           this.elseClause_ = true;
-          var else_input = this.appendValueInput('ELSE')
+          var elseInput = this.appendValueInput('ELSE')
             .appendTitle('otherwise')
             .setType(new Ray.Types.Unknown());
-          if(clause_block.elseConnection_) {
-            else_input.connection.connect(clause_block.elseConnection_);
+          if(clauseBlock.elseConnection_) {
+            elseInput.connection.connect(clauseBlock.elseConnection_);
           }
           break;
         default:
           throw "Unknown block type inside ray_conditional_cond_cond!";
           break;
       }
-      clause_block = clause_block.nextConnection &&
-        clause_block.nextConnection.targetBlock();
+      clauseBlock = clauseBlock.nextConnection &&
+        clauseBlock.nextConnection.targetBlock();
     }
-
     Ray.Blocks.TypeChecker.typecheckBlock(this);
-
   };
-  obj[Ray.Blocks.conditionalBlockName('cond')] = condBlock;
 
-  var condCondBlock = {
-    restArgContainer_: true,
-    renderAsExpression_: false,
-    init: function() {
+  var condCondBlock = new RestArgContainerBlock();
+  condCondBlock.init = function() {
       this.setColour(Ray.Blocks.getColour('forms'));
       this.appendDummyInput()
         .appendTitle('cond');
@@ -317,54 +291,55 @@ Ray.Blocks.defineConditionalBlocks = function(r, obj) {
         .appendTitle('test/body');
       this.appendStatementInput('STACK');
       this.contextMenu = false;
-    }
   };
-  obj[Ray.Blocks.conditionalBlockName('cond_cond')] = condCondBlock;
+  condBlock.condCondBlockProto = condCondBlock;
+  conditionalBlocks.push(condBlock);
 
-  var condTestBodyBlock = {
-    outputType_: Ray.Blocks.condTestBodyBlockName,
-    renderAsExpression_: false,
-    isRestArg_: true,
-    init: function() {
+
+  var condTestBodyBlock = new RestArgBlock();
+  condTestBodyBlock.mutatorBlockType_ = condBlock.mutatorBlockTypes_.TEST_BODY;
+  condTestBodyBlock.externalName_ = Ray.Blocks.condTestBodyBlockName;
+  condTestBodyBlock.init = function() {
       this.setColour(Ray.Blocks.getColour('forms'));
       this.appendDummyInput()
         .appendTitle('test/body');
-    }
   };
-  obj[Ray.Blocks.condTestBodyBlockName] = condTestBodyBlock;
+  condBlock.testBodyBlockProto = condTestBodyBlock;
+  conditionalBlocks.push(condTestBodyBlock);
 
-  var condElseBlock = {
-    outputType_: Ray.Blocks.condElseBlockName,
-    renderAsExpression_: false,
-    isRestArg_: true,
-    init: function() {
+  var condElseBlock = new RestArgBlock();
+  condElseBlock.mutatorBlockType_ = condBlock.mutatorBlockTypes_.ELSE;
+  condElseBlock.externalName_ = Ray.Blocks.condElseBlockName;
+  condElseBlock.init = function() {
       this.setColour(Ray.Blocks.getColour('forms'));
       this.appendDummyInput()
         .appendTitle('otherwise');
       this.nextConnection.dispose();
       this.nextConnection = null;
-    }
   };
-  obj[Ray.Blocks.condElseBlockName] = condElseBlock;
+  condBlock.elseBlockProto = condElseBlock;
+  conditionalBlocks.push(condElseBlock);
 
-  return obj;
+  return conditionalBlocks;
 };
 
 /**
  * Defines the blocks that allow you to enter primitive data.
  * Currently, this is limited to: booleans, numbers, characters, and strings.
  * @param r
- * @param obj
  */
-Ray.Blocks.definePrimitiveDataBlocks = function(r, obj) {
-  function PrimitiveDataBlock(type_name, type) {
+Ray.Blocks.definePrimitiveDataBlocks = function(r) {
+  var primitiveDataBlocks = [];
+  function PrimitiveDataBlock(typeName, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
     this.value_ = null;
-    this.datatype_ = type_name;
+    this.datatype_ = typeName;
     this.outputType_ = type;
-    this.blockClass_ = Blocks[goog.string.toTitleCase(type_name)];
+    this.externalName_ = Ray.Blocks.primitiveDataBlockName(typeName);
+    this.blockClass_ = Blocks[goog.string.toTitleCase(typeName)];
     this.renderAsExpression_ = true;
     this.priority_ = Priorities.PRIMITIVE_DATA_VALUE;
+    primitiveDataBlocks.push(this);
   }
 
   // Boolean
@@ -375,8 +350,6 @@ Ray.Blocks.definePrimitiveDataBlocks = function(r, obj) {
       .appendTitle(dropdown, 'B');
   };
 
-  obj[Ray.Blocks.primitiveDataBlockName('boolean')] = booleanBlock;
-
   // Number
   var numberBlock = new PrimitiveDataBlock('num', new Ray.Types.Num());
   numberBlock.init = function() {
@@ -384,8 +357,6 @@ Ray.Blocks.definePrimitiveDataBlocks = function(r, obj) {
     this.appendDummyInput()
       .appendTitle(textfield, 'N');
   };
-
-  obj[Ray.Blocks.primitiveDataBlockName('num')] = numberBlock;
 
   //String
   var stringBlock = new PrimitiveDataBlock('str', new Ray.Types.Str());
@@ -397,23 +368,20 @@ Ray.Blocks.definePrimitiveDataBlocks = function(r, obj) {
       .appendTitle('"');
   };
 
-  obj[Ray.Blocks.primitiveDataBlockName('str')] = stringBlock;
-
   //Chars
   var charBlock = new PrimitiveDataBlock('char', new Ray.Types.Char());
   charBlock.init = function() {
-    var char_validator = function(text) {
+    var charValidator = function(text) {
       return text.length === 1 ? text : null;
     };
-    var textfield = new this.Blockly.FieldTextInput('a', char_validator);
+    var textfield = new this.Blockly.FieldTextInput('a', charValidator);
     this.appendDummyInput()
       .appendTitle('char')
       .appendTitle(textfield, 'C');
   };
 
-  obj[Ray.Blocks.primitiveDataBlockName('char')] = charBlock;
+  return primitiveDataBlocks;
 };
-
 
 /**
  * Looks through the builtins in a Ray, finds those for which
@@ -424,29 +392,33 @@ Ray.Blocks.definePrimitiveDataBlocks = function(r, obj) {
  * @param r has to have builtins already installed
  * @param obj the object into which we install the missing blocks
  */
-Ray.Blocks.defineBuiltinBlocks = function(r, obj) {
+Ray.Blocks.defineBuiltinBlocks = function(r, blocks) {
   var builtins = r.builtins.dict({});
   goog.object.forEach(builtins, function(value, name) {
-    var block_name = Ray.Blocks.blockName(name);
-    if(!goog.object.containsKey(obj, block_name)) {
-      Ray.Blocks.generateBlock(r, name, value, obj);
+    var blockName = Ray.Blocks.blockName(name);
+    if(!Ray.Blocks.containsBlockWithName(blocks, blockName)) {
+      var generatedBlocks = Ray.Blocks.generateBlock(r, name, value);
+      blocks = blocks.concat(generatedBlocks);
     }
   });
-  obj[Ray.Blocks.restArgArgBlockName] = Ray.Blocks.restArgArgBlock;
-  return obj;
+  blocks.push(Ray.Blocks.restArgArgBlock);
+  return blocks;
 };
 
-function FunctionBlock(name, value, is_user_function) {
+Ray.Blocks.containsBlockWithName = function(blocks, name) {
+  return goog.array.some(blocks, function(block) {
+    return block.externalName_ === name;
+  });
+};
+
+var BuiltinBlock = function(name, value) {
   this.name_ = name;
+  this.externalName_ = Ray.Blocks.blockName(name);
   this.value_ = value;
   this.outputType_ = value.bodyType;
   this.blockClass_ = Blocks.App;
   this.renderAsExpression_ = true;
   this.priority_ = value.priority_ || null;
-  if(is_user_function) {
-    this.isUserFunction_ = true;
-  }
-  this.helpUrl = Ray.Blocks.HELP_URL;
 };
 
 /**
@@ -466,12 +438,9 @@ function FunctionBlock(name, value, is_user_function) {
  * @param r
  * @param name the name of the block, will be used in looking it up, and as title on block.
  * @param value the value from which we are creating the block
- * @param obj
- * @param {?boolean=} opt_userFunction
  */
-Ray.Blocks.generateBlock = function(r, name, value, obj, opt_userFunction) {
-  var is_user_function = !!opt_userFunction;
-  var block_name = is_user_function ? Ray.Blocks.userFunctionBlockName(name) : Ray.Blocks.blockName(name);
+Ray.Blocks.generateBlock = function(r, name, value) {
+  var generatedBlocks = [];
   var block = null;
   switch(R.nodeType(value)) {
     case 'pair':
@@ -487,30 +456,21 @@ Ray.Blocks.generateBlock = function(r, name, value, obj, opt_userFunction) {
       // Ignoring rest and keyword arguments
       var arity = argSpec.positionalArgs.length;
       var restArg = argSpec.restArg || null;
-      var block_title = goog.isDef(value.display_name_) ?
+      var blockTitle = goog.isDef(value.display_name_) ?
                         goog.string.unescapeEntities(value.display_name_) :
                         name;
 
-      block = new FunctionBlock(name, value, is_user_function);
+      block = new BuiltinBlock(name, value);
       block.init = function() {
-        this.makeTitleRow(block_title);
+        this.makeTitleRow(blockTitle);
         for(var i = 0; i < arity; i++) {
           this.appendValueWithType(argSpec.positionalArgs[i],
                                    argSpec.argsType.positionalArgTypes.list[i]);
         }
-        if(restArg) {
-          this.appendValueWithType('REST_ARG0',
-                                   argSpec.argsType.restArgType.elementType);
-          this.appendValueWithType('REST_ARG1',
-                                   argSpec.argsType.restArgType.elementType);
-
-          this.setMutator(new this.Blockly.Mutator([Ray.Blocks.restArgArgBlockName]));
-          this.restArgCount_ = 2;
-        }
       };
 
       if(restArg) {
-        Ray.Blocks.addRestArg(block, obj, restArg, argSpec.argsType.restArgType.elementType);
+        generatedBlocks.push(Ray.Blocks.addRestArg(block, restArg, argSpec.argsType.restArgType.elementType));
       }
       break;
     default:
@@ -519,19 +479,17 @@ Ray.Blocks.generateBlock = function(r, name, value, obj, opt_userFunction) {
       break;
   }
   if(block) {
-    obj[block_name] = block;
+    generatedBlocks.push(block);
   }
-  return block;
+  return generatedBlocks;
 };
 
-Ray.Blocks.addRestArg = function(block, obj, restArg, type) {
+Ray.Blocks.addRestArg = function(block, restArg, type) {
   // Create the block which will hold the arguments as I add or subtract them.
   // The arguments themselves will be shared by any blocks with rest args.
-  var rest_arg_container = {};
-  rest_arg_container.restArgContainer_ = true;
-  rest_arg_container.renderAsExpression_ =  false;
-  rest_arg_container.helpUrl = Ray.Blocks.HELP_URL;
-  rest_arg_container.init = function() {
+  var restArgContainer = new RestArgContainerBlock();
+  restArgContainer.externalName_ = Ray.Blocks.restArgBlockName(block.name_);
+  restArgContainer.init = function() {
     this.setColour(Ray.Blocks.DEFAULT_BLOCK_COLOR);
     this.appendDummyInput()
       .appendTitle(restArg);
@@ -539,39 +497,32 @@ Ray.Blocks.addRestArg = function(block, obj, restArg, type) {
     this.contextMenu = false;
   };
 
-  var container_block_name = Ray.Blocks.restArgBlockName(block.name_);
-  obj[container_block_name] = rest_arg_container;
-
   block.decompose = function(workspace) {
-    var container_block = new this.Blockly.Block(workspace,
-                                                 container_block_name);
-    container_block.initSvg();
-    if(container_block.getInput('STACK')) {
-      var connection = container_block.getInput('STACK').connection;
+    var containerBlock = new this.Blockly.Block(workspace,
+                                                restArgContainer);
+    containerBlock.initSvg();
+    if(containerBlock.getInput('STACK')) {
+      var connection = containerBlock.getInput('STACK').connection;
       for(var x = 0; x < this.restArgCount_; x++) {
-        var arg_block = new this.Blockly.Block(workspace, Ray.Blocks.restArgArgBlockName);
-        arg_block.initSvg();
-        connection.connect(arg_block.previousConnection);
-        connection = arg_block.nextConnection;
+        var argBlock = new this.Blockly.Block(workspace, Ray.Blocks.restArgArgBlock);
+        argBlock.initSvg();
+        connection.connect(argBlock.previousConnection);
+        connection = argBlock.nextConnection;
       }
     }
-    return container_block;
+    return containerBlock;
   };
-  block.compose = function(container_block) {
+  block.compose = function(containerBlock) {
     for(var i = this.restArgCount_ - 1; i >= 0; i--) {
       this.removeInput('REST_ARG' + String(i));
     }
     this.restArgCount_ = 0;
-    var arg_block = container_block.getInputTargetBlock('STACK');
-    while(arg_block) {
-      var arg = this.appendValueWithType('REST_ARG' + String(this.restArgCount_), type);
-      // This should never be set!
-      if(arg_block.value_connection_) {
-        arg.connection.connect(arg_block.value_connection_);
-      }
+    var argBlock = containerBlock.getInputTargetBlock('STACK');
+    while(argBlock) {
+      this.appendValueWithType('REST_ARG' + String(this.restArgCount_), type);
       this.restArgCount_++;
-      arg_block = arg_block.nextConnection &&
-        arg_block.nextConnection.targetBlock();
+      argBlock = argBlock.nextConnection &&
+        argBlock.nextConnection.targetBlock();
     }
 
   };
@@ -589,4 +540,14 @@ Ray.Blocks.addRestArg = function(block, obj, restArg, type) {
       this.appendValueWithType('REST_ARG' + String(x), type);
     }
   };
+
+  block.originalInit_ = block.init;
+  block.init = function() {
+    this.originalInit_();
+    this.appendValueWithType('REST_ARG0', type);
+    this.appendValueWithType('REST_ARG1', type);
+    this.setMutator(new this.Blockly.Mutator([Ray.Blocks.restArgArgBlockName]));
+    this.restArgCount_ = 2;
+  };
+  return restArgContainer;
 };
