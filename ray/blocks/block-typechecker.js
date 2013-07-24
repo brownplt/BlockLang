@@ -39,6 +39,7 @@ var typecheckRest = function(block, type, typeEnv) {
 
 
 var typecheckFunctionArguments = function(block, funType, args, typeEnv) {
+  var isUserFunction = !!block.isUserFunction_;
   var argsType = funType.argumentsType;
   var listOfTypes = argsType.positionalArgTypes.list;
 
@@ -47,7 +48,7 @@ var typecheckFunctionArguments = function(block, funType, args, typeEnv) {
     return false;
   }
   var positionalArgTypes = goog.array.map(goog.array.range(positionalArgs.length), function(i) {
-    return typecheckBlockExpr_(block, positionalArgs[i], listOfTypes[i], typeEnv);
+    return typecheckBlockExpr_(block, isUserFunction ? ('P_ARG' + String(i)) : positionalArgs[i], listOfTypes[i], typeEnv);
   });
 
   if(!goog.array.every(positionalArgTypes, function(p_arg_type) { return !!p_arg_type; })) {

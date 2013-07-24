@@ -99,7 +99,9 @@ var genArgument = function(block, r) {
 };
 
 var gen = function(block, r) {
-  if(block.value_) {
+  if(block.isUserFunction_) {
+    throw 'Handle user functions!';
+  } else if(block.value_) {
     return genValue(block, r);
   } else if(block.form_) {
     return genForm(block, r);

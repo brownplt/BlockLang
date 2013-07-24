@@ -14,7 +14,7 @@ goog.require('goog.dom');
 goog.require('goog.dom.xml');
 goog.require('goog.string');
 
-var ArgumentBlock = function(name, type, funId, argIx) {
+Ray.Blocks.UserFun.ArgumentBlock = function(name, type, funId, argIx) {
   this.helpUrl = Ray.Blocks.HELP_URL;
   this.value_ = null;
   this.name_ = name;
@@ -42,7 +42,7 @@ Ray.Blocks.UserFun.generateArgBlocks = function(args, funId) {
   var argBlocks = [];
   var ix = 0;
   goog.array.forEach(args, function(arg) {
-    argBlocks.push(new ArgumentBlock(arg.getName(), arg.getType(), funId, ix++));
+    argBlocks.push(new Ray.Blocks.UserFun.ArgumentBlock(arg.getName(), arg.getType(), funId, ix++));
   });
   return argBlocks;
 };
@@ -60,10 +60,6 @@ var UserFunctionBlock = function(name, value, funId) {
 };
 
 Ray.Blocks.UserFun.generateAppBlock = function(name, value, funId) {
-  var argSpec = value.argSpec;
-  // Ignoring rest and keyword arguments
-  var arity = argSpec.positionalArgs.length;
-
   block = new UserFunctionBlock(name, value, funId);
   block.preInit_ = function() {
     this.setOutputType(this.outputType_);
@@ -74,8 +70,11 @@ Ray.Blocks.UserFun.generateAppBlock = function(name, value, funId) {
   };
   block.init = function() {
     this.makeTitleRow(this.name_);
+    var argSpec = this.value_.argSpec;
+    var arity = argSpec.positionalArgs.length;
+    // Ignoring keyword arguments and rest arguments
     for(var i = 0; i < arity; i++) {
-      this.appendValueWithType(argSpec.positionalArgs[i],
+      this.appendValueWithType('P_ARG' + String(i),
                                argSpec.argsType.positionalArgTypes.list[i]);
     }
   };
