@@ -82,13 +82,13 @@ Make it so that function blocks are associated with their
 definitions, and if the number of arguments changes, they change as
 well. 
 
-** TODO Order of priorities [7/10]:
+** TODO Order of priorities [8/10]:
 - [X] Move defined functions to the shared set of blocks. 
 - [X] Separate out argument blocks. 
 - [X] Hook up defined function blocks to the definition, so we can change things as needed. 
 - [X] Hook up definition expressions to functions so that we have the right semantics. 
 - [X] Add a run button, and show output somehow!
-- [ ] Make it possible to remove and edit functions (their types)
+- [X] Make it possible to remove and edit functions (their types)
   once created
 Clean up documentation, add some documentation, JSDoc comment
 everything complicated. 
@@ -151,9 +151,9 @@ then have it fill in the appropriate literal.
 - [X] Add interface element to halt computation
 - [X] Fixed bug where char would throw error
 - [X] Fixed bug where opening/closing signature Would cause text highlight
+- [X] Make it possible to rename function arguments.
 
 * Remaining Tasks
-- [ ] Make it possible to rename function arguments.
 - [ ] Show the type name of function arguments alongside the
   function. 
 - [ ] Show the function signature inside the function definition dialog,
@@ -208,6 +208,7 @@ then have it fill in the appropriate literal.
   them
 - [ ] Make pasting happen at cursor, not just at location of copy
 - [ ] Connect example blocks to testing functionality
+- [ ] Use DragLists to handle re-ordering arguments
 
 I guess that maybe the scrollbar isn't broken, because it simply
 won't let me make the canvas larger than it already was.

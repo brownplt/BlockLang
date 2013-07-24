@@ -67,10 +67,14 @@ Ray.UI.getFunId = function() {
 
 
 Ray.UI.addFunDefWorkspaceTab = function(id, funName, tabbar) {
+  var funDefTabNameSpan = goog.dom.createDom('span', {},
+                                             [goog.dom.createTextNode('Define ' + funName + ' ')]);
   var funDefContent = goog.dom.createDom('div', 'goog-inline-block',
-                                         [goog.dom.createTextNode('Define ' + funName + ' ')]);
+                                         [funDefTabNameSpan]);
   var button = Ray.UI.makeEditButton();
   var funDefTab = new goog.ui.Tab(funDefContent);
+
+  funDefTab.nameSpan_ = funDefTabNameSpan;
 
   funDefTab.addChild(button, true);
   funDefTab.workspaceId_ = 'blockly_function_definition_' + String(id);

@@ -220,6 +220,7 @@ Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
   if(oldFunSpec.name !== funSpec.name) {
     funAppBlockProto.name_ = funSpec.name;
     Ray.Shared.updateFunAppBlockNames(funId, funSpec.name);
+    Ray.Shared.updateFunTabName(funDefBlockly, funId, funSpec.name);
     console.log('Names changed!');
   }
 
@@ -268,6 +269,10 @@ Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
   funDefBlockly.funSpec = funSpec;
   funDefBlockly.mainWorkspace.signature_.open();
 
+};
+
+Ray.Shared.updateFunTabName = function(Blockly, funId, newName) {
+  goog.dom.setTextContent(Blockly.funDefTab.nameSpan_, 'Define ' + newName + ' ');
 };
 
 Ray.Shared.removeFunAppBlockSlot = function (funId, argIx) {
