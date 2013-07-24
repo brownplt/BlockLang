@@ -263,7 +263,7 @@ Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
   // If I change arguments as well, I don't want to change value again
   if(!Ray.Shared.areSameTypes(oldFunSpec.returnType, funSpec.returnType)) {
     funAppBlockProto.outputType_ = funSpec.returnType;
-    Ray.Shared.updateFunAppBlockOutputType(funId, value);
+    Ray.Shared.updateFunAppBlockOutputType(funId, funSpec.returnType);
   }
 
   funDefBlockly.funSpec = funSpec;
