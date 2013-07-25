@@ -73,7 +73,18 @@ Ray.Shared.addToSavedBlocks = function(block) {
     throw 'Would overwrite pre-existing block!';
   }
   Ray.Shared.savedBlocks_.push(block);
-  Ray.Blocks.addToBlockDirectory(Ray.Shared.blockDirectory_, block.externalName_, block);
+  //Ray.Blocks.addToBlockDirectory(Ray.Shared.blockDirectory_, block.externalName_, block);
+};
+
+Ray.Shared.removeFromSavedBlocks = function(funId) {
+  var blockIx = goog.array.findIndex(Ray.Shared.savedBlocks_, function(block) {
+    return block.funId_ === funId;
+  });
+  if(blockIx === -1) {
+    throw 'Block with funId not found in Ray.Shared.savedBlocks_';
+  } else {
+    goog.array.removeAt(Ray.Shared.savedBlocks_, blockIx);
+  }
 };
 
 /**
@@ -114,13 +125,16 @@ Ray.Shared.flyoutCategory = function(key, blocks, gaps, margin, workspace, Block
     }
   }
 
+  // Dynamically recreate the block directory
+  Ray.Shared.blockDirectory_ = Ray.Blocks.generateBlockDirectory(Ray.Shared.savedBlocks_);
   var categoryBlocks = Ray.Shared.lookupInSharedBlockDirectory_(key);
   if(categoryBlocks) {
     allBlocks = allBlocks.concat(categoryBlocks);
   }
 
   if(allBlocks.length === 0) {
-    throw 'Nothing in category!';
+    //throw 'Nothing in category!';
+    return;
   }
 
   goog.array.stableSort(allBlocks, function(blockName1, blockName2) {
@@ -295,6 +309,24 @@ Ray.Shared.destroyFunArgGlobally = function(Blockly, funId, argIx) {
   if(!goog.array.removeAt(Blockly.funArgBlockProtos, argIx)) {
     throw 'Invalid argIx!';
   }
+};
+
+Ray.Shared.destroyFunGlobally = function(Blockly, funId) {
+  var argIx = Blockly.funSpec.length;
+  while(--argIx >= 0) {
+    Ray.Shared.destroyFunArgGlobally(funId, argIx);
+  }
+
+  goog.array.forEach(Ray.Shared.getFunAppBlocksFromDB(funId), function(block) {
+    block.dispose();
+  });
+
+  Blockly.funArgBlockProtos = null;
+  Blockly.funAppBlockProto = null;
+  Blockly.funSpec = null;
+  Blockly.mainWorkspace.dispose();
+
+  Ray.Shared.removeFromSavedBlocks(funId);
 };
 
 Ray.Shared.getArgBlockProto = function(Blockly, argIx) {

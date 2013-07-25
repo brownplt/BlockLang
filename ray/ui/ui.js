@@ -17,7 +17,7 @@ Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
 
 
 Ray.UI.functionDefinitionDom = function(id) {
-  var iframe = goog.dom.getElementById('blockly_function_definition_' + String(id));
+  return goog.dom.getElement('blockly_function_definition_' + String(id));
 };
 
 Ray.UI.isDisplayedContainer = function(workspace) {
@@ -25,7 +25,7 @@ Ray.UI.isDisplayedContainer = function(workspace) {
 };
 
 Ray.UI.mainDom = function() {
-  return goog.dom.getElementById('blockly_main');
+  return goog.dom.getElement('blockly_main');
 }
 
 Ray.UI.switchDisplayedWorkspace = function(from, to) {
@@ -114,6 +114,7 @@ Ray.UI.openFunDefEditor = function(Blockly) {
   });
   dialog.onDelete(function(e) {
     console.log('\'Delete\' clicked!');
+    Ray.Shared.destroyFunGlobally(Blockly, Blockly.funId);
     Ray.UI.removeFunDef(Blockly.funId, Blockly.funDefTab);
   });
   dialog.setFunSpec(Blockly.funSpec);
