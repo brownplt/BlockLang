@@ -226,8 +226,11 @@ then have it fill in the appropriate literal.
   definition to indicate that
   the definition is unfinished.
 - [ ] Figure out interface for removing/changing values
-
-* Immediate items to bring up with Emmanuel * 
+- [ ] Require at least one argument for functions
+- [ ] Make purpose statement area much larger (input -> textarea)
+- [ ] Have individual items in the function definition dialog turn green when valid, 
+  and red otherwise, with localized error messages
+* Immediate items to bring up with Emmanuel
 - How to evaluate expression inside function body? Should we make
   students provide values for the arguments, or just disallow this?
 
