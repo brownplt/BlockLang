@@ -4,6 +4,7 @@
     <script type="text/javascript" src="ray/ray-deps.js"></script>
     <title>UI Demo</title>
     <link rel="stylesheet" type="text/css" href="ray/ui/css/ui.css">
+    <link rel="stylesheet" type="text/css" href="ink-2.2.0/ink.css">
     <script type="text/javascript">
         /** Ray Imports */
         goog.require('Ray.Main');
@@ -25,20 +26,28 @@
     </script>
 </head>
 <body>
-<div id="header" class="header row">
-    <div id="create_function_button"
-         class="goog-flat-button goog-inline-block"
-         title="Define a new function to use in your program">
-        Create a new function
+<div class="ink-grid">
+<div id="header" class="column-group">
+    <div class="large-50">
+
+        <div id="create_function_button"
+             class="goog-flat-button goog-inline-block"
+             title="Define a new function to use in your program">
+            Create a new function
+        </div>
+
+
+        <div id="evaluate_expression_button"
+             class="evaluate-button goog-inline-block"
+             title="Evaluate the program in the main workspace">
+            Evaluate expression in Main Workspace
+        </div>
     </div>
-    <div id="evaluate_expression_button"
-         class="evaluate-button goog-inline-block"
-         title="Evaluate the program in the main workspace">
-        Evaluate expression in Main Workspace
+    <div class="large-50 content-right">
+        <div id="evaluation_results"></div>
     </div>
-    <div id="evaluation_results"></div>
 </div>
-<div class="body row scroll-y">
+<div class="body">
     <div id="workspace_tabs" class="goog-tab-bar goog-tab-bar-top">
         <div id="tab_blockly_main" class="goog-tab goog-tab-selected">Main Workspace</div>
     </div>
@@ -48,6 +57,7 @@
             <iframe id="blockly_main" src="Javascript:''"></iframe>
         </div>
     </div>
+</div>
 </div>
 <script>
     var r = Ray.Main.createRay();
@@ -64,7 +74,8 @@
     tabbar.decorate(goog.dom.getElement('workspace_tabs'));
     tabbar.getSelectedTab().workspaceId_ = 'blockly_main';
 
-    //dialog.addBlockly();
+    Ray.Main.resizeWorkspaceContent();
+    goog.events.listen(window, goog.events.EventType.RESIZE, Ray.Main.resizeWorkspaceContent);
 
     var createFunctionButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
     createFunctionButton.decorate(goog.dom.getElement('create_function_button'));

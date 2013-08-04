@@ -57,25 +57,14 @@ div.hidden_container {
   display: none;
 }
 
+#header {
+    background-color: #99c0ff;
+}
+
 #workspace_content {
   overflow: auto;
 }
 
-.row, .col { overflow: hidden; position: absolute; }
-.row { left: 0; right: 0; }
-.col { top: 0; bottom: 0; }
-.scroll-x { overflow-x: auto; }
-.scroll-y { overflow-y: auto; }
-
-.header.row {
-  height: 25px;
-  top: 0;
-}
-
-.body.row {
-  top: 27px;
-  bottom: 0;
-}
 
 #create_function_button {
   float: left;
@@ -86,12 +75,10 @@ div.hidden_container {
 }
 
 #evaluation_results {
-  /* float: right; */
   background-color: lightpink;
   border: 2px solid black;
   margin: 2px;
   padding: 2px;
-  /* height: 15px; */
 }
 
 .invalid-state-message {

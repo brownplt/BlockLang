@@ -151,6 +151,8 @@ then have it fill in the appropriate literal.
 - [X] Fixed bug where opening/closing signature Would cause text highlight
 - [X] Make it possible to rename function arguments.
 - [X] Make it possible to edit function signature, remove a function.
+- [X] Figure out how to get the workspace to fit in the available
+  space exactly.
 
 * Remaining Tasks
 ** High Priority
@@ -199,8 +201,6 @@ then have it fill in the appropriate literal.
 - [ ] See about having function body not just floating in
   space. (Don't worry about this, just throw an error if they try to
   run and there are multiple expressions that could be the body)
-- [ ] Figure out how to get the workspace to fit in the available
-  space exactly.
 - [ ] Build up support for vertical layouts, and convert 'if' and
   'cond' to use vertical layouts.
 - [ ] Remove dependency on jQuery. Not necessarily worth the hassle,

@@ -45,6 +45,18 @@ Ray.Main.initializeFunDefBlocklyDom = function() {
                                             src: "Javascript:''"})));
 };
 
+Ray.Main.resizeWorkspaceContent = function() {
+  var tabsHeight = goog.dom.getElement('workspace_tabs').offsetHeight;
+  console.log('workspace_tabs offsetHeight: ' + String(tabsHeight));
+  var viewportHeight = window.innerHeight;
+  console.log('window height: ' + String(viewportHeight));
+  var headerHeight = goog.dom.getElement('header').offsetHeight;
+  console.log('header height: ' + String(headerHeight));
+  var contentHeight = viewportHeight - headerHeight - tabsHeight;
+  console.log('desired iframe height: ' + String(contentHeight));
+  goog.style.setHeight(goog.dom.getElement('workspace_content'), contentHeight);
+};
+
 Ray.Main.runTest = function() {
   return Ray.Test();
 };
