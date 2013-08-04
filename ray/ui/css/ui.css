@@ -58,13 +58,16 @@ div.hidden_container {
 }
 
 #header {
-    background-color: #99c0ff;
+    /* background-color: #99c0ff; */
 }
 
 #workspace_content {
   overflow: auto;
 }
 
+.ink-grid {
+    padding: 0px;
+}
 
 #create_function_button {
   float: left;
