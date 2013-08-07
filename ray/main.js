@@ -218,11 +218,56 @@ Ray.Main.go = function(evaluateButton) {
 
 Ray.Main.bindFunDefBlockly = function(Blockly) {
   var r = Ray.Shared.Ray;
-  var body_block = Ray.Main.getFunBodyBlock(Blockly);
-  var body = Ray.Main.blockToCode(body_block);
-  var function_parts = Ray.Main.createFunArgSpec(r, Blockly.funSpec, false);
-  var fn = r.Expr.Lambda(function_parts.argSpec, body, function_parts.returnType);
+  var bodyBlock = Ray.Main.getFunBodyBlock(Blockly);
+  var body = Ray.Main.blockToCode(bodyBlock);
+  var functionParts = Ray.Main.createFunArgSpec(r, Blockly.funSpec, false);
+  var fn = r.Expr.Lambda(functionParts.argSpec, body, functionParts.returnType);
   r.bindTopLevel(Blockly.funName, fn);
+};
+
+Ray.Main.isExampleBlock = function(block) {
+  return block.name_ === Ray.Blocks.EXAMPLE_BLOCK_NAME;
+};
+
+Ray.Main.hasFunBodyBlock = function(Blockly) {
+  var workspace = Blockly.mainWorkspace;
+  var topBlocks = workspace.getTopBlocks(false);
+  var potentialBodyBlocks = goog.array.filter(topBlocks, function(block) {
+    return !Ray.Main.isExampleBlock(block);
+  });
+  if(potentialBodyBlocks.length > 1 || potentialBodyBlocks.length === 0) {
+    // Too many or too few blocks
+    return false;
+  }
+
+  var bodyBlock = potentialBodyBlocks.shift();
+  return Ray.Types.areMatchingTypes(Blockly.funSpec.returnType, bodyBlock.getOutputType());
+};
+
+Ray.Main.hasHoles = function(block) {
+  var uncheckedConnections = block.getConnections_(true);
+  while(uncheckedConnections.length > 0) {
+    var conn = uncheckedConnections.shift();
+    if(!conn.isConnected()) {
+      return true;
+    }
+    var connectedBlock = conn.getConnectedBlock();
+    var allSubConnections = connectedBlock.getAllConnections();
+    var subConnections = goog.array.filter(allSubConnections, function(subConn) {
+      return subConn !== conn;
+    });
+    uncheckedConnections = uncheckedConnections.concat(subConnections);
+  }
+  return false;
+};
+
+/**
+ * We will treat a function definition as finished if there is a single body block, of the right type, with no holes in it
+ * @param Blockly
+ */
+Ray.Main.isFinishedFunctionDefinition = function(Blockly) {
+  return Ray.Main.hasFunBodyBlock(Blockly) &&
+         !Ray.Main.hasHoles(Ray.Main.getFunBodyBlock(Blockly));
 };
 
 Ray.Main.getFunBlockName = function(name) {

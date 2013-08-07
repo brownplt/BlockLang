@@ -23,6 +23,7 @@ Ray.Blocks.CONDITIONAL_PREFIX = "ray_conditional_";
 Ray.Blocks.ARG_PREFIX = "ray_function_arg_";
 Ray.Blocks.FUNCTION_DEF_PREFIX = "ray_user_function_";
 Ray.Blocks.HELP_URL = "#";
+Ray.Blocks.EXAMPLE_BLOCK_NAME = 'example';
 
 Ray.Blocks.blockName = function(name) {
   return Ray.Blocks.BLOCK_PREFIX + goog.string.htmlEscape(name);
@@ -271,10 +272,10 @@ Ray.Blocks.typeNameBlock = function(type) {
 
 Ray.Blocks.exampleBlock = function() {
   var exampleBlock = {};
-  exampleBlock.name_ = 'example';
-  exampleBlock.externalName_ = 'example';
+  exampleBlock.name_ = Ray.Blocks.EXAMPLE_BLOCK_NAME;
+  exampleBlock.externalName_ = Ray.Blocks.EXAMPLE_BLOCK_NAME;
   exampleBlock.renderAsExpression_ = true;
-  exampleBlock.type = 'example';
+  exampleBlock.type = Ray.Blocks.EXAMPLE_BLOCK_NAME;
   exampleBlock.blockClass_ = Ray.Globals.Blocks.Example;
   exampleBlock.preInit_ = function() {
     if(this.outputConnection) {
@@ -291,4 +292,4 @@ Ray.Blocks.exampleBlock = function() {
     this.appendValueWithType('RESULT', new Ray.Types.Unknown());
   };
   return exampleBlock;
-}
+};

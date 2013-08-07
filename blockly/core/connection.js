@@ -219,6 +219,14 @@ Blockly.Connection.singleConnection_ = function(block, orphanBlock) {
   return connection;
 };
 
+Blockly.Connection.prototype.isConnected = function() {
+  return !!this.targetConnection;
+};
+
+Blockly.Connection.prototype.getConnectedBlock = function() {
+  return this.targetConnection.sourceBlock_;
+};
+
 /**
  * Disconnect this connection.
  */
