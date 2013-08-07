@@ -153,6 +153,8 @@ then have it fill in the appropriate literal.
 - [X] Make it possible to edit function signature, remove a function.
 - [X] Figure out how to get the workspace to fit in the available
   space exactly.
+- [X] Main vertical scrollbar is broken.
+- [X] Fix weird rendering issue with statement blocks.
 
 * Remaining Tasks
 ** High Priority
@@ -216,8 +218,6 @@ then have it fill in the appropriate literal.
   according to their type. Same with function name. 
 - [ ] Ordering for evaluation of multiple expressions in main workspace.
 - [ ] Figure out how to handle unfinished function definitions
-- [ ] Main vertical scrollbar is broken.
-- [ ] Fix weird rendering issue with statement blocks.
 - [ ] X to remove argument
 - [ ] Make pasting happen at cursor, not just at location of copy
 - [ ] Use DragLists to handle re-ordering arguments
@@ -288,3 +288,5 @@ doing this is kind of annoying and I don't really don't want to
 figure out how to get this working. I propose simplifying the
 implementation of Ray.Shared.flyoutCategory to dynamically create the
 blockDir from Ray.Shared.savedBlocks_, and then just use that.
+
+Problem is in renderDrawLeft_

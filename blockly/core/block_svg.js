@@ -689,7 +689,8 @@ Blockly.BlockSvg.prototype.renderDrawLeft_ = function(steps, highlightSteps,
     if (this.squareTopLeftCorner_) {
       highlightSteps.push('V', 1);
     } else {
-      highlightSteps.push('V', Blockly.BlockSvg.CORNER_RADIUS);
+      // I think this is the problem!!
+      //highlightSteps.push('V', Blockly.BlockSvg.CORNER_RADIUS);
     }
   }
   steps.push('z');
