@@ -5,6 +5,7 @@ goog.provide('Ray.Main');
  */
 goog.require('Ray.Blocks');
 goog.require('Ray.Blocks.UserFun');
+goog.require('Ray.Evaluation');
 goog.require('Ray.Generator');
 goog.require('Ray.Lib');
 goog.require('Ray.Ray');
@@ -47,13 +48,13 @@ Ray.Main.initializeFunDefBlocklyDom = function() {
 
 Ray.Main.resizeWorkspaceContent = function() {
   var tabsHeight = goog.dom.getElement('workspace_tabs').offsetHeight;
-  console.log('workspace_tabs offsetHeight: ' + String(tabsHeight));
+  //console.log('workspace_tabs offsetHeight: ' + String(tabsHeight));
   var viewportHeight = window.innerHeight;
-  console.log('window height: ' + String(viewportHeight));
+  //console.log('window height: ' + String(viewportHeight));
   var headerHeight = goog.dom.getElement('header').offsetHeight;
-  console.log('header height: ' + String(headerHeight));
+  //console.log('header height: ' + String(headerHeight));
   var contentHeight = viewportHeight - headerHeight - tabsHeight;
-  console.log('desired iframe height: ' + String(contentHeight));
+  //console.log('desired iframe height: ' + String(contentHeight));
   goog.style.setHeight(goog.dom.getElement('workspace_content'), contentHeight);
 };
 
@@ -126,148 +127,11 @@ Ray.Main.makeFunAppBlock = function(r, name, returnType, argSpec, funId) {
   return Ray.Blocks.UserFun.generateAppBlock(name, value, funId);
 };
 
-/**
- *
- * @param r
- * @param funSpec
- * @param opt_asValue
- */
-Ray.Main.createFunArgSpec = function(r, funSpec, opt_asValue) {
-  var asValue = goog.isDef(opt_asValue) ? opt_asValue : false;
-  var argTypes = goog.array.map(funSpec.args, function(a) { return a.getType(); });
-  var argNames = goog.array.map(funSpec.args, function(a)  {return a.getName(); });
-
-  var argsType = new Ray.Types.ArgumentsType(
-    new Ray.Types.ListOfTypes(argTypes), null);
-
-  return asValue ?
-         new r.Value.ArgumentSpec(argNames, {}, null, argsType) :
-         new r.Expr.ArgumentSpec(argNames, {}, null, argsType);
-};
-
-
 Ray.Main.makeFunAppAndArgBlocks = function(r, funSpec) {
-  var argSpec = Ray.Main.createFunArgSpec(r, funSpec, true);
+  var argSpec = Ray.Evaluation.createFunArgSpec(r, funSpec, true);
   var argBlocks = Ray.Main.makeFunArgBlocks(funSpec.args, funSpec.funId);
   var appBlock = Ray.Main.makeFunAppBlock(r, funSpec.name, funSpec.returnType, argSpec, funSpec.funId);
   return { 'args': argBlocks, 'app': appBlock };
-};
-
-Ray.Main.getFunBodyBlock = function(Blockly) {
-  var workspace = Blockly.mainWorkspace;
-  var topBlocks = workspace.getTopBlocks(false);
-  if(topBlocks.length > 1) {
-    throw 'Only one expression can be present at the top-level in a function definition workspace';
-  } else {
-    return topBlocks[0];
-  }
-};
-
-Ray.Main.blockToCode = function(block) {
-  var expr = Ray.Generator.generate(block, Ray.Shared.Ray);
-  return expr;
-};
-
-Ray.Main.evaluateCode = function(expr) {
-  var result = Ray.Shared.Ray.eval(expr);
-  return result;
-};
-
-Ray.Main.formatResult = function(result) {
-  var text = Ray.Shared.Ray.display(result);
-  return text;
-};
-
-Ray.Main.evaluateBlockAndFormat = function(block) {
-  var code = Ray.Main.blockToCode(block);
-  var result = Ray.Main.evaluateCode(code);
-  return Ray.Main.formatResult(result);
-};
-
-Ray.Main.getMainExpressionBlock = function() {
-  var Blockly = Ray.Shared.MainBlockly;
-  var workspace = Blockly.mainWorkspace;
-  var topBlocks = workspace.getTopBlocks(false);
-  if(topBlocks.length > 1) {
-    throw 'Only one expression can be present at the top-level in a function definition workspace';
-  } else {
-    return topBlocks[0];
-  }
-};
-
-Ray.Main.go = function(evaluateButton) {
-  goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Main.bindFunDefBlockly);
-  var originalContent = evaluateButton.getContent();
-  var originalTooltip = evaluateButton.getTooltip();
-  evaluateButton.setContent('Computing... click to stop');
-  evaluateButton.setTooltip('Click to interrupt the current computation');
-  goog.dom.classes.add(evaluateButton.getContentElement(), 'halt-button');
-  var result = null;
-
-  try {
-    result = Ray.Main.evaluateBlockAndFormat(Ray.Main.getMainExpressionBlock());
-  } catch(e) {
-    result = e;
-  }
-
-  evaluateButton.setContent(originalContent);
-  evaluateButton.getTooltip(originalTooltip);
-  goog.dom.classes.remove(evaluateButton.getContentElement(), 'halt-button');
-  return result;
-};
-
-Ray.Main.bindFunDefBlockly = function(Blockly) {
-  var r = Ray.Shared.Ray;
-  var bodyBlock = Ray.Main.getFunBodyBlock(Blockly);
-  var body = Ray.Main.blockToCode(bodyBlock);
-  var functionParts = Ray.Main.createFunArgSpec(r, Blockly.funSpec, false);
-  var fn = r.Expr.Lambda(functionParts.argSpec, body, functionParts.returnType);
-  r.bindTopLevel(Blockly.funName, fn);
-};
-
-Ray.Main.isExampleBlock = function(block) {
-  return block.name_ === Ray.Blocks.EXAMPLE_BLOCK_NAME;
-};
-
-Ray.Main.hasFunBodyBlock = function(Blockly) {
-  var workspace = Blockly.mainWorkspace;
-  var topBlocks = workspace.getTopBlocks(false);
-  var potentialBodyBlocks = goog.array.filter(topBlocks, function(block) {
-    return !Ray.Main.isExampleBlock(block);
-  });
-  if(potentialBodyBlocks.length > 1 || potentialBodyBlocks.length === 0) {
-    // Too many or too few blocks
-    return false;
-  }
-
-  var bodyBlock = potentialBodyBlocks.shift();
-  return Ray.Types.areMatchingTypes(Blockly.funSpec.returnType, bodyBlock.getOutputType());
-};
-
-Ray.Main.hasHoles = function(block) {
-  var uncheckedConnections = block.getConnections_(true);
-  while(uncheckedConnections.length > 0) {
-    var conn = uncheckedConnections.shift();
-    if(!conn.isConnected()) {
-      return true;
-    }
-    var connectedBlock = conn.getConnectedBlock();
-    var allSubConnections = connectedBlock.getAllConnections();
-    var subConnections = goog.array.filter(allSubConnections, function(subConn) {
-      return subConn !== conn;
-    });
-    uncheckedConnections = uncheckedConnections.concat(subConnections);
-  }
-  return false;
-};
-
-/**
- * We will treat a function definition as finished if there is a single body block, of the right type, with no holes in it
- * @param Blockly
- */
-Ray.Main.isFinishedFunctionDefinition = function(Blockly) {
-  return Ray.Main.hasFunBodyBlock(Blockly) &&
-         !Ray.Main.hasHoles(Ray.Main.getFunBodyBlock(Blockly));
 };
 
 Ray.Main.getFunBlockName = function(name) {
@@ -311,4 +175,8 @@ Ray.Main.Block = function(block_name, block, editable) {
   if (goog.isFunction(this.init)) {
     this.init();
   }
+};
+
+Ray.Main.go = function(evaluateButton) {
+  return Ray.Evaluation.go(evaluateButton);
 };

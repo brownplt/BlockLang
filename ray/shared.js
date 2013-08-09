@@ -286,7 +286,7 @@ Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
 };
 
 Ray.Shared.updateFunTabName = function(Blockly, funId, newName) {
-  goog.dom.setTextContent(Blockly.funDefTab.nameSpan_, 'Define ' + newName + ' ');
+  Blockly.funDefTab.setFunName(newName);
 };
 
 Ray.Shared.removeFunAppBlockSlot = function (funId, argIx) {

@@ -2,6 +2,7 @@
 goog.provide('Ray.UI');
 
 goog.require('Ray.UI.FunDef');
+goog.require('Ray.UI.FunTab');
 
 goog.require('goog.array');
 goog.require('goog.dom');
@@ -14,11 +15,6 @@ goog.require('goog.ui.LinkButtonRenderer');
 
 Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
 Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
-
-
-Ray.UI.functionDefinitionDom = function(id) {
-  return goog.dom.getElement('blockly_function_definition_' + String(id));
-};
 
 Ray.UI.isDisplayedContainer = function(workspace) {
   return goog.dom.classes.has(goog.dom.getParentElement(workspace), 'container');
@@ -53,7 +49,7 @@ Ray.UI.showWorkspaceForTab = function(tab, workspace_content) {
 Ray.UI.addFunDefWorkspaceDom = function(id, container) {
   var funDefDiv = goog.dom.createDom('div', 'hidden_container');
   var funDefIFrame = goog.dom.createDom('iframe', {
-    id: 'blockly_function_definition_' + String(id),
+    id: Ray.UI.Util.funDefDomId(id),
     src: "Javascript:''"});
   goog.dom.appendChild(funDefDiv, funDefIFrame);
   goog.dom.appendChild(container, funDefDiv);
@@ -67,26 +63,18 @@ Ray.UI.getFunId = function() {
 
 
 Ray.UI.addFunDefWorkspaceTab = function(id, funName, tabbar) {
-  var funDefTabNameSpan = goog.dom.createDom('span', {},
-                                             [goog.dom.createTextNode('Define ' + funName + ' ')]);
-  var funDefContent = goog.dom.createDom('div', 'goog-inline-block',
-                                         [funDefTabNameSpan]);
-  var button = Ray.UI.makeEditButton();
-  var funDefTab = new goog.ui.Tab(funDefContent);
+  var Blockly = Ray.Shared.lookupFunDefBlockly(id);
 
-  funDefTab.nameSpan_ = funDefTabNameSpan;
-
-  funDefTab.addChild(button, true);
-  funDefTab.workspaceId_ = 'blockly_function_definition_' + String(id);
+  var funDefTab = new Ray.UI.FunTab.FunTab(Blockly);
   tabbar.addChild(funDefTab, true);
 
-  var Blockly = Ray.Shared.lookupFunDefBlockly(id);
   Blockly.funDefTab = funDefTab;
 
-  goog.events.listen(button.getElement(), goog.events.EventType.CLICK, function(e) {
-    console.log('hello');
+  funDefTab.onEdit(function(e) {
     Ray.UI.openFunDefEditor(Blockly);
   });
+
+
   return funDefTab;
 };
 
@@ -95,7 +83,7 @@ Ray.UI.removeFunDef = function(id, funDefTab) {
   tabbar.removeChild(funDefTab, true);
   funDefTab.dispose();
 
-  var funDefWorkspace = Ray.UI.functionDefinitionDom(id);
+  var funDefWorkspace = goog.dom.getElement(Ray.UI.Util.funDefDomId(id));
   if(Ray.UI.isDisplayedContainer(funDefWorkspace)) {
     Ray.UI.switchDisplayedWorkspace(funDefWorkspace, Ray.UI.mainDom());
   }
@@ -120,13 +108,3 @@ Ray.UI.openFunDefEditor = function(Blockly) {
   dialog.setFunSpec(Blockly.funSpec);
   dialog.setVisible(true);
 };
-
-
-Ray.UI.makeEditButton = function() {
-  var image = goog.dom.createDom('img', {'src': '../../iconic/raster/cyan/pen_alt_fill_12x12.png'});
-  var button = new goog.ui.CustomButton(image, Ray.UI.EditButtonRenderer);
-  return button;
-};
-
-Ray.UI.EvaluateButtonRenderer = goog.ui.ControlRenderer.getCustomRenderer(goog.ui.FlatButtonRenderer, 'evaluate-button');
-Ray.UI.EditButtonRenderer = goog.ui.ControlRenderer.getCustomRenderer(goog.ui.CustomButtonRenderer, 'edit-button');

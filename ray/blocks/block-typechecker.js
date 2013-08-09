@@ -11,34 +11,32 @@ goog.require('Ray.Runtime');
 goog.require('Ray.Types');
 goog.require('Ray.Env');
 
-var R = Ray.Runtime;
-
 var Blocks = Ray.Globals.Blocks;
 
-var typecheckCons = function(block, type, typeEnv) {
-  var carType = typecheckBlockExpr_(block, 'car', type.elementType, typeEnv);
-  var cdrType = typecheckBlockExpr_(block, 'cdr', type, typeEnv);
+Ray.Blocks.TypeChecker.cons = function(block, type, typeEnv) {
+  var carType = Ray.Blocks.TypeChecker.expr_(block, 'car', type.elementType, typeEnv);
+  var cdrType = Ray.Blocks.TypeChecker.expr_(block, 'cdr', type, typeEnv);
   var principalType = Ray.Types.principalType_(new Ray.Types.List(carType), cdrType);
   return principalType;
 };
 
-var typecheckEmpty = function(block, type, typeEnv) {
+Ray.Blocks.TypeChecker.empty = function(block, type, typeEnv) {
   return type;
 };
 
-var typecheckFirst = function(block, type, typeEnv) {
-  var xType = typecheckBlockExpr_(block, 'x', new Ray.Types.List(type), typeEnv);
+Ray.Blocks.TypeChecker.first = function(block, type, typeEnv) {
+  var xType = Ray.Blocks.TypeChecker.expr_(block, 'x', new Ray.Types.List(type), typeEnv);
   return !!xType ? xType.elementType : xType;
 };
 
-var typecheckRest = function(block, type, typeEnv) {
-  var xType = typecheckBlockExpr_(block, 'x', type, typeEnv);
+Ray.Blocks.TypeChecker.rest = function(block, type, typeEnv) {
+  var xType = Ray.Blocks.TypeChecker.expr_(block, 'x', type, typeEnv);
   return xType;
 };
 
 
 
-var typecheckFunctionArguments = function(block, funType, args, typeEnv) {
+Ray.Blocks.TypeChecker.functionArguments = function(block, funType, args, typeEnv) {
   var isUserFunction = !!block.isUserFunction_;
   var argsType = funType.argumentsType;
   var listOfTypes = argsType.positionalArgTypes.list;
@@ -48,7 +46,7 @@ var typecheckFunctionArguments = function(block, funType, args, typeEnv) {
     return false;
   }
   var positionalArgTypes = goog.array.map(goog.array.range(positionalArgs.length), function(i) {
-    return typecheckBlockExpr_(block, isUserFunction ? ('P_ARG' + String(i)) : positionalArgs[i], listOfTypes[i], typeEnv);
+    return Ray.Blocks.TypeChecker.expr_(block, isUserFunction ? ('P_ARG' + String(i)) : positionalArgs[i], listOfTypes[i], typeEnv);
   });
 
   if(!goog.array.every(positionalArgTypes, function(p_arg_type) { return !!p_arg_type; })) {
@@ -60,7 +58,7 @@ var typecheckFunctionArguments = function(block, funType, args, typeEnv) {
   }
   var restArgElementType = argsType.restArgType.elementType;
   var restArgTypes = goog.array.map(goog.array.range(block.restArgCount_), function(i) {
-    return typecheckBlockExpr_(block, 'REST_ARG' + String(i), restArgElementType, typeEnv);
+    return Ray.Blocks.TypeChecker.expr_(block, 'REST_ARG' + String(i), restArgElementType, typeEnv);
   });
 
   if(!goog.array.every(restArgTypes, function(restArgType) { return !!restArgType; })) {
@@ -70,7 +68,7 @@ var typecheckFunctionArguments = function(block, funType, args, typeEnv) {
   return funType.returnType;
 };
 
-var typecheckBlockExpr_ = function(block, inputName, type, typeEnv) {
+Ray.Blocks.TypeChecker.expr_ = function(block, inputName, type, typeEnv) {
   var input = block.getInput(inputName);
   if(!input.connection) {
     throw 'Input doesn\'t have a connection';
@@ -79,7 +77,7 @@ var typecheckBlockExpr_ = function(block, inputName, type, typeEnv) {
   var conn = input.connection;
   conn.inferType(type);
   if(conn.targetConnection && conn.targetConnection.sourceBlock_) {
-    return typecheckBlockExpr(conn.targetConnection.sourceBlock_, type, typeEnv);
+    return Ray.Blocks.TypeChecker.expr(conn.targetConnection.sourceBlock_, type, typeEnv);
   } else {
     return type;
   }
@@ -92,7 +90,7 @@ var typecheckBlockExpr_ = function(block, inputName, type, typeEnv) {
  * @param {Ray.Env} typeEnv
  * returns type of expr in typeEnv or false if expr fails typechecking
  */
-var typecheckBlockExpr = function(block, type, typeEnv) {
+Ray.Blocks.TypeChecker.expr = function(block, type, typeEnv) {
   /* We don't have to worry about type, because if the block typechecks,
    * whatever we get back will be at least as specific as type
    */    
@@ -100,16 +98,16 @@ var typecheckBlockExpr = function(block, type, typeEnv) {
   var outputType;
   switch(block.blockClass_) {
     case Blocks.Empty:
-      outputType = typecheckEmpty(block, type, typeEnv);
+      outputType = Ray.Blocks.TypeChecker.empty(block, type, typeEnv);
       break;
     case Blocks.First:
-      outputType = typecheckFirst(block, type, typeEnv);
+      outputType = Ray.Blocks.TypeChecker.first(block, type, typeEnv);
       break;
     case Blocks.Rest:
-      outputType = typecheckRest(block, type, typeEnv);
+      outputType = Ray.Blocks.TypeChecker.rest(block, type, typeEnv);
       break;
     case Blocks.Cons:
-      outputType = typecheckCons(block, type, typeEnv);
+      outputType = Ray.Blocks.TypeChecker.cons(block, type, typeEnv);
       break;
     case Blocks.Num:
       var num =  new Ray.Types.Num();
@@ -130,9 +128,9 @@ var typecheckBlockExpr = function(block, type, typeEnv) {
 
     case Blocks.Cond:
       var testClauseCount = block.testClauseCount_;
-      var questionTypes = [typecheckBlockExpr_(block, 'CONDITION', new Ray.Types.Boolean(), typeEnv)];
+      var questionTypes = [Ray.Blocks.TypeChecker.expr_(block, 'CONDITION', new Ray.Types.Boolean(), typeEnv)];
       goog.array.forEach(goog.array.range(testClauseCount), function(i) {
-        questionTypes.push(typecheckBlockExpr_(block, 'CONDITION' + String(i), new Ray.Types.Boolean(), typeEnv));
+        questionTypes.push(Ray.Blocks.TypeChecker.expr_(block, 'CONDITION' + String(i), new Ray.Types.Boolean(), typeEnv));
       });
       var bool = new Ray.Types.Boolean();
       var questionTypesGood = goog.array.every(questionTypes, function(questionType) {
@@ -141,23 +139,23 @@ var typecheckBlockExpr = function(block, type, typeEnv) {
       if(!questionTypesGood) {
         return false;
       }
-      var answerTypes = [typecheckBlockExpr_(block, 'BODY', type, typeEnv)];
+      var answerTypes = [Ray.Blocks.TypeChecker.expr_(block, 'BODY', type, typeEnv)];
       goog.array.forEach(goog.array.range(testClauseCount), function(i) {
-        answerTypes.push(typecheckBlockExpr_(block, 'BODY' + String(i), type, typeEnv));
+        answerTypes.push(Ray.Blocks.TypeChecker.expr_(block, 'BODY' + String(i), type, typeEnv));
       });
       if(block.elseClause_) {
-        answerTypes.push(typecheckBlockExpr_(block, 'ELSE', type, typeEnv));
+        answerTypes.push(Ray.Blocks.TypeChecker.expr_(block, 'ELSE', type, typeEnv));
       }
       outputType = Ray.Types.principalType(answerTypes);
       break;
 
     case Blocks.If:
-      var predicateType = typecheckBlockExpr_(block, 'PRED', new Ray.Types.Boolean(), typeEnv);
+      var predicateType = Ray.Blocks.TypeChecker.expr_(block, 'PRED', new Ray.Types.Boolean(), typeEnv);
       if(!predicateType) {
         return false;
       }
-      var thenType = typecheckBlockExpr_(block, 'THEN_EXPR', type, typeEnv);
-      var elseType = typecheckBlockExpr_(block, 'ELSE_EXPR', type, typeEnv);
+      var thenType = Ray.Blocks.TypeChecker.expr_(block, 'THEN_EXPR', type, typeEnv);
+      var elseType = Ray.Blocks.TypeChecker.expr_(block, 'ELSE_EXPR', type, typeEnv);
       outputType = Ray.Types.principalType_(thenType, elseType);
       break;
 
@@ -166,7 +164,7 @@ var typecheckBlockExpr = function(block, type, typeEnv) {
       var argCount = block.restArgCount_;
       var bool = new Ray.Types.Boolean();
       var argTypes = goog.array.map(goog.array.range(argCount), function(i) {
-        return typecheckBlockExpr_(block, 'REST_ARG' + String(i), bool, typeEnv);
+        return Ray.Blocks.TypeChecker.expr_(block, 'REST_ARG' + String(i), bool, typeEnv);
       });
       outputType = goog.array.every(argTypes, function(arg_type) {
         return Ray.Types.areMatchingTypes(bool, arg_type);
@@ -188,7 +186,7 @@ var typecheckBlockExpr = function(block, type, typeEnv) {
       }
 
       var funType = new Ray.Types.FunctionType(fun.argSpec.argsType, fun.bodyType);
-      outputType = typecheckFunctionArguments(block, funType, fun.argSpec, typeEnv);
+      outputType = Ray.Blocks.TypeChecker.functionArguments(block, funType, fun.argSpec, typeEnv);
       break;
 
     case Blocks.Argument:
@@ -211,15 +209,15 @@ var typecheckBlockExpr = function(block, type, typeEnv) {
 
 };
 
-var typecheckStatement = function(block, typeEnv) {
+Ray.Blocks.TypeChecker.statement = function(block, typeEnv) {
   switch(block.blockClass_) {
     case Blocks.Example:
       var unknown = new Ray.Types.Unknown();
-      var expr = typecheckBlockExpr_(block, 'EXPR', unknown, typeEnv);
-      var result = typecheckBlockExpr_(block, 'RESULT', unknown, typeEnv);
+      var expr = Ray.Blocks.TypeChecker.expr_(block, 'EXPR', unknown, typeEnv);
+      var result = Ray.Blocks.TypeChecker.expr_(block, 'RESULT', unknown, typeEnv);
       var principalType = Ray.Types.principalType_(expr, result);
-      typecheckBlockExpr_(block, 'EXPR', principalType, typeEnv);
-      typecheckBlockExpr_(block, 'RESULT', principalType, typeEnv);
+      Ray.Blocks.TypeChecker.expr_(block, 'EXPR', principalType, typeEnv);
+      Ray.Blocks.TypeChecker.expr_(block, 'RESULT', principalType, typeEnv);
       return true;
       break;
     default:
@@ -230,16 +228,16 @@ var typecheckStatement = function(block, typeEnv) {
 
 Ray.Blocks.TypeChecker.typecheckBlock = function(block) {
   if(!block.outputConnection) {
-    return typecheckStatement(block, Ray.Env.emptyEnv());
+    return Ray.Blocks.TypeChecker.statement(block, Ray.Env.emptyEnv());
   } else {
     var originalOutputType = block.getOutputType(true);
-    var outputType = typecheckBlockExpr(block, block.getOutputType(true), Ray.Env.emptyEnv());
+    var outputType = Ray.Blocks.TypeChecker.expr(block, block.getOutputType(true), Ray.Env.emptyEnv());
     if(!outputType || !originalOutputType) {
       throw 'Failed to Typecheck';
     }
 
     if(!Ray.Types.areSameType(originalOutputType, outputType)) {
-      return typecheckBlockExpr(block, block.getOutputType(), Ray.Env.emptyEnv());
+      return Ray.Blocks.TypeChecker.expr(block, block.getOutputType(), Ray.Env.emptyEnv());
     } else {
       return outputType;
     }

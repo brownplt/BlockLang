@@ -40,12 +40,13 @@ goog.addDependency('../../../ray/blocks/inference.js', ['Ray.Inference'], ['Ray.
 goog.addDependency('../../../ray/blocks/misc.js', ['Ray.Blocks.misc'], ['Blockly', 'Ray.Globals', 'Ray.Inference', 'Ray.Runtime', 'Ray.Types', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml', 'goog.string']);
 goog.addDependency('../../../ray/blocks/user-fun.js', ['Ray.Blocks.UserFun'], ['Blockly', 'Ray.Blocks.misc', 'Ray.Globals', 'Ray.Inference', 'Ray.Runtime', 'Ray.Types', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml', 'goog.string']);
 goog.addDependency('../../../ray/env.js', ['Ray.Env'], ['Ray.Util', 'goog.array', 'goog.object']);
+goog.addDependency('../../../ray/evaluation.js', ['Ray.Evaluation'], ['Ray.Generator', 'Ray.Ray', 'Ray.Shared', 'Ray.Types', 'goog.array']);
 goog.addDependency('../../../ray/generate.js', ['Ray.Generator'], ['Ray.Blocks']);
 goog.addDependency('../../../ray/globals.js', ['Ray.Globals'], []);
 goog.addDependency('../../../ray/jquery.js', ['Ray.JQuery'], []);
 goog.addDependency('../../../ray/js-numbers.js', ['Ray.JSNumbers'], []);
 goog.addDependency('../../../ray/lib.js', ['Ray.Lib'], ['Ray.Globals', 'Ray.Ray', 'Ray.Types', 'goog.array']);
-goog.addDependency('../../../ray/main.js', ['Ray.Main'], ['Blockly.Xml', 'Ray.Blocks', 'Ray.Blocks.UserFun', 'Ray.Generator', 'Ray.Lib', 'Ray.Ray', 'Ray.Test', 'Ray.Types', 'Ray.UI', 'goog.dom', 'goog.object']);
+goog.addDependency('../../../ray/main.js', ['Ray.Main'], ['Blockly.Xml', 'Ray.Blocks', 'Ray.Blocks.UserFun', 'Ray.Evaluation', 'Ray.Generator', 'Ray.Lib', 'Ray.Ray', 'Ray.Test', 'Ray.Types', 'Ray.UI', 'goog.dom', 'goog.object']);
 goog.addDependency('../../../ray/ray-numbers.js', ['Ray.RayNumbers'], ['Ray.JSNumbers']);
 goog.addDependency('../../../ray/ray.js', ['Ray.Ray'], ['Ray.R', 'Ray.RayNumbers', 'Ray.Runtime']);
 goog.addDependency('../../../ray/runtime.js', ['Ray.R', 'Ray.Runtime'], ['Ray.Env', 'Ray.Globals', 'Ray.Types', 'Ray.Util', 'goog.array', 'goog.functions', 'goog.object', 'goog.structs.Set']);
@@ -54,5 +55,7 @@ goog.addDependency('../../../ray/test.js', ['Ray.Test'], ['Ray.JQuery', 'Ray.Lib
 goog.addDependency('../../../ray/typechecker.js', ['Ray.Typechecker'], ['Ray.Env', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types']);
 goog.addDependency('../../../ray/types.js', ['Ray.Types'], ['goog.array', 'goog.string']);
 goog.addDependency('../../../ray/ui/fun-def.js', ['Ray.UI.FunDef'], ['Blockly', 'Ray.Types', 'goog.array', 'goog.dom', 'goog.dom.query', 'goog.events', 'goog.events.EventType', 'goog.object', 'goog.style', 'goog.ui.Button', 'goog.ui.Container', 'goog.ui.ContainerRenderer', 'goog.ui.Control', 'goog.ui.CustomButtonRenderer', 'goog.ui.Dialog', 'goog.ui.Dialog.ButtonSet', 'goog.ui.FlatButtonRenderer', 'goog.ui.FlatMenuButtonRenderer', 'goog.ui.LabelInput', 'goog.ui.Option', 'goog.ui.Select', 'goog.ui.Tab']);
-goog.addDependency('../../../ray/ui/ui.js', ['Ray.UI'], ['Ray.UI.FunDef', 'goog.array', 'goog.dom', 'goog.dom.classes', 'goog.ui.Button', 'goog.ui.ControlRenderer', 'goog.ui.CustomButton', 'goog.ui.FlatButtonRenderer', 'goog.ui.LinkButtonRenderer']);
+goog.addDependency('../../../ray/ui/fun-tab.js', ['Ray.UI.FunTab'], ['Ray.Evaluation', 'Ray.UI.Util', 'goog.array', 'goog.dom', 'goog.dom.classes', 'goog.ui.CustomButton', 'goog.ui.Tab']);
+goog.addDependency('../../../ray/ui/ui.js', ['Ray.UI'], ['Ray.UI.FunDef', 'Ray.UI.FunTab', 'goog.array', 'goog.dom', 'goog.dom.classes', 'goog.ui.Button', 'goog.ui.ControlRenderer', 'goog.ui.CustomButton', 'goog.ui.FlatButtonRenderer', 'goog.ui.LinkButtonRenderer']);
+goog.addDependency('../../../ray/ui/util.js', ['Ray.UI.Util'], ['goog.dom', 'goog.ui.ControlRenderer', 'goog.ui.CustomButtonRenderer', 'goog.ui.FlatButtonRenderer']);
 goog.addDependency('../../../ray/util.js', ['Ray.Util'], ['goog.array', 'goog.object']);
