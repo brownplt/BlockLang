@@ -1,6 +1,6 @@
 goog.provide('Ray.Shared');
 
-goog.require('Ray.Main');
+goog.require('Ray.Evaluation');
 goog.require('Ray.Blocks');
 goog.require('Ray.Blocks.TypeChecker');
 goog.require('Ray.Types');
@@ -217,7 +217,7 @@ Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
 
   // Creating the new function value
   var R = Ray.Shared.Ray;
-  var argSpec = Ray.Main.createFunArgSpec(R, funSpec, true);
+  var argSpec = Ray.Evaluation.createFunArgSpec(R, funSpec, true);
   // Creating placeholder closure!
   var value = new R.Value.Closure(argSpec, null, null, funSpec.returnType);
 
@@ -234,7 +234,7 @@ Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
   if(oldFunSpec.name !== funSpec.name) {
     funAppBlockProto.name_ = funSpec.name;
     Ray.Shared.updateFunAppBlockNames(funId, funSpec.name);
-    Ray.Shared.updateFunTabName(funDefBlockly, funId, funSpec.name);
+    Ray.Shared.updateFunTabName(funDefBlockly, funSpec.name);
     console.log('Names changed!');
   }
 
@@ -285,8 +285,8 @@ Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
 
 };
 
-Ray.Shared.updateFunTabName = function(Blockly, funId, newName) {
-  Blockly.funDefTab.setFunName(newName);
+Ray.Shared.updateFunTabName = function(Blockly, newName) {
+  Blockly.funDefTab.updateFunName(newName);
 };
 
 Ray.Shared.removeFunAppBlockSlot = function (funId, argIx) {

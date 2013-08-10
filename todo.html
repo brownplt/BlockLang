@@ -1,63 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>TODO</title>
+<!-- 2013-08-11 Sun 00:31 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-<meta name="title" content="TODO"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2013-08-07T13:00+0700"/>
 <meta name="author" content="Spencer Gordon"/>
-<meta name="description" content=""/>
-<meta name="keywords" content=""/>
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
-  html { font-family: Times, serif; font-size: 12pt; }
   .title  { text-align: center; }
-  .todo   { color: red; }
+  .todo   { font-family: monospace; color: red; }
   .done   { color: green; }
-  .tag    { background-color: #add8e6; font-weight:normal }
-  .target { }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
   .timestamp { color: #bebebe; }
   .timestamp-kwd { color: #5f9ea0; }
-  .right  {margin-left:auto; margin-right:0px;  text-align:right;}
-  .left   {margin-left:0px;  margin-right:auto; text-align:left;}
-  .center {margin-left:auto; margin-right:auto; text-align:center;}
-  p.verse { margin-left: 3% }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
   pre {
-	border: 1pt solid #AEBDCC;
-	background-color: #F3F5F7;
-	padding: 5pt;
-	font-family: courier, monospace;
-        font-size: 90%;
-        overflow:auto;
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
   }
-  table { border-collapse: collapse; }
-  td, th { vertical-align: top;  }
-  th.right  { text-align:center;  }
-  th.left   { text-align:center;   }
-  th.center { text-align:center; }
-  td.right  { text-align:right;  }
-  td.left   { text-align:left;   }
-  td.center { text-align:center; }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
   dt { font-weight: bold; }
-  div.figure { padding: 0.5em; }
-  div.figure p { text-align: center; }
-  div.inlinetask {
-    padding:10px;
-    border:2px solid gray;
-    margin:10px;
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
     background: #ffffcc;
   }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
   textarea { overflow-x: auto; }
-  .linenr { font-size:smaller }
-  .code-highlighted {background-color:#ffff00;}
-  .org-info-js_info-navigation { border-style:none; }
-  #org-info-js_console-label { font-size:10px; font-weight:bold;
-                               white-space:nowrap; }
-  .org-info-js_search-highlight {background-color:#ffff00; color:#000000;
-                                 font-weight:bold; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
   /*]]>*/-->
 </style>
 <script type="text/javascript">
@@ -65,7 +90,7 @@
 @licstart  The following is the entire license notice for the
 JavaScript code in this tag.
 
-Copyright (C) 2012-2013 Free Software Foundation, Inc.
+Copyright (C) 2012  Free Software Foundation, Inc.
 
 The JavaScript code in this tag is free software: you can
 redistribute it and/or modify it under the terms of the GNU
@@ -106,40 +131,30 @@ for the JavaScript code in this tag.
  }
 /*]]>*///-->
 </script>
-
 </head>
 <body>
-
-<div id="preamble">
-
-</div>
-
 <div id="content">
 <h1 class="title">TODO</h1>
-
-
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#sec-1">1 Completed Tasks</a></li>
-<li><a href="#sec-2">2 Remaining Tasks</a>
+<li><a href="#sec-1">1. Completed Tasks</a></li>
+<li><a href="#sec-2">2. Remaining Tasks</a>
 <ul>
-<li><a href="#sec-2-1">2.1 High Priority</a></li>
-<li><a href="#sec-2-2">2.2 Low Priority</a></li>
+<li><a href="#sec-2-1">2.1. High Priority</a></li>
+<li><a href="#sec-2-2">2.2. Low Priority</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-
-<div id="outline-container-1" class="outline-2">
+<div id="outline-container-sec-1" class="outline-2">
 <h2 id="sec-1"><span class="section-number-2">1</span> Completed Tasks</h2>
 <div class="outline-text-2" id="text-1">
-
-<ul>
+<ul class="org-ul">
 <li><code>[X]</code> Switch from "consumes char" to "consumes", and same for "produces"
-  and other types.
+and other types.
 </li>
 <li><code>[X]</code> Get the function name to be above the function arguments.
 </li>
@@ -154,16 +169,16 @@ for the JavaScript code in this tag.
 <li><code>[X]</code> Refactor to have consistent naming conventions!!!
 </li>
 <li><code>[X]</code> Fix bug where disposing an expression with sub-expressions
-  throws an error during typechecking
+throws an error during typechecking
 </li>
 <li><code>[X]</code> Remove dependency on underscore.js 
 </li>
 <li><code>[X]</code> When dragging blocks with rest arguments, the rest arguments
-  revert to unknown color, they're fine if I add or remove arguments,
-  but initially they do have this problem.
+revert to unknown color, they're fine if I add or remove arguments,
+but initially they do have this problem.
 </li>
 <li><code>[X]</code> Show the function signature inside the canvas as well, so that you
-  can drag arguments from the signature into the function body.
+can drag arguments from the signature into the function body.
 </li>
 <li><code>[X]</code> Add blocks for test cases 
 </li>
@@ -180,169 +195,155 @@ for the JavaScript code in this tag.
 <li><code>[X]</code> Make it possible to edit function signature, remove a function.
 </li>
 <li><code>[X]</code> Figure out how to get the workspace to fit in the available
-  space exactly.
+space exactly.
 </li>
 <li><code>[X]</code> Main vertical scrollbar is broken.
 </li>
 <li><code>[X]</code> Fix weird rendering issue with statement blocks.
 </li>
+<li><code>[X]</code> For definitions with holes, have a hole icon on the tab for that
+definition to indicate that
+the definition is unfinished.
+</li>
 </ul>
-
-
+</div>
 </div>
 
-</div>
-
-<div id="outline-container-2" class="outline-2">
+<div id="outline-container-sec-2" class="outline-2">
 <h2 id="sec-2"><span class="section-number-2">2</span> Remaining Tasks</h2>
 <div class="outline-text-2" id="text-2">
-
-
-</div>
-
-<div id="outline-container-2-1" class="outline-3">
+</div><div id="outline-container-sec-2-1" class="outline-3">
 <h3 id="sec-2-1"><span class="section-number-3">2.1</span> High Priority</h3>
 <div class="outline-text-3" id="text-2-1">
-
-<ul>
-<li><code>[&nbsp;]</code> Double clicking is like using a repl, and is immediate evaluation,
-  while running a program is the formal version which triggers tests to
-  be run. (Even if you don't use something, all the tests should be run)
+<ul class="org-ul">
+<li><code>[&#xa0;]</code> Double clicking is like using a repl, and is immediate evaluation,
+while running a program is the formal version which triggers tests to
+be run. (Even if you don't use something, all the tests should be run)
 </li>
-<li><code>[&nbsp;]</code> Have failed tests change color to red upon failure, and
-  successful ones to turn green upon success, and then have a tooltip
-  that explains what went wrong that is active over the whole area of
-  the test block. Have a tab change color as well if there are
-  failing tests in the tab.
+<li><code>[&#xa0;]</code> Have failed tests change color to red upon failure, and
+successful ones to turn green upon success, and then have a tooltip
+that explains what went wrong that is active over the whole area of
+the test block. Have a tab change color as well if there are
+failing tests in the tab.
 </li>
-<li><code>[&nbsp;]</code> When you change a function and that causes type error, make the
-  block that doesn't fit turn red or something, and then also have the
-  workspaces which use that block turn red as well
+<li><code>[&#xa0;]</code> When you change a function and that causes type error, make the
+block that doesn't fit turn red or something, and then also have the
+workspaces which use that block turn red as well
 </li>
-<li><code>[&nbsp;]</code> Add in image atomic type.
+<li><code>[&#xa0;]</code> Add in image atomic type.
 </li>
-<li><code>[&nbsp;]</code> Add support for world-programming, via big-bang primitives. 
+<li><code>[&#xa0;]</code> Add support for world-programming, via big-bang primitives. 
 </li>
-<li><code>[&nbsp;]</code> Test adding so many functions that the tab bar is longer than
-  the screen width 
+<li><code>[&#xa0;]</code> Test adding so many functions that the tab bar is longer than
+the screen width 
 </li>
-<li><code>[&nbsp;]</code> Get function body displayable in pop-up alongside function usage
+<li><code>[&#xa0;]</code> Get function body displayable in pop-up alongside function usage
 </li>
-<li><code>[&nbsp;]</code> Make it possible to define a value by right-clicking, saying
-  "Name a value" (Not inside functions)
+<li><code>[&#xa0;]</code> Make it possible to define a value by right-clicking, saying
+"Name a value" (Not inside functions)
 </li>
-<li><code>[&nbsp;]</code> Hook up to WeScheme
+<li><code>[&#xa0;]</code> Hook up to WeScheme
 </li>
-<li><code>[&nbsp;]</code> Make failed attempts to connect react more violently to that
-  failure. Maybe have block to which you can't connect get repelled!
+<li><code>[&#xa0;]</code> Make failed attempts to connect react more violently to that
+failure. Maybe have block to which you can't connect get repelled!
 </li>
-<li><code>[&nbsp;]</code> Make drop targets for blocks larger, so that it's easier to connect
-  them.
+<li><code>[&#xa0;]</code> Make drop targets for blocks larger, so that it's easier to connect
+them.
 </li>
-<li><code>[&nbsp;]</code> Default type of argument should be blank.
+<li><code>[&#xa0;]</code> Default type of argument should be blank.
 </li>
-<li><code>[&nbsp;]</code> Test it on iPad
+<li><code>[&#xa0;]</code> Test it on iPad
 </li>
 </ul>
-
+</div>
 </div>
 
-</div>
-
-<div id="outline-container-2-2" class="outline-3">
+<div id="outline-container-sec-2-2" class="outline-3">
 <h3 id="sec-2-2"><span class="section-number-3">2.2</span> Low Priority</h3>
 <div class="outline-text-3" id="text-2-2">
-
-<ul>
-<li><code>[&nbsp;]</code> Switch to rounded rectangles. Merge this with notch shape
+<ul class="org-ul">
+<li><code>[&#xa0;]</code> Switch to rounded rectangles. Merge this with notch shape
 </li>
-<li><code>[&nbsp;]</code> Change unknown color to rainbow gradient.
+<li><code>[&#xa0;]</code> Change unknown color to rainbow gradient.
 </li>
-<li><code>[&nbsp;]</code> Move the button to open function editing dialog to the signature
+<li><code>[&#xa0;]</code> Move the button to open function editing dialog to the signature
 </li>
-<li><code>[&nbsp;]</code> Make it possible to define a value by right-clicking, saying
-  "Name a value" (Inside functions)
+<li><code>[&#xa0;]</code> Make it possible to define a value by right-clicking, saying
+"Name a value" (Inside functions)
 </li>
-<li><code>[&nbsp;]</code> Make function names unique
+<li><code>[&#xa0;]</code> Make function names unique
 </li>
-<li><code>[&nbsp;]</code> Every time there is a bug, set it up to send me an email.
+<li><code>[&#xa0;]</code> Every time there is a bug, set it up to send me an email.
 </li>
-<li><code>[&nbsp;]</code> Inside function definition dialog, you should be able to drag a name
-  and type into the signature to add an argument.
+<li><code>[&#xa0;]</code> Inside function definition dialog, you should be able to drag a name
+and type into the signature to add an argument.
 </li>
-<li><code>[&nbsp;]</code> Use full name of types. num -&gt; number, str -&gt; string, char -&gt;
-  character. Make this easy and configurable, so I can change this globally
+<li><code>[&#xa0;]</code> Use full name of types. num -&gt; number, str -&gt; string, char -&gt;
+character. Make this easy and configurable, so I can change this globally
 </li>
-<li><code>[&nbsp;]</code> Have flyout automatically refresh when I switch tabs, so that I get
-  most up to date set of blocks.
+<li><code>[&#xa0;]</code> Have flyout automatically refresh when I switch tabs, so that I get
+most up to date set of blocks.
 </li>
-<li><code>[&nbsp;]</code> Disable copying of argument blocks from one function to
-  another. *** Actually just allow, and throw error if you use an
-  undefined variable
+<li><code>[&#xa0;]</code> Disable copying of argument blocks from one function to
+another. <b>*</b> Actually just allow, and throw error if you use an
+undefined variable
 </li>
-<li><code>[&nbsp;]</code> See about having function body not just floating in
-  space. (Don't worry about this, just throw an error if they try to
-  run and there are multiple expressions that could be the body)
+<li><code>[&#xa0;]</code> See about having function body not just floating in
+space. (Don't worry about this, just throw an error if they try to
+run and there are multiple expressions that could be the body)
 </li>
-<li><code>[&nbsp;]</code> Build up support for vertical layouts, and convert 'if' and
-  'cond' to use vertical layouts.
+<li><code>[&#xa0;]</code> Build up support for vertical layouts, and convert 'if' and
+'cond' to use vertical layouts.
 </li>
-<li><code>[&nbsp;]</code> Remove dependency on jQuery. Not necessarily worth the hassle,
-  it's also only used in testing.
+<li><code>[&#xa0;]</code> Remove dependency on jQuery. Not necessarily worth the hassle,
+it's also only used in testing.
 </li>
-<li><code>[&nbsp;]</code> Start getting compiled mode to work.
+<li><code>[&#xa0;]</code> Start getting compiled mode to work.
 </li>
-<li><code>[&nbsp;]</code> Fix list block, so that it typechecks correctly (basically, I
-  just have to special case this in the typechecker, and provide the
-  appropriate constraints).
+<li><code>[&#xa0;]</code> Fix list block, so that it typechecks correctly (basically, I
+just have to special case this in the typechecker, and provide the
+appropriate constraints).
 </li>
-<li><code>[&nbsp;]</code> Color toolbar items, according to type.
+<li><code>[&#xa0;]</code> Color toolbar items, according to type.
 </li>
-<li><code>[&nbsp;]</code> Figure out why drawers get confused sometimes. 
+<li><code>[&#xa0;]</code> Figure out why drawers get confused sometimes. 
 </li>
-<li><code>[&nbsp;]</code> Rename 'unknown' to 'misc'. 
+<li><code>[&#xa0;]</code> Rename 'unknown' to 'misc'. 
 </li>
-<li><code>[&nbsp;]</code> In funtion creation dialog, arguments names should be colored
-  according to their type. Same with function name. 
+<li><code>[&#xa0;]</code> In funtion creation dialog, arguments names should be colored
+according to their type. Same with function name. 
 </li>
-<li><code>[&nbsp;]</code> Ordering for evaluation of multiple expressions in main workspace.
+<li><code>[&#xa0;]</code> Ordering for evaluation of multiple expressions in main workspace.
 </li>
-<li><code>[&nbsp;]</code> Figure out how to handle unfinished function definitions
+<li><code>[&#xa0;]</code> Figure out how to handle unfinished function definitions
 </li>
-<li><code>[&nbsp;]</code> X to remove argument
+<li><code>[&#xa0;]</code> X to remove argument
 </li>
-<li><code>[&nbsp;]</code> Make pasting happen at cursor, not just at location of copy
+<li><code>[&#xa0;]</code> Make pasting happen at cursor, not just at location of copy
 </li>
-<li><code>[&nbsp;]</code> Use DragLists to handle re-ordering arguments
+<li><code>[&#xa0;]</code> Use DragLists to handle re-ordering arguments
 </li>
-<li><code>[&nbsp;]</code> Put 'example' block in forms
+<li><code>[&#xa0;]</code> Put 'example' block in forms
 </li>
-<li><code>[&nbsp;]</code> For definitions with holes, have a hole icon on the tab for that
-  definition to indicate that
-  the definition is unfinished.
+<li><code>[&#xa0;]</code> Figure out interface for removing/changing values
 </li>
-<li><code>[&nbsp;]</code> Figure out interface for removing/changing values
+<li><code>[&#xa0;]</code> Require at least one argument for functions
 </li>
-<li><code>[&nbsp;]</code> Require at least one argument for functions
+<li><code>[&#xa0;]</code> Make purpose statement area much larger (input -&gt; textarea)
 </li>
-<li><code>[&nbsp;]</code> Make purpose statement area much larger (input -&gt; textarea)
-</li>
-<li><code>[&nbsp;]</code> Have individual items in the function definition dialog turn green when valid, 
-  and red otherwise, with localized error messages
+<li><code>[&#xa0;]</code> Have individual items in the function definition dialog turn green when valid, 
+and red otherwise, with localized error messages
 </li>
 </ul>
-
 </div>
 </div>
 </div>
 </div>
-
-<div id="postamble">
-<p class="date">Date: 2013-08-07T13:00+0700</p>
+<div id="postamble" class="status">
 <p class="author">Author: Spencer Gordon</p>
-<p class="creator"><a href="http://orgmode.org">Org</a> version 7.9.3d with <a href="http://www.gnu.org/software/emacs/">Emacs</a> version 24</p>
-<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>
-
+<p class="date">Created: 2013-08-11 Sun 00:31</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.0.7)</p>
+<p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
 </div>
 </body>
 </html>

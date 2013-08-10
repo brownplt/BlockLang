@@ -85,5 +85,11 @@ div.hidden_container {
 }
 
 .invalid-state-message {
-    color: #f00;
+    color: red;
+}
+
+.unfinished-icon {
+  color: red;
+  padding: 0;
+  padding-left: 2px;
 }

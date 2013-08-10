@@ -33,17 +33,26 @@ Ray.UI.switchDisplayedWorkspace = function(from, to) {
                         Ray.UI.VISIBLE_CONTAINER_CLASS);
 };
 
-Ray.UI.showWorkspaceForTab = function(tab, workspace_content) {
-  var currWorkspaceId = tab.workspaceId_;
-  var containers = goog.dom.getChildren(workspace_content);
+Ray.UI.selectTab = function(tab, workspacesDiv) {
+  var workspaceId = tab.workspaceId_;
+  var containers = goog.dom.getChildren(workspacesDiv);
   goog.array.forEach(containers, function(container) {
-    var workspace = goog.dom.getFirstElementChild(container);
-    if(workspace.id === currWorkspaceId) {
+    var workspaceIframe = goog.dom.getFirstElementChild(container);
+    if(workspaceIframe.id === workspaceId) {
       goog.dom.classes.swap(container, Ray.UI.HIDDEN_CONTAINER_CLASS, Ray.UI.VISIBLE_CONTAINER_CLASS);
     } else {
       goog.dom.classes.swap(container, Ray.UI.VISIBLE_CONTAINER_CLASS, Ray.UI.HIDDEN_CONTAINER_CLASS);
     }
   });
+  if(tab.activate) {
+    tab.activate();
+  }
+};
+
+Ray.UI.deselectTab = function(tab) {
+  if(tab.deactivate) {
+    tab.deactivate();
+  }
 };
 
 Ray.UI.addFunDefWorkspaceDom = function(id, container) {

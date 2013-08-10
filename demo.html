@@ -3,7 +3,7 @@
     <script type="text/javascript" src="closure-library/closure/goog/base.js"></script>
     <script type="text/javascript" src="ray/ray-deps.js"></script>
     <title>UI Demo</title>
-    <link rel="stylesheet" type="text/css" href="ink-2.2.0/ink.css">
+    <link rel="stylesheet" type="text/css" href="ink-2.2.0/css/ink-custom.css">
     <link rel="stylesheet" type="text/css" href="ray/ui/css/ui.css">
     <script type="text/javascript">
         /** Ray Imports */
@@ -70,9 +70,9 @@
     dialog.testPopulate_();
 
     var workspaceContent = goog.dom.getElement('workspace_content');
-    var tabbar = new goog.ui.TabBar();
-    tabbar.decorate(goog.dom.getElement('workspace_tabs'));
-    tabbar.getSelectedTab().workspaceId_ = 'blockly_main';
+    var tabBar = new goog.ui.TabBar();
+    tabBar.decorate(goog.dom.getElement('workspace_tabs'));
+    tabBar.getSelectedTab().workspaceId_ = 'blockly_main';
 
     Ray.Main.resizeWorkspaceContent();
     goog.events.listen(window, goog.events.EventType.RESIZE, Ray.Main.resizeWorkspaceContent);
@@ -114,13 +114,16 @@
             funSpec: funSpec
         };
         Ray.Main.loadFunDefBlockly(funDefWorkspace,
-                                   funDefInfo, tabbar, workspaceContent);
+                                   funDefInfo, tabBar, workspaceContent);
 
         // We will create the tab and load it from the iframe
     });
 
-    goog.events.listen(tabbar, goog.ui.Component.EventType.SELECT, function(e) {
-        Ray.UI.showWorkspaceForTab(e.target, workspaceContent);
+    goog.events.listen(tabBar, goog.ui.Component.EventType.SELECT, function(e) {
+        Ray.UI.selectTab(e.target, workspaceContent);
+    });
+    goog.events.listen(tabBar, goog.ui.Component.EventType.UNSELECT, function(e) {
+        Ray.UI.deselectTab(e.target);
     });
 
     //Ray.Main.initializeMainBlocklyDom();

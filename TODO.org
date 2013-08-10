@@ -155,6 +155,10 @@ then have it fill in the appropriate literal.
   space exactly.
 - [X] Main vertical scrollbar is broken.
 - [X] Fix weird rendering issue with statement blocks.
+- [X] For definitions with holes, have a hole icon on the tab for that
+  definition to indicate that
+  the definition is unfinished.
+
 
 * Remaining Tasks
 ** High Priority
@@ -222,9 +226,6 @@ then have it fill in the appropriate literal.
 - [ ] Make pasting happen at cursor, not just at location of copy
 - [ ] Use DragLists to handle re-ordering arguments
 - [ ] Put 'example' block in forms
-- [ ] For definitions with holes, have a hole icon on the tab for that
-  definition to indicate that
-  the definition is unfinished.
 - [ ] Figure out interface for removing/changing values
 - [ ] Require at least one argument for functions
 - [ ] Make purpose statement area much larger (input -> textarea)

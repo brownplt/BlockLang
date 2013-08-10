@@ -124,17 +124,18 @@ Ray.Evaluation.hasFunBodyBlock = function(Blockly) {
 
 Ray.Evaluation.hasHoles = function(block) {
   var uncheckedConnections = block.getConnections_(true);
+  if(block.outputConnection) {
+    goog.array.remove(uncheckedConnections, block.outputConnection);
+  }
   while(uncheckedConnections.length > 0) {
     var conn = uncheckedConnections.shift();
     if(!conn.isConnected()) {
       return true;
     }
     var connectedBlock = conn.getConnectedBlock();
-    var allSubConnections = connectedBlock.getAllConnections();
-    var subConnections = goog.array.filter(allSubConnections, function(subConn) {
-      return subConn !== conn;
-    });
-    uncheckedConnections = uncheckedConnections.concat(subConnections);
+    var allSubConnections = connectedBlock.getConnections_(true);
+    goog.array.remove(allSubConnections, connectedBlock.outputConnection);
+    uncheckedConnections = uncheckedConnections.concat(allSubConnections);
   }
   return false;
 };
