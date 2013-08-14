@@ -23,6 +23,7 @@ goog.require('goog.ui.FlatMenuButtonRenderer');
 goog.require('goog.ui.Option');
 goog.require('goog.ui.Select');
 goog.require('goog.ui.Tab');
+goog.require('goog.ui.Textarea');
 
 
 Ray.UI.FunDef.CHANGE_EVENTS = [goog.events.EventType.PROPERTYCHANGE,
@@ -273,7 +274,7 @@ Ray.UI.FunDef.Dialog.prototype.createDom = function() {
 
   goog.dom.append(elem, "What does this function do?");
   goog.dom.append(elem, goog.dom.createElement('br'));
-  var funDescription = new goog.ui.LabelInput('description');
+  var funDescription = new goog.ui.Textarea('description');
   this.funDescription_ = funDescription;
   this.addChild(funDescription, true);
 
