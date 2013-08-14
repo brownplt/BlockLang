@@ -123,7 +123,8 @@ ArgUI.prototype.createDom = function() {
 
   goog.style.setInlineBlock(argType.getContentElement());
 
-  var argRemoveButton = Ray.UI.FunDef.makeButton_('-');
+  var removeIcon = goog.dom.createDom('i', {class: 'icon-remove'});
+  var argRemoveButton = Ray.UI.FunDef.makeButton_(removeIcon);
   this.argRemoveButton_ = argRemoveButton;
 
   this.addChild(argRemoveButton, true);
@@ -197,7 +198,8 @@ ArgListContainer.prototype.createDom = function() {
     this.addChild(new ArgUI(arg), true);
   }, this);
 
-  var argAddButton = Ray.UI.FunDef.makeButton_('+');
+  var addIcon = goog.dom.createDom('i', {class: 'icon-plus'});
+  var argAddButton = Ray.UI.FunDef.makeButton_(addIcon);
   this.argAddButton_ = argAddButton;
   argAddButton.render(containerDiv);
   goog.style.setInlineBlock(argAddButton.getContentElement());
@@ -557,8 +559,8 @@ Ray.UI.FunDef.setSelectedType = function(typeSelector, type) {
   typeSelector.setSelectedItem(null);
 };
 
-Ray.UI.FunDef.makeButton_ = function(text) {
-  return new goog.ui.Button(text, goog.ui.FlatButtonRenderer.getInstance());
+Ray.UI.FunDef.makeButton_ = function(content) {
+  return new goog.ui.Button(content, goog.ui.FlatButtonRenderer.getInstance());
 };
 
 Ray.UI.FunDef.makeDialog = function(opt_domHelper) {

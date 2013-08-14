@@ -159,6 +159,7 @@ then have it fill in the appropriate literal.
   definition to indicate that
   the definition is unfinished.
 - [X] Update signature language to read more like natural language
+- [X] X to remove argument
 
 * Remaining Tasks
 ** High Priority
@@ -224,7 +225,6 @@ then have it fill in the appropriate literal.
   according to their type. Same with function name. 
 - [ ] Ordering for evaluation of multiple expressions in main workspace.
 - [ ] Figure out how to handle unfinished function definitions
-- [ ] X to remove argument
 - [ ] Make pasting happen at cursor, not just at location of copy
 - [ ] Use DragLists to handle re-ordering arguments
 - [ ] Put 'example' block in forms
