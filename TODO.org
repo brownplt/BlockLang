@@ -158,7 +158,7 @@ then have it fill in the appropriate literal.
 - [X] For definitions with holes, have a hole icon on the tab for that
   definition to indicate that
   the definition is unfinished.
-
+- [X] Update signature language to read more like natural language
 
 * Remaining Tasks
 ** High Priority
@@ -187,6 +187,8 @@ then have it fill in the appropriate literal.
   them.
 - [ ] Default type of argument should be blank.
 - [ ] Test it on iPad
+- [ ] Make signature easier to open when closed
+- [ ] Move example block to next line, and add the word "For" in front so it reads "For example..."
 ** Low Priority
 - [ ] Switch to rounded rectangles. Merge this with notch shape
 - [ ] Change unknown color to rainbow gradient.
