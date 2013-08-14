@@ -13,10 +13,13 @@ goog.require('goog.array');
 Ray.Evaluation.getFunBodyBlock = function(Blockly) {
   var workspace = Blockly.mainWorkspace;
   var topBlocks = workspace.getTopBlocks(false);
-  if(topBlocks.length > 1) {
+  var bodyBlocks = goog.array.filter(topBlocks, function(block) {
+  return !Ray.Evaluation.isExampleBlock(block);
+  });
+  if(bodyBlocks.length > 1) {
     throw 'Only one expression can be present at the top-level in a function definition workspace';
   } else {
-    return topBlocks[0];
+    return bodyBlocks[0];
   }
 };
 
