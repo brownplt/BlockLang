@@ -453,7 +453,7 @@ Blockly.Signature.prototype.open = function() {
   }
 
   // Now produces and type name block
-  var produces = this.makeTextAt('produces', cursorX, margin);
+  var produces = this.makeTextAt('and produces a', cursorX, margin);
   cursorX += this.advanceCursor(produces, margin);
 
   var typeBlock = Blockly.Ray_.Blocks.typeNameBlock(Blockly.funSpec.returnType);
