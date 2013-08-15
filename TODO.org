@@ -160,6 +160,9 @@ then have it fill in the appropriate literal.
   the definition is unfinished.
 - [X] Update signature language to read more like natural language
 - [X] X to remove argument
+- [X] Fix list block, so that it typechecks correctly (basically, I
+  just have to special case this in the typechecker, and provide the
+  appropriate constraints).
 
 * Remaining Tasks
 ** High Priority
@@ -215,9 +218,6 @@ then have it fill in the appropriate literal.
 - [ ] Remove dependency on jQuery. Not necessarily worth the hassle,
   it's also only used in testing.
 - [ ] Start getting compiled mode to work.
-- [ ] Fix list block, so that it typechecks correctly (basically, I
-  just have to special case this in the typechecker, and provide the
-  appropriate constraints).
 - [ ] Color toolbar items, according to type.
 - [ ] Figure out why drawers get confused sometimes. 
 - [ ] Rename 'unknown' to 'misc'. 

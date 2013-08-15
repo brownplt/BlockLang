@@ -64,11 +64,12 @@ Blocks.Cons = 6;
 Blocks.First = 7;
 Blocks.Rest = 8;
 Blocks.Empty = 9;
-Blocks.App = 10;
-Blocks.Argument = 11;
-Blocks.And = 12;
-Blocks.Or = 13;
-Blocks.Example = 14;
+Blocks.List = 10
+Blocks.App = 11;
+Blocks.Argument = 12;
+Blocks.And = 13;
+Blocks.Or = 14;
+Blocks.Example = 15;
 
 Ray.Globals.Priorities = {};
 var Priorities = Ray.Globals.Priorities;

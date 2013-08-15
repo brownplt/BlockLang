@@ -34,6 +34,15 @@ Ray.Blocks.TypeChecker.rest = function(block, type, typeEnv) {
   return xType;
 };
 
+Ray.Blocks.TypeChecker.list = function(block, type, typeEnv) {
+  var elementTypes = [];
+  for(var i = 0; i < block.restArgCount_; i++) {
+    if(block)
+    elementTypes.push(Ray.Blocks.TypeChecker.expr_(block, 'REST_ARG' + String(i), type.elementType, typeEnv, true));
+  }
+  var principalType = Ray.Types.principalType(elementTypes);
+  return new Ray.Types.List(principalType);
+}
 
 
 Ray.Blocks.TypeChecker.functionArguments = function(block, funType, args, typeEnv) {
@@ -68,8 +77,16 @@ Ray.Blocks.TypeChecker.functionArguments = function(block, funType, args, typeEn
   return funType.returnType;
 };
 
-Ray.Blocks.TypeChecker.expr_ = function(block, inputName, type, typeEnv) {
+Ray.Blocks.TypeChecker.expr_ = function(block, inputName, type, typeEnv, opt_ignoreMissingInputs) {
+  var ignoreMissingInputs = !!opt_ignoreMissingInputs;
   var input = block.getInput(inputName);
+  if(!input) {
+    if(ignoreMissingInputs) {
+      return new Ray.Types.Unknown();
+    } else {
+      throw 'Missing input';
+    }
+  }
   if(!input.connection) {
     throw 'Input doesn\'t have a connection';
   }
@@ -108,6 +125,9 @@ Ray.Blocks.TypeChecker.expr = function(block, type, typeEnv) {
       break;
     case Blocks.Cons:
       outputType = Ray.Blocks.TypeChecker.cons(block, type, typeEnv);
+      break;
+    case Blocks.List:
+      outputType = Ray.Blocks.TypeChecker.list(block, type, typeEnv);
       break;
     case Blocks.Num:
       var num =  new Ray.Types.Num();

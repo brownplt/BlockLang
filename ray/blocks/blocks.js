@@ -15,6 +15,7 @@ goog.provide('Ray.Blocks');
 
 goog.require('Ray.Blocks.UserFun');
 goog.require('Ray.Blocks.misc');
+goog.require('Ray.Blocks.TypeChecker');
 goog.require('Ray.Runtime');
 goog.require('Ray.Types');
 goog.require('Ray.Inference');
@@ -107,6 +108,12 @@ Ray.Blocks.defineListBlocks = function(r) {
     this.appendValueWithType('x', new Ray.Types.List(new Ray.Types.Unknown()));
   };
 
+  var listBlock = new ListBlock('list', new Ray.Types.List(new Ray.Types.Unknown()));
+  listBlock.init = function() {
+    this.makeTitleRow('list');
+  };
+  listBlocks.push(Ray.Blocks.makeRestArg(listBlock, 'elements', new Ray.Types.Unknown()));
+
   return listBlocks;
 
 };
@@ -150,7 +157,7 @@ Ray.Blocks.defineConditionalBlocks = function(r) {
   andBlock.init = function() {
     this.makeTitleRow('and');
   };
-  conditionalBlocks.push(Ray.Blocks.addRestArg(andBlock, 'and', new Ray.Types.Boolean()));
+  conditionalBlocks.push(Ray.Blocks.makeRestArg(andBlock, 'and', new Ray.Types.Boolean()));
 
   // Or
   var orBlock = new ConditionalBlock('or', new Ray.Types.Boolean());
@@ -158,7 +165,7 @@ Ray.Blocks.defineConditionalBlocks = function(r) {
   orBlock.init = function() {
     this.makeTitleRow('or');
   };
-  conditionalBlocks.push(Ray.Blocks.addRestArg(orBlock, 'or', new Ray.Types.Boolean()));
+  conditionalBlocks.push(Ray.Blocks.makeRestArg(orBlock, 'or', new Ray.Types.Boolean()));
 
   // Cond
   var condBlock = new ConditionalBlock('cond', new Ray.Types.Unknown());
@@ -468,7 +475,7 @@ Ray.Blocks.generateBlock = function(r, name, value) {
       };
 
       if(restArg) {
-        generatedBlocks.push(Ray.Blocks.addRestArg(block, restArg, argSpec.argsType.restArgType.elementType));
+        generatedBlocks.push(Ray.Blocks.makeRestArg(block, restArg, argSpec.argsType.restArgType.elementType));
       }
       break;
     default:
@@ -482,7 +489,7 @@ Ray.Blocks.generateBlock = function(r, name, value) {
   return generatedBlocks;
 };
 
-Ray.Blocks.addRestArg = function(block, restArg, type) {
+Ray.Blocks.makeRestArg = function(block, restArg, type) {
   // Create the block which will hold the arguments as I add or subtract them.
   // The arguments themselves will be shared by any blocks with rest args.
   var restArgContainer = new RestArgContainerBlock();
@@ -511,18 +518,28 @@ Ray.Blocks.addRestArg = function(block, restArg, type) {
     return containerBlock;
   };
   block.compose = function(containerBlock) {
-    for(var i = this.restArgCount_ - 1; i >= 0; i--) {
-      this.removeInput('REST_ARG' + String(i));
-    }
-    this.restArgCount_ = 0;
+    var newRestArgCount = 0;
     var argBlock = containerBlock.getInputTargetBlock('STACK');
     while(argBlock) {
-      this.appendValueWithType('REST_ARG' + String(this.restArgCount_), type);
-      this.restArgCount_++;
+      newRestArgCount++;
       argBlock = argBlock.nextConnection &&
-        argBlock.nextConnection.targetBlock();
+                 argBlock.nextConnection.targetBlock();
+      }
+
+    var oldRestArgCount = this.restArgCount_;
+    if(newRestArgCount < oldRestArgCount) {
+      while(this.restArgCount_ > newRestArgCount) {
+        this.restArgCount_--;
+        this.removeInput('REST_ARG' + String(this.restArgCount_));
+      }
+    } else if(newRestArgCount > oldRestArgCount) {
+      while(this.restArgCount_ < newRestArgCount) {
+        this.appendValueWithType('REST_ARG' + String(this.restArgCount_), type);
+        this.restArgCount_++;
+      }
     }
 
+    Ray.Blocks.TypeChecker.typecheckBlock(this);
   };
   block.mutationToDom = function(workspace) {
     var container = document.createElement('mutation');
