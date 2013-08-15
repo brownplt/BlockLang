@@ -302,3 +302,4 @@ I think I can pretty closely follow the model presented in PLAI/2e [[http://cs.b
 * First thing to get going:
 ** Get the compiled mode evaluation going
 *** Every function should have a finished definition, and all the test cases should be run.
+This is now working, I believe

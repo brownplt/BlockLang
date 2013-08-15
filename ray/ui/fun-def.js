@@ -499,18 +499,14 @@ Ray.UI.FunDef.Dialog.prototype.setVisible = function(visible) {
 
 
 Ray.UI.FunDef.Dialog.prototype.testPopulate_ = function() {
-  this.funName_.setValue('double_if');
-  this.funDescription_.setValue('doubles x if y is true');
+  this.funName_.setValue('string-last');
+  this.funDescription_.setValue('gets the last character of the passed-in string');
 
   this.argListContainer_.addArg();
-  this.argListContainer_.getChildAt(0).setArgTypeIndex(1);
+  this.argListContainer_.getChildAt(0).setArgTypeIndex(2);
   this.argListContainer_.getChildAt(0).setArgName('x');
 
-  this.argListContainer_.addArg();
-  this.argListContainer_.getChildAt(1).setArgTypeIndex(0);
-  this.argListContainer_.getChildAt(1).setArgName('y');
-
-  this.returnType_.setSelectedIndex(1);
+  this.returnType_.setSelectedIndex(3);
 };
 
 Ray.UI.FunDef.Dialog.prototype.getFunSpec = function() {

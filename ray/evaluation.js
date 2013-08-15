@@ -111,7 +111,7 @@ Ray.Evaluation.bindFunDefBlockly = function(Blockly) {
   var body = Ray.Evaluation.blockToCode(bodyBlock);
   var argSpec = Ray.Evaluation.createFunArgSpec(r, Blockly.funSpec, false);
   var fn = r.Expr.Lambda(argSpec, body,Blockly.funSpec.returnType);
-  r.bindTopLevel(Blockly.funName, fn);
+  r.bindTopLevel(Blockly.funSpec.name, fn);
 };
 
 Ray.Evaluation.runTests = function(Blockly) {
@@ -125,9 +125,17 @@ Ray.Evaluation.runTests = function(Blockly) {
  * @param exampleBlock
  */
 Ray.Evaluation.runTest = function(exampleBlock) {
-  var expr = exampleBlock.getInput(Ray.Blocks.EXAMPLE_BLOCK_EXPR_INPUT);
+  var exprBlock = exampleBlock.getInputTargetBlock(Ray.Blocks.EXAMPLE_BLOCK_EXPR_INPUT);
+  if(!exprBlock || Ray.Evaluation.hasHoles(exprBlock)) {
+    return false;
+  }
+  var expr = Ray.Evaluation.blockToCode(exprBlock);
   var exprValue = Ray.Shared.Ray.eval(expr);
-  var result = exampleBlock.getInput(Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT);
+  var resultBlock = exampleBlock.getInputTargetBlock(Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT);
+  if(!resultBlock || Ray.Evaluation.hasHoles(resultBlock)) {
+    return false;
+  }
+  var result = Ray.Evaluation.blockToCode(resultBlock);
   var resultValue = Ray.Shared.Ray.eval(result);
   var testPassed = Ray.Shared.Ray.equals(exprValue, resultValue);
   console.log("Test " + (testPassed ? "passed" : "failed") + "!");
