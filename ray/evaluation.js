@@ -10,6 +10,12 @@ goog.require('Ray.Types');
 goog.require('goog.array');
 
 
+Ray.Evaluation.getTests = function(Blockly) {
+  var workspace = Blockly.mainWorkspace;
+  var topBlocks = workspace.getTopBlocks(false);
+  return goog.array.filter(topBlocks, Ray.Evaluation.isExampleBlock);
+};
+
 Ray.Evaluation.getFunBodyBlock = function(Blockly) {
   var workspace = Blockly.mainWorkspace;
   var topBlocks = workspace.getTopBlocks(false);
@@ -55,8 +61,10 @@ Ray.Evaluation.getMainExpressionBlock = function() {
   }
 };
 
-Ray.Evaluation.go = function(evaluateButton) {
+Ray.Evaluation.compileAndRun = function(evaluateButton) {
   goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Evaluation.bindFunDefBlockly);
+  goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Evaluation.runTests);
+
   var originalContent = evaluateButton.getContent();
   var originalTooltip = evaluateButton.getTooltip();
   evaluateButton.setContent('Computing... click to stop');
@@ -101,9 +109,29 @@ Ray.Evaluation.bindFunDefBlockly = function(Blockly) {
   var r = Ray.Shared.Ray;
   var bodyBlock = Ray.Evaluation.getFunBodyBlock(Blockly);
   var body = Ray.Evaluation.blockToCode(bodyBlock);
-  var functionParts = Ray.Evaluation.createFunArgSpec(r, Blockly.funSpec, false);
-  var fn = r.Expr.Lambda(functionParts.argSpec, body, functionParts.returnType);
+  var argSpec = Ray.Evaluation.createFunArgSpec(r, Blockly.funSpec, false);
+  var fn = r.Expr.Lambda(argSpec, body,Blockly.funSpec.returnType);
   r.bindTopLevel(Blockly.funName, fn);
+};
+
+Ray.Evaluation.runTests = function(Blockly) {
+  var testBlocks = Ray.Evaluation.getTests(Blockly);
+  var testResults = goog.array.map(testBlocks, Ray.Evaluation.runTest);
+  return testResults;
+};
+
+/**
+ * Returns true if the test passes, false if anything goes wrong
+ * @param exampleBlock
+ */
+Ray.Evaluation.runTest = function(exampleBlock) {
+  var expr = exampleBlock.getInput(Ray.Blocks.EXAMPLE_BLOCK_EXPR_INPUT);
+  var exprValue = Ray.Shared.Ray.eval(expr);
+  var result = exampleBlock.getInput(Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT);
+  var resultValue = Ray.Shared.Ray.eval(result);
+  var testPassed = Ray.Shared.Ray.equals(exprValue, resultValue);
+  console.log("Test " + (testPassed ? "passed" : "failed") + "!");
+  return testPassed;
 };
 
 Ray.Evaluation.isExampleBlock = function(block) {

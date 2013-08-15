@@ -93,7 +93,7 @@
     goog.dom.setTextContent(evaluationResults, 'Results of last evaluation...');
 
     goog.events.listen(evaluateButton, goog.ui.Component.EventType.ACTION, function(e) {
-        var result = Ray.Main.go(evaluateButton);
+        var result = Ray.Main.compileAndRun(evaluateButton);
         goog.dom.setTextContent(evaluationResults, result);
     });
 

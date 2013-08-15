@@ -70,6 +70,29 @@ var genValue = function(block, r) {
 
 };
 
+/**
+ * Generate the code for the application of a user function.
+ * The only complication here is changing the positional argument names to P_ARGi
+ * since I kept them generic to better handle changing argument names during function creation
+ * @param block
+ * @param r
+ * @returns {*}
+ */
+var genUserFunctionApplication = function(block, r) {
+  var argSpec = block.value_.argSpec;
+  var args = [];
+  for(var i = 0; i < argSpec.positionalArgs.length; i++) {
+    args.push(getArg(block, 'P_ARG' + String(i), r));
+  }
+  if(argSpec.restArg && block.restArgCount_) {
+    for(var i = 0; i < block.restArgCount_; i++) {
+      args.push(getArg(block, 'REST_ARG' + String(i), r));
+    }
+  }
+
+  return r.app(r.name(block.name_), r.positionalArgs.apply(null, args));
+};
+
 var genDatatype = function(block, r) {
   switch(block.datatype_) {
     case('boolean'):
@@ -100,7 +123,8 @@ var genArgument = function(block, r) {
 
 var gen = function(block, r) {
   if(block.isUserFunction_) {
-    throw 'Handle user functions!';
+    //throw 'Handle user functions!';
+    return genUserFunctionApplication(block, r);
   } else if(block.value_) {
     return genValue(block, r);
   } else if(block.form_) {

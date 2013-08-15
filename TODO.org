@@ -293,3 +293,12 @@ implementation of Ray.Shared.flyoutCategory to dynamically create the
 blockDir from Ray.Shared.savedBlocks_, and then just use that.
 
 Problem is in renderDrawLeft_
+
+* Reason I'm having trouble figuring out how to do correct handling of unfinished function definitions. 
+It requires lazy evaluation, which is entirely different from what I have currently!
+
+I think I can pretty closely follow the model presented in PLAI/2e [[http://cs.brown.edu/courses/cs173/2012/book/Alternate_Application_Semantics.html#(part._.Lazy_.Application)][here]]
+
+* First thing to get going:
+** Get the compiled mode evaluation going
+*** Every function should have a finished definition, and all the test cases should be run.

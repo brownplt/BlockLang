@@ -10,6 +10,7 @@ goog.require('Ray.Globals');
 goog.require('Ray.Util');
 goog.require('Ray.Env');
 goog.require('Ray.Types');
+goog.require('Ray.JSNumbers');
 
 goog.require('goog.array');
 goog.require('goog.functions');
@@ -577,18 +578,6 @@ Ray.Runtime.builtins = env.emptyEnv();
 Ray.Runtime.functionCallLimit_ = 100;
 var self = Ray.Runtime;
 
-Ray.Runtime.Value = {};
-attachValueNode(Pair,'Pair',Pair.proto);
-attachValueNode(Empty,'Empty',Empty.proto);
-attachValueNode(Num,'Num',Num.proto);
-attachValueNode(Boolean,'Boolean',Boolean.proto);
-attachValueNode(Primitive,'Primitive',Primitive.proto);
-attachValueNode(Closure,'Closure',Closure.proto);
-attachValueNode(ArgumentSpec,'ArgumentSpec',ArgumentSpec.proto);
-attachValueNode(Arguments,'Arguments',Arguments.proto);
-attachValueNode(Str,'Str',Str.proto);
-attachValueNode(Char,'Char',Char.proto);
-
 Ray.Runtime.Expr = {};
 attachExprNode(PairExpr,'Pair',PairExpr.proto);
 attachExprNode(EmptyExpr,'Empty',EmptyExpr.proto);
@@ -607,6 +596,55 @@ attachExprNode(Or,'Or',Or.proto);
 attachExprNode(App,'App',App.proto);
 attachExprNode(ArgumentsExpr,'Arguments',ArgumentsExpr.proto);
 attachExprNode(ArgumentSpecExpr,'ArgumentSpec',ArgumentSpecExpr.proto);
+
+
+Ray.Runtime.Value = {};
+attachValueNode(Pair,'Pair',Pair.proto);
+attachValueNode(Empty,'Empty',Empty.proto);
+attachValueNode(Num,'Num',Num.proto);
+attachValueNode(Boolean,'Boolean',Boolean.proto);
+attachValueNode(Primitive,'Primitive',Primitive.proto);
+attachValueNode(Closure,'Closure',Closure.proto);
+attachValueNode(ArgumentSpec,'ArgumentSpec',ArgumentSpec.proto);
+attachValueNode(Arguments,'Arguments',Arguments.proto);
+attachValueNode(Str,'Str',Str.proto);
+attachValueNode(Char,'Char',Char.proto);
+
+Ray.Runtime.equals = function(valueA, valueB) {
+  if(Ray.Runtime.valueType(valueA) !== Ray.Runtime.valueType(valueB)) {
+    return false;
+  } else {
+    switch(Ray.Runtime.valueType(valueA)) {
+      case Ray.Globals.Values.Pair:
+        return Ray.Runtime.equals(valueA.car, valueB.car) &&
+               Ray.Runtime.equals(valueA.cdr, valueB.cdr);
+        break;
+      case Ray.Globals.Values.Empty:
+        return true;
+        break;
+      case Ray.Globals.Values.Boolean:
+        return valueA.b === valueB.b;
+        break;
+      case Ray.Globals.Values.Num:
+        // TODO (Make this work)
+        throw "Haven't got numeric equality figured out yet";
+        break;
+      case Ray.Globals.Values.Str:
+        return valueA.s === valueB.s;
+      case Ray.Globals.Values.Char:
+        return valueA.c === valueB.c;
+
+      case Ray.Globals.Values.Primitive:
+      case Ray.Globals.Values.Closure:
+        // TODO (Figure out what I actually should do)
+        return false;
+        break;
+      default:
+        throw 'Invalid valueType for valueA';
+        break;
+    }
+  }
+};
 
 Ray.Runtime.setFunctionCallLimit = function(limit) {
   this.functionCallLimit_ = limit;

@@ -177,6 +177,6 @@ Ray.Main.Block = function(block_name, block, editable) {
   }
 };
 
-Ray.Main.go = function(evaluateButton) {
-  return Ray.Evaluation.go(evaluateButton);
+Ray.Main.compileAndRun = function(evaluateButton) {
+  return Ray.Evaluation.compileAndRun(evaluateButton);
 };

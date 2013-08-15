@@ -24,6 +24,8 @@ Ray.Blocks.ARG_PREFIX = "ray_function_arg_";
 Ray.Blocks.FUNCTION_DEF_PREFIX = "ray_user_function_";
 Ray.Blocks.HELP_URL = "#";
 Ray.Blocks.EXAMPLE_BLOCK_NAME = 'example';
+Ray.Blocks.EXAMPLE_BLOCK_EXPR_INPUT = 'EXPR';
+Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT = 'RESULT';
 
 Ray.Blocks.blockName = function(name) {
   return Ray.Blocks.BLOCK_PREFIX + goog.string.htmlEscape(name);
@@ -286,10 +288,10 @@ Ray.Blocks.exampleBlock = function() {
   exampleBlock.init = function() {
     this.appendDummyInput()
       .appendTitle('example:');
-    this.appendValueWithType('EXPR', new Ray.Types.Unknown());
+    this.appendValueWithType(Ray.Blocks.EXAMPLE_BLOCK_EXPR_INPUT, new Ray.Types.Unknown());
     this.appendDummyInput()
       .appendTitle('evaluates to');
-    this.appendValueWithType('RESULT', new Ray.Types.Unknown());
+    this.appendValueWithType(Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT, new Ray.Types.Unknown());
   };
   return exampleBlock;
 };
