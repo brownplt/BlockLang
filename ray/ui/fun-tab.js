@@ -23,10 +23,10 @@ Ray.UI.FunTab.makeUnfinishedIconDom = function() {
   var iconDiv = goog.dom.createDom('div', { 'class': 'goog-inline-block unfinished-icon' },
                                    [goog.dom.createDom('i', { 'class': 'icon-exclamation-sign' })]);
   return iconDiv;
-}
+};
 
 Ray.UI.FunTab.makeEditButton = function() {
-  var image = goog.dom.createDom('i', { 'class': 'icon-pencil icon-border' });
+  var image = goog.dom.createDom('i', { 'class': 'icon-gears' });
   var button = new goog.ui.CustomButton(image, Ray.UI.FunTab.EditButtonRenderer);
   //goog.style.setInlineBlock(button.getContentElement());
   return button;
@@ -99,7 +99,7 @@ Ray.UI.FunTab.FunTab.prototype.deactivate = function() {
   this.stopPollingForStatus();
   this.clearStatus();
   this.updateStatus();
-}
+};
 
 Ray.UI.FunTab.FunTab.prototype.startPollingForStatus = function() {
   this.timer_ = new goog.Timer(1000);
