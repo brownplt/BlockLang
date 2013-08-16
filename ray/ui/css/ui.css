@@ -6,6 +6,7 @@
 @import url('evaluatebutton.css');
 @import url('flatbutton.css');
 @import url('flatmenubutton.css');
+@import url('icontooltip.css');
 @import url('linkbutton.css');
 @import url('menu.css');
 @import url('menubutton.css');
@@ -15,6 +16,7 @@
 @import url('splitpane.css');
 @import url('tab.css');
 @import url('tabbar.css');
+@import url('unfinishedbutton.css');
 
 
 html, body {
@@ -93,10 +95,4 @@ div.hidden_container {
 
 .invalid-state-message {
     color: red;
-}
-
-.unfinished-icon {
-  color: red;
-  padding: 0;
-  padding-left: 2px;
 }

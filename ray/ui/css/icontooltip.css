@@ -1,0 +1,19 @@
+.icontooltip-edit {
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 0 #444;
+  background-color: white;
+  color: black;
+  border: 2px solid black;
+  padding: 2px;
+  width: 120px;
+}
+
+.icontooltip-unfinished {
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 0 #444;
+  background-color: white;
+  color: red;
+  border: 2px solid red;
+  padding: 2px;
+  width: 120px;
+}

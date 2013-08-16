@@ -8,8 +8,11 @@ goog.require('Ray.UI.Util');
 goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.classes');
-goog.require('goog.ui.CustomButton');
+goog.require('goog.ui.ControlRenderer');
+goog.require('goog.ui.CustomButton')
+goog.require('goog.ui.CustomButtonRenderer');
 goog.require('goog.ui.Tab');
+goog.require('goog.ui.Tooltip');
 goog.require('goog.Timer');
 
 
@@ -18,14 +21,20 @@ Ray.UI.FunTab.makeTabText = function(funName) {
 };
 
 Ray.UI.FunTab.EditButtonRenderer = goog.ui.ControlRenderer.getCustomRenderer(goog.ui.CustomButtonRenderer, 'edit-button');
+Ray.UI.FunTab.UnfinishedButtonRenderer = goog.ui.ControlRenderer.getCustomRenderer(goog.ui.CustomButtonRenderer, 'unfinished-button');
 
-Ray.UI.FunTab.makeUnfinishedIconDom = function() {
-  var iconDiv = goog.dom.createDom('div', { 'class': 'goog-inline-block unfinished-icon' },
-                                   [goog.dom.createDom('i', { 'class': 'icon-exclamation-sign' })]);
-  return iconDiv;
+Ray.UI.FunTab.ICON_TOOLTIP_CLASS_PREFIX = 'icontooltip';
+Ray.UI.FunTab.getIconTooltipClass = function(key) {
+  return Ray.UI.FunTab.ICON_TOOLTIP_CLASS_PREFIX + '-' + key;
 };
 
-Ray.UI.FunTab.makeEditButton = function() {
+Ray.UI.FunTab.makeUnfinishedIconButton = function() {
+  var image = goog.dom.createDom('i', { 'class': 'icon-exclamation-sign' });
+  var button = new goog.ui.CustomButton(image, Ray.UI.FunTab.UnfinishedButtonRenderer);
+  return button;
+};
+
+Ray.UI.FunTab.makeEditIconButton = function() {
   var image = goog.dom.createDom('i', { 'class': 'icon-gears' });
   var button = new goog.ui.CustomButton(image, Ray.UI.FunTab.EditButtonRenderer);
   //goog.style.setInlineBlock(button.getContentElement());
@@ -38,9 +47,15 @@ Ray.UI.FunTab.FunTab = function(Blockly) {
   this.nameSpan_  = goog.dom.createDom('span', {},
                                        [goog.dom.createTextNode(Ray.UI.FunTab.makeTabText(funName))]);
   var funDefContent = goog.dom.createDom('div', 'goog-inline-block', [this.nameSpan_]);
-  this.button_ = Ray.UI.FunTab.makeEditButton();
   goog.base(this, funDefContent);
-  this.addChild(this.button_, true);
+
+  this.editButton_ = Ray.UI.FunTab.makeEditIconButton();
+  this.addChild(this.editButton_, true);
+
+  var editTooltip = new goog.ui.Tooltip(this.editButton_.getContentElement(), 'Edit the function signature and description or remove this function');
+  editTooltip.className = Ray.UI.FunTab.getIconTooltipClass('edit');
+  this.editButton_.registerDisposable(editTooltip);
+
   this.workspaceId_ = this.getFunWorkspaceId();
 };
 goog.inherits(Ray.UI.FunTab.FunTab, goog.ui.Tab);
@@ -64,28 +79,37 @@ Ray.UI.FunTab.FunTab.prototype.updateFunName = function(newName) {
 };
 
 Ray.UI.FunTab.FunTab.prototype.onEdit = function(listener) {
-  return this.getHandler().listen(this.button_.getContentElement(),
+  return this.getHandler().listen(this.editButton_.getContentElement(),
                                   goog.events.EventType.CLICK, listener);
 };
 
 Ray.UI.FunTab.FunTab.prototype.updateStatus = function() {
-  if(Ray.Evaluation.isFinishedFunctionDefinition(this.blockly_)) {
-    if(this.unfinishedIcon_) {
-      goog.dom.removeNode(this.unfinishedIcon_);
-      this.unfinishedIcon_ = null;
+  var incompleteMessage = Ray.Evaluation.isIncompleteFunctionDefinition(this.blockly_);
+  if(!incompleteMessage) {
+    if(this.unfinishedButton_) {
+      this.removeChild(this.unfinishedButton_, true);
+      this.unfinishedButton_.dispose();
+      this.unfinishedButton_ = null;
+      this.unfinishedTooltip_ = null;
     }
   } else {
-    if(!this.unfinishedIcon_) {
-      this.unfinishedIcon_ = Ray.UI.FunTab.makeUnfinishedIconDom();
-      goog.dom.appendChild(this.element_, this.unfinishedIcon_);
+    if(!this.unfinishedButton_) {
+      this.unfinishedButton_ = Ray.UI.FunTab.makeUnfinishedIconButton();
+      this.addChild(this.unfinishedButton_, true);
+      var iconTooltip = new goog.ui.Tooltip(this.unfinishedButton_.getContentElement());
+      iconTooltip.className = Ray.UI.FunTab.getIconTooltipClass('unfinished');
+      this.unfinishedTooltip_ = iconTooltip;
+      this.unfinishedButton_.registerDisposable(iconTooltip);
     }
+    this.unfinishedTooltip_.setText(incompleteMessage);
   }
 };
 
 Ray.UI.FunTab.FunTab.prototype.clearStatus = function() {
-  if(this.unfinishedIcon_) {
-    goog.dom.removeNode(this.unfinishedIcon_);
-    this.unfinishedIcon_ = null;
+  if(this.unfinishedButton_) {
+    this.removeChild(this.unfinishedButton_, true);
+    this.unfinishedButton_.dispose();
+    this.unfinishedButton_ = null;
   }
 };
 

@@ -163,6 +163,8 @@ then have it fill in the appropriate literal.
 - [X] Fix list block, so that it typechecks correctly (basically, I
   just have to special case this in the typechecker, and provide the
   appropriate constraints).
+- [X] Add tooltips to funTab icon buttons
+
 
 * Remaining Tasks
 ** High Priority
@@ -302,4 +304,9 @@ I think I can pretty closely follow the model presented in PLAI/2e [[http://cs.b
 * First thing to get going:
 ** Get the compiled mode evaluation going
 *** Every function should have a finished definition, and all the test cases should be run.
-This is now working, I believe
+This is now working, I believe.
+
+Next order of business: 
+Get tooltips for the widgets on the tabs.
+Get tabs to change color depending on test success/failure.
+Get test blocks to change color as well.

@@ -180,11 +180,15 @@ Ray.Evaluation.hasHoles = function(block) {
 };
 
 /**
- * We will treat a function definition as finished if there is a single body block, of the right type,
- * with no holes in it
+ * We will treat a function definition as finished if there is a single body block, of the right type, with no holes in it.
  * @param Blockly
  */
-Ray.Evaluation.isFinishedFunctionDefinition = function(Blockly) {
-  return Ray.Evaluation.hasFunBodyBlock(Blockly) &&
-         !Ray.Evaluation.hasHoles(Ray.Evaluation.getFunBodyBlock(Blockly));
+Ray.Evaluation.isIncompleteFunctionDefinition = function(Blockly) {
+  if(!Ray.Evaluation.hasFunBodyBlock(Blockly)) {
+    return 'There must be exactly one non-example block (of the correct type) for the function body.';
+  } else if(Ray.Evaluation.hasHoles(Ray.Evaluation.getFunBodyBlock(Blockly))) {
+    return 'The function body is not fully filled in yet.';
+  } else {
+    return false;
+  }
 };
