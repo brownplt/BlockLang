@@ -8,6 +8,7 @@ goog.require('Ray.UI.Util');
 goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.classes');
+goog.require('goog.fx.dom.BgColorTransform');
 goog.require('goog.ui.ControlRenderer');
 goog.require('goog.ui.CustomButton')
 goog.require('goog.ui.CustomButtonRenderer');
@@ -27,6 +28,10 @@ Ray.UI.FunTab.ICON_TOOLTIP_CLASS_PREFIX = 'icontooltip';
 Ray.UI.FunTab.getIconTooltipClass = function(key) {
   return Ray.UI.FunTab.ICON_TOOLTIP_CLASS_PREFIX + '-' + key;
 };
+
+Ray.UI.FunTab.TEST_FAILURE_COLOR = [255, 0, 0];
+Ray.UI.FunTab.TEST_SUCCESS_COLOR = [0, 255, 0];
+Ray.UI.FunTab.TEST_COLOR_ANIMATION_MILLIS = 500;
 
 Ray.UI.FunTab.makeUnfinishedIconButton = function() {
   var image = goog.dom.createDom('i', { 'class': 'icon-exclamation-sign' });
@@ -59,6 +64,8 @@ Ray.UI.FunTab.FunTab = function(Blockly) {
   this.workspaceId_ = this.getFunWorkspaceId();
 };
 goog.inherits(Ray.UI.FunTab.FunTab, goog.ui.Tab);
+
+Ray.UI.FunTab.FunTab.prototype.workspaceId_ = null;
 
 Ray.UI.FunTab.FunTab.prototype.getFunWorkspaceId = function() {
   return Ray.UI.Util.funDefDomId(this.blockly_.funId);
@@ -105,12 +112,40 @@ Ray.UI.FunTab.FunTab.prototype.updateStatus = function() {
   }
 };
 
+Ray.UI.FunTab.FunTab.prototype.animateColorFromTestResults = function (allTestsPassed) {
+  if(goog.isNull(allTestsPassed)) {
+    return;
+  }
+
+  var contentElement = this.getContentElement();
+  var originalColor = goog.color.parse(goog.style.getComputedStyle(contentElement, 'background-color'));
+  var originalColorRgb = goog.color.hexToRgb(originalColor.hex);
+
+  var animation = new goog.fx.dom.BgColorTransform(
+    this.getContentElement(),
+    originalColorRgb,
+    allTestsPassed ? Ray.UI.FunTab.TEST_SUCCESS_COLOR : Ray.UI.FunTab.TEST_FAILURE_COLOR,
+    Ray.UI.FunTab.TEST_COLOR_ANIMATION_MILLIS);
+
+  animation.addEventListener(goog.fx.Transition.EventType.END, function(e) {
+    // If this tab is selected, then reset after the animation finishes
+    if(this.isSelected()) {
+      goog.style.setStyle(contentElement, 'background-color', '');
+    }
+    animation.dispose();
+  }, false, this);
+
+  animation.play();
+};
+
 Ray.UI.FunTab.FunTab.prototype.clearStatus = function() {
   if(this.unfinishedButton_) {
     this.removeChild(this.unfinishedButton_, true);
     this.unfinishedButton_.dispose();
     this.unfinishedButton_ = null;
   }
+
+  goog.style.setStyle(this.getContentElement(), 'background-color', '');
 };
 
 Ray.UI.FunTab.FunTab.prototype.activate = function() {

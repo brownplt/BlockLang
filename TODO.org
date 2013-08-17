@@ -164,7 +164,7 @@ then have it fill in the appropriate literal.
   just have to special case this in the typechecker, and provide the
   appropriate constraints).
 - [X] Add tooltips to funTab icon buttons
-
+- [X] Have tabs change color on test success/failure (don't correctly handle unfinished definitions or tests)
 
 * Remaining Tasks
 ** High Priority
@@ -195,6 +195,7 @@ then have it fill in the appropriate literal.
 - [ ] Test it on iPad
 - [ ] Make signature easier to open when closed
 - [ ] Move example block to next line, and add the word "For" in front so it reads "For example..."
+
 ** Low Priority
 - [ ] Switch to rounded rectangles. Merge this with notch shape
 - [ ] Change unknown color to rainbow gradient.
@@ -307,6 +308,13 @@ I think I can pretty closely follow the model presented in PLAI/2e [[http://cs.b
 This is now working, I believe.
 
 Next order of business: 
-Get tooltips for the widgets on the tabs.
-Get tabs to change color depending on test success/failure.
-Get test blocks to change color as well.
+- [X] Get tooltips for the widgets on the tabs.
+- [X] Get tabs to change color depending on test success/failure.
+- [ ] Get test blocks to change color as well.
+
+How should I handle trying to compile while there are unfinished definitions. 
+At which point should I abandon ship, and stop?
+Where in the interface should I provide this information
+
+
+

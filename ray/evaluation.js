@@ -115,8 +115,20 @@ Ray.Evaluation.bindFunDefBlockly = function(Blockly) {
 };
 
 Ray.Evaluation.runTests = function(Blockly) {
+  Blockly.allTestsPassed = null;
   var testBlocks = Ray.Evaluation.getTests(Blockly);
-  var testResults = goog.array.map(testBlocks, Ray.Evaluation.runTest);
+  var testResults = [];
+  goog.array.forEach(testBlocks, function(block) {
+    var result = Ray.Evaluation.runTest(block);
+    if(goog.isNull(Blockly.allTestsPassed)) {
+      Blockly.allTestsPassed = result;
+    } else {
+      Blockly.allTestsPassed = Blockly.allTestsPassed && result;
+    }
+    testResults.push(result);
+  });
+
+  Blockly.funDefTab.animateColorFromTestResults(Blockly.allTestsPassed);
   return testResults;
 };
 

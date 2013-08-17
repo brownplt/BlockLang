@@ -3,6 +3,10 @@
 <head>
     <title>Blah</title>
     <link rel="stylesheet" type="text/css" href="ink-2.2.0/ink.css">
+    <script type="text/javascript" src="closure-library/closure/goog/base.js"></script>
+    <script type="text/javascript">
+        goog.require('goog.fx.dom.BgColorTransform');
+    </script>
     <style>
         #div1 {
             background-color: red;
@@ -10,6 +14,7 @@
 
         #div2 {
             background-color: blue;
+            color: white;
         }
 
         #div3 {
@@ -40,5 +45,11 @@
         </div>
     </div>
 </div>
+<div id="div2">Hello, world!</div>
+<script>
+    var animation = new goog.fx.dom.BgColorTransform(goog.dom.getElement('div2'), [0, 0, 255], [255, 0, 0], 1000);
+    animation.play();
+    animation.dispose();
+</script>
 </body>
 </html>
