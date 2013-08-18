@@ -1,0 +1,47 @@
+/*
+ * Copyright 2009 The Closure Library Authors. All Rights Reserved.
+ *
+ * Use of this source code is governed by the Apache License, Version 2.0.
+ * See the COPYING file for details.
+ */
+
+/*
+ * Styling for buttons rendered by goog.ui.ButtonRenderer.
+ *
+ * @author attila@google.com (Attila Bodis)
+ */
+
+@goog-button-color: #036;
+@goog-button-bg-color: #69c;
+
+@goog-button-disabled-color: #333;
+@goog-button-disabled-bg-color: #999;
+
+@goog-button-hover-color: #369;
+@goog-button-hover-bg-color: #9cf;
+
+.goog-button {
+  color: @goog-button-color;
+  border-color: @goog-button-color;
+  background-color: @goog-button-bg-color;
+}
+
+/* State: disabled. */
+.goog-button-disabled {
+  border-color: @goog-button-disabled-color;
+  color: @goog-button-disabled-color;
+  background-color: @goog-button-disabled-bg-color;
+}
+
+/* State: hover. */
+.goog-button-hover {
+  color: @goog-button-hover-color;
+  border-color: @goog-button-hover-color;
+  background-color: @goog-button-hover-bg-color;
+}
+
+/* State: active. */
+.goog-button-active {
+  color: @goog-button-bg-color;
+  border-color: @goog-button-bg-color;
+}

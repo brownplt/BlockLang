@@ -8,6 +8,11 @@
 /* Author: attila@google.com (Attila Bodis) */
 /* Author: eae@google.com (Emil A. Eklund) */
 
+@tab-text-color: white;
+@tab-bg-color: darkgrey;
+@tab-hover-bg-color: black;
+@tab-selected-bg-color: black;
+
 
 /*
  * Styles used by goog.ui.TabRenderer.
@@ -15,9 +20,8 @@
 .goog-tab {
   position: relative;
   padding: 4px 8px 6px 8px;
-  color: white;
-  background-color: darkgrey;
-  font: normal 13px "Trebuchet MS", Tahoma, Arial, sans-serif;
+  color: @tab-text-color;
+  background-color: @tab-bg-color;
   text-decoration: none;
   cursor: pointer;
   outline: none;
@@ -29,8 +33,7 @@
   float: left;
 }
 
-.goog-tab-bar-top:after,
-.goog-tab-bar-bottom:after {
+.goog-tab-bar-top:after {
   content: " ";
   display: block;
   height: 0;
@@ -38,27 +41,11 @@
   visibility: hidden;
 }
 
-.goog-tab-bar-bottom .goog-tab {
-  margin: 0 4px 1px 0;
-  border-top: 0;
-  float: left;
-}
-
-.goog-tab-bar-start .goog-tab {
-  margin: 0 0 4px 1px;
-  border-right: 0;
-}
-
-.goog-tab-bar-end .goog-tab {
-  margin: 0 1px 4px 0;
-  border-left: 0;
-}
-
 /* State: Hover */
 .goog-tab-hover {
   border-color: #ff9;
-  color: white;
-  background-color: black;
+  color: @tab-text-color;
+  background-color: @tab-hover-bg-color;
 }
 
 /* State: Disabled */
@@ -72,8 +59,8 @@
 /* State: Selected */
 .goog-tab-selected {
   border: 2px solid black;
-  background-color: black;
-  color: white;
+  background-color: @tab-selected-bg-color;
+  color: @tab-text-color;
   text-decoration: none;
   font-weight: bold;
 
@@ -93,22 +80,4 @@
   top: 1px;
   margin-top: 0;
   padding-bottom: 5px;
-}
-
-.goog-tab-bar-bottom .goog-tab-selected {
-  top: -1px;
-  margin-bottom: 0;
-  padding-top: 5px;
-}
-
-.goog-tab-bar-start .goog-tab-selected {
-  left: 1px;
-  margin-left: 0;
-  padding-right: 9px;
-}
-
-.goog-tab-bar-end .goog-tab-selected {
-  left: -1px;
-  margin-right: 0;
-  padding-left: 9px;
 }
