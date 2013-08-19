@@ -1,19 +1,16 @@
 /*jslint vars: true, maxerr: 50, indent: 4 */
 
-goog.provide('Ray.RayNumbers');
+goog.provide('Ray.Numbers');
 
 goog.require('Ray.JSNumbers');
 
 var jsnums = Ray.JSNumbers;
 
-Ray.RayNumbers = (function() {
+Ray.Numbers = (function() {
     // Numbers.
     /*global jsnums*/
-  return function(R) {
-
     'use strict';
     var exports = {};
-    R.numbers = exports;
 
     var isNumber = jsnums.isSchemeNumber;
     var isReal = jsnums.isReal;
@@ -81,6 +78,5 @@ Ray.RayNumbers = (function() {
     exports.isNonNegativeReal = isNonNegativeReal;
 
     exports.sign = sign;
-    return R;
-  };
+    return exports;
 }());

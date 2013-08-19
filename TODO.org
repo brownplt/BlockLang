@@ -316,5 +316,38 @@ How should I handle trying to compile while there are unfinished definitions.
 At which point should I abandon ship, and stop?
 Where in the interface should I provide this information
 
+Just have holes be replaced with 'undefined', and cause dynamic errors, but no static errors.
 
+As a test, create string-last, with correct definition, and test it with "Hello, world!" --> '!'
 
+Also, create double-a-number and test it with 20 --> 40
+
+(define (string-last x) (string-ref x (- (string-length x) 1)))
+(check-expect (string-last "Hello, world!") #\!)
+
+(define (double-a-number n) (* 2 n))
+(check-expect (double-a-number 20) 40)
+
+Make it possible to undo all actions
+
+Rename 'forms' -> 'constructs' / 'control / ?
+
+Add a list category, and then see if we need unknown?
+
+Make the header come back as soon as you finish dragging blocks off?
+
+Eventually make the header area not usable for blocks on the canvas
+
+Talk to Joe and Daniel about moving this to integrate with the Cap'n Teach storage mechanism
+
+Go with the undefined proposal
+
+Have the evaluation button text change
+
+Why don't I have Ray.UI keep track of all the UI elements it needs.
+
+Also, get rid of Ray.Shared.Ray, because that obscures the object graph.
+
+It's really ugly how I have the UI and core logic slapped together in Ray.Shared
+
+I also would like 

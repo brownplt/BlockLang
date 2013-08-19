@@ -2,7 +2,6 @@ goog.provide('Ray.Blocks.misc');
 
 goog.require('Ray.Runtime');
 goog.require('Ray.Types');
-goog.require('Ray.Inference');
 goog.require('Ray.Globals');
 
 goog.require('Blockly');

@@ -1,14 +1,5 @@
 /**
  * @desc Defines blocks from Ray constructs.
- *
- * The standard usage pattern for Ray.Blocks is to first
- * call Ray.Blocks.generate_all_blocks with an instance of Ray.Ray
- * to get an object of block name & block key-value pairs and set Blockly.Language to that object
- *
- * With the set of blocks generated, we can then call Ray.Blocks.generate_toolbox,
- * passing in the new Blockly.Language. This will return an xml string that can be passed in to
- * Blockly.inject as the value of the toolbox argument.
- *
  */
 
 goog.provide('Ray.Blocks');
@@ -18,7 +9,6 @@ goog.require('Ray.Blocks.misc');
 goog.require('Ray.Blocks.TypeChecker');
 goog.require('Ray.Runtime');
 goog.require('Ray.Types');
-goog.require('Ray.Inference');
 goog.require('Ray.Globals');
 
 goog.require('Blockly');
@@ -31,7 +21,7 @@ goog.require('goog.string');
 
 var Blocks = Ray.Globals.Blocks;
 var Priorities = Ray.Globals.Priorities;
-var R = Ray.Runtime;
+var RT = Ray.Runtime;
 
 Ray.Blocks.condTestBodyBlockName = "ray_conditional_cond_test_body";
 Ray.Blocks.condElseBlockName = "ray_conditional_cond_else";
@@ -58,24 +48,26 @@ Ray.Blocks.restArgArgBlock.externalName_ = Ray.Blocks.restArgArgBlockName;
 
 /**
  * Generates all the standard library blocks, including list blocks, primitive data blocks, and conditionals
- * @param r Ray.Runtime
  * @returns {Array.<*>}
  */
-Ray.Blocks.generateAllBlocks = function(r) {
+Ray.Blocks.generateAllBlocks = function() {
   var blocks = [];
-  blocks = blocks.concat(Ray.Blocks.definePrimitiveDataBlocks(r));
-  blocks = blocks.concat(Ray.Blocks.defineListBlocks(r));
-  blocks = blocks.concat(Ray.Blocks.defineConditionalBlocks(r));
-  blocks = blocks.concat(Ray.Blocks.defineBuiltinBlocks(r, blocks));
-  return blocks;
+  var primitiveDataBlocks = Ray.Blocks.definePrimitiveDataBlocks();
+  var listBlocks = Ray.Blocks.defineListBlocks();
+  var conditionalBlocks = Ray.Blocks.defineConditionalBlocks();
+  var remainingBuiltinBlocks = Ray.Blocks.defineRemainingBuiltinBlocks(blocks);
+  return goog.array.concat(primitiveDataBlocks,
+                           listBlocks,
+                           conditionalBlocks,
+                           remainingBuiltinBlocks);
 };
 
 // Cons, first, rest, empty
-Ray.Blocks.defineListBlocks = function(r) {
+Ray.Blocks.defineListBlocks = function() {
   var listBlocks = [];
   var ListBlock = function(name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
-    this.value_ = r.builtins.lookup(name);
+    this.value_ = RT.builtins.lookup(name);
     this.outputType_ = type;
     this.name_ = name;
     this.externalName_ = Ray.Blocks.blockName(name);
@@ -119,7 +111,7 @@ Ray.Blocks.defineListBlocks = function(r) {
 };
 
 // if, or, and, cond
-Ray.Blocks.defineConditionalBlocks = function(r) {
+Ray.Blocks.defineConditionalBlocks = function() {
   var conditionalBlocks = [];
   function ConditionalBlock(name, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
@@ -332,9 +324,8 @@ Ray.Blocks.defineConditionalBlocks = function(r) {
 /**
  * Defines the blocks that allow you to enter primitive data.
  * Currently, this is limited to: booleans, numbers, characters, and strings.
- * @param r
  */
-Ray.Blocks.definePrimitiveDataBlocks = function(r) {
+Ray.Blocks.definePrimitiveDataBlocks = function() {
   var primitiveDataBlocks = [];
   function PrimitiveDataBlock(typeName, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
@@ -390,19 +381,18 @@ Ray.Blocks.definePrimitiveDataBlocks = function(r) {
 
 /**
  * Looks through the builtins in a Ray, finds those for which
- * there aren't blocks in obj, and creates blocks for them.
+ * there isn't a block in obj, and creates a block for them.
  *
  * If you want to change a pre-existing block, you cannot do so here.
  *
- * @param r has to have builtins already installed
- * @param obj the object into which we install the missing blocks
+ * @param blocks the array into which we install the missing blocks
  */
-Ray.Blocks.defineBuiltinBlocks = function(r, blocks) {
-  var builtins = r.builtins.dict({});
+Ray.Blocks.defineRemainingBuiltinBlocks = function(blocks) {
+  var builtins = RT.builtins.dict({});
   goog.object.forEach(builtins, function(value, name) {
     var blockName = Ray.Blocks.blockName(name);
     if(!Ray.Blocks.containsBlockWithName(blocks, blockName)) {
-      var generatedBlocks = Ray.Blocks.generateBlock(r, name, value);
+      var generatedBlocks = Ray.Blocks.generateBlock(name, value);
       blocks = blocks.concat(generatedBlocks);
     }
   });
@@ -440,14 +430,13 @@ var BuiltinBlock = function(name, value) {
  *   a Closure,    this)
  *   an ArgumentSpec, <-- Should never be passed in directly
  *   an Arguments. <-- Should never be passed in directly, not really a Value either.
- * @param r
  * @param name the name of the block, will be used in looking it up, and as title on block.
  * @param value the value from which we are creating the block
  */
-Ray.Blocks.generateBlock = function(r, name, value) {
+Ray.Blocks.generateBlock = function(name, value) {
   var generatedBlocks = [];
   var block = null;
-  switch(R.nodeType(value)) {
+  switch(RT.nodeType(value)) {
     case 'pair':
     case 'number':
     case 'empty':
@@ -527,6 +516,7 @@ Ray.Blocks.makeRestArg = function(block, restArg, type) {
       }
 
     var oldRestArgCount = this.restArgCount_;
+    // By determining the difference between the old and new counts, we can avoid disconnecting blocks in slots that aren't removed
     if(newRestArgCount < oldRestArgCount) {
       while(this.restArgCount_ > newRestArgCount) {
         this.restArgCount_--;

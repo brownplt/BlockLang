@@ -1,9 +1,9 @@
 
 goog.provide('Ray.Evaluation');
 
+goog.require('Ray.Runtime');
 goog.require('Ray.Blocks');
 goog.require('Ray.Generator');
-goog.require('Ray.Ray');
 goog.require('Ray.Shared');
 goog.require('Ray.Types');
 

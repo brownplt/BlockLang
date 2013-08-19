@@ -14,4 +14,9 @@ Ray.UI.Util.funDefDomId = function(id) {
 
 Ray.UI.Util.EvaluateButtonRenderer = goog.ui.ControlRenderer.getCustomRenderer(goog.ui.FlatButtonRenderer, 'evaluate-button');
 
+// Strings needed for header buttons in the UI
 
+Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT = "Run program in main workspace";
+Ray.UI.Util.GO_BUTTON_FUN_TAB_TEXT = "Run function tests";
+
+Ray.UI.Util.CREATE_FUN_BUTTON_TEXT = "Create a new function";

@@ -7,10 +7,6 @@ goog.require('Ray.Types');
 
 goog.require('Blockly');
 
-Ray.Shared.setRayInstance = function(r) {
-  Ray.Shared.Ray = r;
-};
-
 Ray.Shared.saveBlockXml = function(block) {
   var blockXml = Blockly.Xml.blockToDom_(block);
   var xy = block.getRelativeToSurfaceXY();

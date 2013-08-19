@@ -33,14 +33,14 @@
         <div id="create_function_button"
              class="goog-flat-button goog-inline-block header-item"
              title="Define a new function to use in your program">
-            Create a new function
+            ...
         </div>
 
 
-        <div id="evaluate_expression_button"
-             class="evaluate-button goog-inline-block header-item"
+        <div id="go_button"
+             class="go-button goog-inline-block header-item"
              title="Evaluate the program in the main workspace">
-            Evaluate expression in Main Workspace
+            ...
         </div>
     </div>
     <div class="large-50 content-right">
@@ -60,9 +60,8 @@
 </div>
 </div>
 <script>
-    var r = Ray.Main.createRay();
-    var blocks = Ray.Main.createRayBlocks(r);
-    Ray.Shared.setRayInstance(r);
+    Ray.Main.initializeLibrary();
+    var blocks = Ray.Main.createBlocks();
     Ray.Shared.setBlocks(blocks);
     Ray.Shared.attachToBlockly(Blockly);
     var dialog = Ray.UI.FunDef.makeDialog(goog.dom.getDomHelper(document.body));
@@ -79,21 +78,23 @@
 
     var createFunctionButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
     createFunctionButton.decorate(goog.dom.getElement('create_function_button'));
+    createFunctionButton.setContent(Ray.UI.Util.CREATE_FUN_BUTTON_TEXT);
     goog.events.listen(createFunctionButton, goog.ui.Component.EventType.ACTION, function(e) {
         dialog.asCreate();
         dialog.setVisible(true);
 
     });
 
-    var evaluateButton = new goog.ui.Button(undefined, Ray.UI.Util.EvaluateButtonRenderer);
-    evaluateButton.decorate(goog.dom.getElement('evaluate_expression_button'));
+    var goButton = new goog.ui.Button(undefined, Ray.UI.Util.EvaluateButtonRenderer);
+    goButton.decorate(goog.dom.getElement('go_button'));
+    goButton.setContent(Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT);
 
     var evaluationResults = goog.dom.getElement('evaluation_results');
     goog.style.setInlineBlock(evaluationResults);
     goog.dom.setTextContent(evaluationResults, 'Results of last evaluation...');
 
-    goog.events.listen(evaluateButton, goog.ui.Component.EventType.ACTION, function(e) {
-        var result = Ray.Main.compileAndRun(evaluateButton);
+    goog.events.listen(goButton, goog.ui.Component.EventType.ACTION, function(e) {
+        var result = Ray.Main.compileAndRun(goButton);
         goog.dom.setTextContent(evaluationResults, result);
     });
 

@@ -8,7 +8,6 @@ goog.require('Ray.Blocks.UserFun');
 goog.require('Ray.Evaluation');
 goog.require('Ray.Generator');
 goog.require('Ray.Lib');
-goog.require('Ray.Ray');
 goog.require('Ray.Test');
 goog.require('Ray.Types');
 goog.require('Ray.UI');
@@ -62,12 +61,8 @@ Ray.Main.runTest = function() {
   return Ray.Test();
 };
 
-Ray.Main.createRay = function() {
-  var R = Ray.R;
-  var lib = Ray.Lib;
-  var r = lib.initialize(R);
-  window.$ = Ray.JQuery;
-  return r;
+Ray.Main.initializeLibrary = function() {
+  Ray.Lib.initialize();
 };
 
 Ray.Main.loadMainBlockly = function(iframe) {
@@ -105,8 +100,8 @@ Ray.Main.blocksToXml = function(blockNames) {
   return goog.array.map(blockNames, toXml).join('\n');
 };
 
-Ray.Main.createRayBlocks = function(r) {
-  var blocks = Ray.Blocks.generateAllBlocks(r);
+Ray.Main.createBlocks = function() {
+  var blocks = Ray.Blocks.generateAllBlocks();
   return blocks;
 };
 
