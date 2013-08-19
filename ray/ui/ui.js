@@ -3,6 +3,11 @@ goog.provide('Ray.UI');
 
 goog.require('Ray.UI.FunDef');
 goog.require('Ray.UI.FunTab');
+goog.require('Ray.UI.Util');
+
+goog.require('Ray.Evaluation');
+goog.require('Ray.Shared');
+goog.require('Ray.UserFun');
 
 goog.require('goog.array');
 goog.require('goog.dom');
@@ -12,6 +17,10 @@ goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.FlatButtonRenderer');
 goog.require('goog.ui.Button');
 goog.require('goog.ui.LinkButtonRenderer');
+goog.require('goog.ui.LabelInput');
+goog.require('goog.ui.Tab');
+goog.require('goog.ui.TabBar');
+
 
 Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
 Ray.UI.HIDDEN_CONTAINER_CLASS = "hidden_container";
@@ -22,7 +31,83 @@ Ray.UI.isDisplayedContainer = function(workspace) {
 
 Ray.UI.mainDom = function() {
   return goog.dom.getElement('blockly_main');
-}
+};
+
+Ray.UI.resizeWorkspaceContainer = function() {
+  var tabsHeight = Ray.UI.tabs.offsetHeight;
+  //console.log('workspace_tabs offsetHeight: ' + String(tabsHeight));
+  var viewportHeight = window.innerHeight;
+  //console.log('window height: ' + String(viewportHeight));
+  var headerHeight = Ray.UI.header.offsetHeight;
+  //console.log('header height: ' + String(headerHeight));
+  var contentHeight = viewportHeight - headerHeight - tabsHeight;
+  //console.log('desired iframe height: ' + String(contentHeight));
+  goog.style.setHeight(Ray.UI.workspaceContainer, contentHeight);
+};
+
+Ray.UI.saveWorkspaceHeaderTabsContainer = function(header, tabs, container) {
+  Ray.UI.header = header;
+  Ray.UI.tabs = tabs;
+  Ray.UI.workspaceContainer = container;
+};
+
+
+Ray.UI.setupTabBar = function(tabDivId, initialSelectedTabDivId) {
+  var tabBar = new goog.ui.TabBar();
+  tabBar.decorate(goog.dom.getElement(tabDivId));
+  tabBar.getSelectedTab().workspaceId_ = initialSelectedTabDivId;
+  Ray.UI.tabBar = tabBar;
+  return tabBar;
+};
+
+Ray.UI.listenForTabChanges = function() {
+  goog.events.listen(Ray.UI.tabBar, goog.ui.Component.EventType.SELECT, function(e) {
+    Ray.UI.selectTab(e.target);
+  });
+  goog.events.listen(Ray.UI.tabBar, goog.ui.Component.EventType.UNSELECT, function(e) {
+    Ray.UI.deselectTab(e.target);
+  });
+};
+
+Ray.UI.setupFunDefDialog = function(domHelper) {
+  var dialog = Ray.UI.FunDef.makeDialog(domHelper);
+  dialog.createDom();
+  dialog.testPopulate_();
+  Ray.UI.funDefDialog = dialog;
+  return dialog;
+};
+
+Ray.UI.setupCreateFunButton = function(div) {
+  var createFunButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
+  createFunButton.decorate(div);
+  createFunButton.setContent(Ray.UI.Util.CREATE_FUN_BUTTON_TEXT);
+  goog.events.listen(createFunButton, goog.ui.Component.EventType.ACTION, function(e) {
+    Ray.UI.funDefDialog.asCreate();
+    Ray.UI.funDefDialog.setVisible(true);
+  });
+  Ray.UI.createFunButton = createFunButton;
+  return createFunButton;
+};
+
+Ray.UI.setupRunButton = function(div) {
+  var runButton = new goog.ui.Button(undefined, Ray.UI.Util.EvaluateButtonRenderer);
+  runButton.decorate(div);
+  runButton.setContent(Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT);
+  Ray.UI.runButton = runButton;
+
+  goog.events.listen(Ray.UI.runButton, goog.ui.Component.EventType.ACTION, function(e) {
+    var result = Ray.Evaluation.compileAndRun(Ray.UI.runButton);
+    goog.dom.setTextContent(Ray.UI.resultsDom, result);
+  });
+
+  return runButton;
+};
+
+Ray.UI.setupResultsDom = function(div) {
+  goog.style.setInlineBlock(div);
+  goog.dom.setTextContent(div, 'Results of last evaluation...');
+  Ray.UI.resultsDom = div;
+};
 
 Ray.UI.switchDisplayedWorkspace = function(from, to) {
   goog.dom.classes.swap(goog.dom.getParentElement(from),
@@ -33,9 +118,9 @@ Ray.UI.switchDisplayedWorkspace = function(from, to) {
                         Ray.UI.VISIBLE_CONTAINER_CLASS);
 };
 
-Ray.UI.selectTab = function(tab, workspacesDiv) {
+Ray.UI.selectTab = function(tab) {
   var workspaceId = tab.workspaceId_;
-  var containers = goog.dom.getChildren(workspacesDiv);
+  var containers = goog.dom.getChildren(Ray.UI.workspaceContainer);
   goog.array.forEach(containers, function(container) {
     var workspaceIframe = goog.dom.getFirstElementChild(container);
     if(workspaceIframe.id === workspaceId) {
@@ -55,13 +140,37 @@ Ray.UI.deselectTab = function(tab) {
   }
 };
 
-Ray.UI.addFunDefWorkspaceDom = function(id, container) {
+Ray.UI.loadMainBlockly = function(iframe) {
+  goog.dom.setProperties(iframe, {src: Ray.UI.Util.DIRECTORY_PREFIX + 'main_blockly.html'});
+};
+
+/**
+ *
+ * @param {HTMLIFrameElement} iframe
+ * @param {Object} funDefInfo
+ */
+Ray.UI.loadFunDefBlockly = function(iframe, funDefInfo) {
+  window._funDefInfo = funDefInfo;
+  goog.dom.setProperties(iframe, {src: Ray.UI.Util.DIRECTORY_PREFIX + 'fun_def_blockly.html'});
+};
+
+Ray.UI.initializeFunDefBlocklyDom = function() {
+  var div = goog.dom.createDom('div', Ray.UI.HIDDEN_CONTAINER_CLASS,
+                               goog.dom.createDom('iframe', {
+                                 id: Ray.UI.Util.FUN_DEF_BLOCKLY_ID,
+                                 src: "Javascript:''"}));
+  goog.dom.appendChild(document.body, div);
+};
+
+
+
+Ray.UI.addFunDefWorkspaceDom = function(id) {
   var funDefDiv = goog.dom.createDom('div', 'hidden_container');
   var funDefIFrame = goog.dom.createDom('iframe', {
     id: Ray.UI.Util.funDefDomId(id),
     src: "Javascript:''"});
   goog.dom.appendChild(funDefDiv, funDefIFrame);
-  goog.dom.appendChild(container, funDefDiv);
+  goog.dom.appendChild(Ray.UI.workspaceContainer, funDefDiv);
   return funDefIFrame;
 };
 
@@ -71,11 +180,11 @@ Ray.UI.getFunId = function() {
 };
 
 
-Ray.UI.addFunDefWorkspaceTab = function(id, funName, tabbar) {
+Ray.UI.addFunDefWorkspaceTab = function(id) {
   var Blockly = Ray.Shared.lookupFunDefBlockly(id);
 
   var funDefTab = new Ray.UI.FunTab.FunTab(Blockly);
-  tabbar.addChild(funDefTab, true);
+  Ray.UI.tabBar.addChild(funDefTab, true);
 
   Blockly.funDefTab = funDefTab;
 
@@ -88,8 +197,8 @@ Ray.UI.addFunDefWorkspaceTab = function(id, funName, tabbar) {
 };
 
 Ray.UI.removeFunDef = function(id, funDefTab) {
-  var tabbar = funDefTab.getParent();
-  tabbar.removeChild(funDefTab, true);
+  var tabBar = funDefTab.getParent();
+  tabBar.removeChild(funDefTab, true);
   funDefTab.dispose();
 
   var funDefWorkspace = goog.dom.getElement(Ray.UI.Util.funDefDomId(id));
@@ -116,4 +225,24 @@ Ray.UI.openFunDefEditor = function(Blockly) {
   });
   dialog.setFunSpec(Blockly.funSpec);
   dialog.setVisible(true);
+};
+
+Ray.UI.createFunBlockly = function() {
+  var funSpec = Ray.UI.funDefDialog.getFunSpec();
+  funSpec.funId = Ray.UI.getFunId();
+  var funBlocks = Ray.UserFun.makeFunAppAndArgBlocks(funSpec);
+  var funArgBlocks = funBlocks.args;
+  var funAppBlock = funBlocks.app;
+  Ray.Shared.addToSavedBlocks(funAppBlock);
+
+  var funDefWorkspace = Ray.UI.addFunDefWorkspaceDom(funSpec.funId);
+  var funDefInfo = {
+    funId: funSpec.funId,
+    funArgBlockProtos: funArgBlocks,
+    funAppBlockProto: funAppBlock,
+    funName: funSpec.name,
+    funSpec: funSpec
+  };
+  Ray.UI.loadFunDefBlockly(funDefWorkspace, funDefInfo);
+  // We will create the tab and load it from the iframe
 };

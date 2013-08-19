@@ -40,7 +40,7 @@ Ray.Blocks.restArgArgBlockName = "ray_rest_arg_arg_";
 Ray.Blocks.restArgArgBlock = new RestArgBlock();
 Ray.Blocks.restArgArgBlock.init = function() {
     this.setColour(Ray.Blocks.DEFAULT_BLOCK_COLOR);
-    this.appendDummyInput()
+  this.appendDummyInput()
       .appendTitle('arg');
 };
 Ray.Blocks.restArgArgBlock.externalName_ = Ray.Blocks.restArgArgBlockName;

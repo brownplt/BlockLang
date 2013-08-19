@@ -30,17 +30,17 @@ Ray.Evaluation.getFunBodyBlock = function(Blockly) {
 };
 
 Ray.Evaluation.blockToCode = function(block) {
-  var expr = Ray.Generator.generate(block, Ray.Shared.Ray);
+  var expr = Ray.Generator.generate(block);
   return expr;
 };
 
 Ray.Evaluation.evaluateCode = function(expr) {
-  var result = Ray.Shared.Ray.eval(expr);
+  var result = Ray.Runtime.eval(expr);
   return result;
 };
 
 Ray.Evaluation.formatResult = function(result) {
-  var text = Ray.Shared.Ray.display(result);
+  var text = Ray.Runtime.display(result);
   return text;
 };
 
@@ -90,7 +90,7 @@ Ray.Evaluation.compileAndRun = function(evaluateButton) {
  * @param funSpec
  * @param opt_asValue
  */
-Ray.Evaluation.createFunArgSpec = function(r, funSpec, opt_asValue) {
+Ray.Evaluation.createFunArgSpec = function(funSpec, opt_asValue) {
   var asValue = goog.isDef(opt_asValue) ? opt_asValue : false;
   var argTypes = goog.array.map(funSpec.args, function(a) { return a.getType(); });
   var argNames = goog.array.map(funSpec.args, function(a)  {return a.getName(); });
@@ -99,19 +99,18 @@ Ray.Evaluation.createFunArgSpec = function(r, funSpec, opt_asValue) {
     new Ray.Types.ListOfTypes(argTypes), null);
 
   return asValue ?
-         new r.Value.ArgumentSpec(argNames, {}, null, argsType) :
-         new r.Expr.ArgumentSpec(argNames, {}, null, argsType);
+         new Ray.Runtime.Value.ArgumentSpec(argNames, {}, null, argsType) :
+         new Ray.Runtime.Expr.ArgumentSpec(argNames, {}, null, argsType);
 };
 
 
 
 Ray.Evaluation.bindFunDefBlockly = function(Blockly) {
-  var r = Ray.Shared.Ray;
   var bodyBlock = Ray.Evaluation.getFunBodyBlock(Blockly);
   var body = Ray.Evaluation.blockToCode(bodyBlock);
-  var argSpec = Ray.Evaluation.createFunArgSpec(r, Blockly.funSpec, false);
-  var fn = r.Expr.Lambda(argSpec, body,Blockly.funSpec.returnType);
-  r.bindTopLevel(Blockly.funSpec.name, fn);
+  var argSpec = Ray.Evaluation.createFunArgSpec(Blockly.funSpec, false);
+  var fn = Ray.Runtime.Expr.Lambda(argSpec, body,Blockly.funSpec.returnType);
+  Ray.Runtime.bindTopLevel(Blockly.funSpec.name, fn);
 };
 
 Ray.Evaluation.runTests = function(Blockly) {
@@ -142,14 +141,14 @@ Ray.Evaluation.runTest = function(exampleBlock) {
     return false;
   }
   var expr = Ray.Evaluation.blockToCode(exprBlock);
-  var exprValue = Ray.Shared.Ray.eval(expr);
+  var exprValue = Ray.Runtime.eval(expr);
   var resultBlock = exampleBlock.getInputTargetBlock(Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT);
   if(!resultBlock || Ray.Evaluation.hasHoles(resultBlock)) {
     return false;
   }
   var result = Ray.Evaluation.blockToCode(resultBlock);
-  var resultValue = Ray.Shared.Ray.eval(result);
-  var testPassed = Ray.Shared.Ray.equals(exprValue, resultValue);
+  var resultValue = Ray.Runtime.eval(result);
+  var testPassed = Ray.Runtime.equals(exprValue, resultValue);
   console.log("Test " + (testPassed ? "passed" : "failed") + "!");
   return testPassed;
 };

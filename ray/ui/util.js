@@ -20,3 +20,14 @@ Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT = "Run program in main workspace";
 Ray.UI.Util.GO_BUTTON_FUN_TAB_TEXT = "Run function tests";
 
 Ray.UI.Util.CREATE_FUN_BUTTON_TEXT = "Create a new function";
+
+Ray.UI.Util.DIRECTORY_PREFIX = "ray/ui/";
+
+Ray.UI.Util.MAIN_BLOCKLY_ID = "blockly_main";
+Ray.UI.Util.FUN_DEF_BLOCKLY_ID = "blockly_function_definition";
+Ray.UI.Util.funDefBlockly = function() {
+  return goog.dom.getElement(Ray.UI.Util.FUN_DEF_BLOCKLY_ID);
+};
+Ray.UI.Util.mainBlockly = function () {
+  return goog.dom.getElement(Ray.UI.Util.MAIN_BLOCKLY_ID);
+};

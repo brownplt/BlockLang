@@ -10,7 +10,7 @@ goog.require('Blockly');
 Ray.Shared.saveBlockXml = function(block) {
   var blockXml = Blockly.Xml.blockToDom_(block);
   var xy = block.getRelativeToSurfaceXY();
-  blockXml.setAttribute('x', Blockly.RTL ? -xy.x : xy.x);
+  blockXml.setAttribute('x', xy.x);
   blockXml.setAttribute('y', xy.y);
   Ray.Shared.savedBlockXml_ = blockXml;
 };
@@ -21,7 +21,7 @@ Ray.Shared.loadBlockXml = function(Blockly, workspace) {
   var blockX = parseInt(blockXml.getAttribute('x'), 10);
   var blockY = parseInt(blockXml.getAttribute('y'), 10);
   if (!isNaN(blockX) && !isNaN(blockY)) {
-    block.moveBy(Blockly.RTL ? -blockX : blockX, blockY);
+    block.moveBy(blockX, blockY);
   }
   block.Blockly = Blockly;
   return block;
@@ -212,10 +212,9 @@ Ray.Shared.applyFunDefChanges = function(funId, funSpec) {
   funDefBlockly.mainWorkspace.signature_.close();
 
   // Creating the new function value
-  var R = Ray.Shared.Ray;
-  var argSpec = Ray.Evaluation.createFunArgSpec(R, funSpec, true);
+  var argSpec = Ray.Evaluation.createFunArgSpec(funSpec, true);
   // Creating placeholder closure!
-  var value = new R.Value.Closure(argSpec, null, null, funSpec.returnType);
+  var value = new Ray.Runtime.Value.Closure(argSpec, null, null, funSpec.returnType);
 
   // Update the prototype's associated value
   funAppBlockProto.value_ = value;

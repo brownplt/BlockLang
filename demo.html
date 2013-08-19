@@ -14,15 +14,6 @@
         goog.require('goog.dom');
         goog.require('goog.events');
         goog.require('goog.events.EventType');
-        goog.require('goog.ui.Button');
-        goog.require('goog.ui.FlatButtonRenderer');
-        goog.require('goog.ui.LabelInput');
-        goog.require('goog.ui.Tab');
-        goog.require('goog.ui.TabBar');
-        goog.require('goog.ui.Textarea');
-        goog.require('goog.ui.TextareaRenderer');
-        goog.require('goog.ui.SplitPane');
-        goog.require('goog.ui.SplitPane.Orientation');
     </script>
 </head>
 <body>
@@ -37,14 +28,14 @@
         </div>
 
 
-        <div id="go_button"
-             class="go-button goog-inline-block header-item"
+        <div id="run_button"
+             class="evaluate-button goog-inline-block header-item"
              title="Evaluate the program in the main workspace">
             ...
         </div>
     </div>
     <div class="large-50 content-right">
-        <div id="evaluation_results" class="header-item"></div>
+        <div id="results" class="header-item"></div>
     </div>
 </div>
 <div class="body">
@@ -52,7 +43,7 @@
         <div id="tab_blockly_main" class="goog-tab goog-tab-selected">Main Workspace</div>
     </div>
     <div class="goog-tab-bar-clear"></div>
-    <div id="workspace_content" class="goog-tab-content">
+    <div id="workspace_container" class="goog-tab-content">
         <div class="container">
             <iframe id="blockly_main" src="Javascript:''"></iframe>
         </div>
@@ -64,72 +55,32 @@
     var blocks = Ray.Main.createBlocks();
     Ray.Shared.setBlocks(blocks);
     Ray.Shared.attachToBlockly(Blockly);
-    var dialog = Ray.UI.FunDef.makeDialog(goog.dom.getDomHelper(document.body));
-    dialog.createDom();
-    dialog.testPopulate_();
 
-    var workspaceContent = goog.dom.getElement('workspace_content');
-    var tabBar = new goog.ui.TabBar();
-    tabBar.decorate(goog.dom.getElement('workspace_tabs'));
-    tabBar.getSelectedTab().workspaceId_ = 'blockly_main';
+    Ray.UI.setupFunDefDialog(goog.dom.getDomHelper(document.body));
 
-    Ray.Main.resizeWorkspaceContent();
-    goog.events.listen(window, goog.events.EventType.RESIZE, Ray.Main.resizeWorkspaceContent);
+    Ray.UI.setupTabBar('workspace_tabs', 'blockly_main');
 
-    var createFunctionButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
-    createFunctionButton.decorate(goog.dom.getElement('create_function_button'));
-    createFunctionButton.setContent(Ray.UI.Util.CREATE_FUN_BUTTON_TEXT);
-    goog.events.listen(createFunctionButton, goog.ui.Component.EventType.ACTION, function(e) {
-        dialog.asCreate();
-        dialog.setVisible(true);
+    Ray.UI.saveWorkspaceHeaderTabsContainer(goog.dom.getElement('header'),
+                                            goog.dom.getElement('workspace_tabs'),
+                                            goog.dom.getElement('workspace_container'));
 
-    });
+    Ray.UI.resizeWorkspaceContainer();
+    goog.events.listen(window, goog.events.EventType.RESIZE, Ray.UI.resizeWorkspaceContainer);
 
-    var goButton = new goog.ui.Button(undefined, Ray.UI.Util.EvaluateButtonRenderer);
-    goButton.decorate(goog.dom.getElement('go_button'));
-    goButton.setContent(Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT);
+    Ray.UI.setupCreateFunButton(goog.dom.getElement('create_function_button'));
 
-    var evaluationResults = goog.dom.getElement('evaluation_results');
-    goog.style.setInlineBlock(evaluationResults);
-    goog.dom.setTextContent(evaluationResults, 'Results of last evaluation...');
+    Ray.UI.setupRunButton(goog.dom.getElement('run_button'));
 
-    goog.events.listen(goButton, goog.ui.Component.EventType.ACTION, function(e) {
-        var result = Ray.Main.compileAndRun(goButton);
-        goog.dom.setTextContent(evaluationResults, result);
-    });
+    Ray.UI.setupResultsDom(goog.dom.getElement('results'));
 
-    dialog.onCreate(function(e) {
-        var funSpec = dialog.getFunSpec();
-        funSpec.funId = Ray.UI.getFunId();
-        var funBlocks = Ray.Main.makeFunAppAndArgBlocks(r, funSpec);
-        var funArgBlocks = funBlocks.args;
-        var funAppBlock = funBlocks.app;
-        Ray.Shared.addToSavedBlocks(funAppBlock);
 
-        var funDefWorkspace = Ray.UI.addFunDefWorkspaceDom(funSpec.funId, workspaceContent);
-        var funDefInfo = {
-            funId: funSpec.funId,
-            funArgBlockProtos: funArgBlocks,
-            funAppBlockProto: funAppBlock,
-            funName: funSpec.name,
-            funSpec: funSpec
-        };
-        Ray.Main.loadFunDefBlockly(funDefWorkspace,
-                                   funDefInfo, tabBar, workspaceContent);
+    Ray.UI.funDefDialog.onCreate(Ray.UI.createFunBlockly);
 
-        // We will create the tab and load it from the iframe
-    });
-
-    goog.events.listen(tabBar, goog.ui.Component.EventType.SELECT, function(e) {
-        Ray.UI.selectTab(e.target, workspaceContent);
-    });
-    goog.events.listen(tabBar, goog.ui.Component.EventType.UNSELECT, function(e) {
-        Ray.UI.deselectTab(e.target);
-    });
+    Ray.UI.listenForTabChanges();
 
     //Ray.Main.initializeMainBlocklyDom();
-    Ray.Main.initializeFunDefBlocklyDom();
-    Ray.Main.loadMainBlockly(Ray.Main.mainBlockly());
+    Ray.UI.initializeFunDefBlocklyDom();
+    Ray.UI.loadMainBlockly(Ray.UI.Util.mainBlockly());
 
     goog.events.listen(window, goog.events.EventType.BEFOREUNLOAD, function(e) {
         return 'If you leave the page, any unsaved programs will be lost!';

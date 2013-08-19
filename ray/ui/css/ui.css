@@ -1228,7 +1228,7 @@ div.hidden_container {
 #evaluate_expression_button {
   float: left;
 }
-#evaluation_results {
+div #results {
   background-color: lightpink;
   border: 2px solid black;
   margin: 2px;

@@ -20,67 +20,12 @@ goog.require('Blockly.Xml');
 goog.require('goog.dom');
 goog.require('goog.object');
 
-Ray.Main.DIRECTORY_PREFIX = "ray/ui/";
-
-Ray.Main.MAIN_BLOCKLY_ID = "blockly_main";
-Ray.Main.FUN_DEF_BLOCKLY_ID = "blockly_function_definition";
-Ray.Main.funDefBlockly = function() {
-  return goog.dom.getElement(Ray.Main.FUN_DEF_BLOCKLY_ID);
-};
-Ray.Main.mainBlockly = function () {
-  return goog.dom.getElement(Ray.Main.MAIN_BLOCKLY_ID);
-};
-Ray.Main.initializeMainBlocklyDom = function() {
-  goog.dom.appendChild(document.body,
-                  goog.dom.createDom('div', Ray.UI.VISIBLE_CONTAINER_CLASS,
-                                     goog.dom.createDom('iframe', {
-                                       id: Ray.Main.MAIN_BLOCKLY_ID,
-                                       src: "Javascript:''"})));
-};
-Ray.Main.initializeFunDefBlocklyDom = function() {
-  goog.dom.appendChild(document.body,
-                       goog.dom.createDom('div', Ray.UI.HIDDEN_CONTAINER_CLASS,
-                                          goog.dom.createDom('iframe', {
-                                            id: Ray.Main.FUN_DEF_BLOCKLY_ID,
-                                            src: "Javascript:''"})));
-};
-
-Ray.Main.resizeWorkspaceContent = function() {
-  var tabsHeight = goog.dom.getElement('workspace_tabs').offsetHeight;
-  //console.log('workspace_tabs offsetHeight: ' + String(tabsHeight));
-  var viewportHeight = window.innerHeight;
-  //console.log('window height: ' + String(viewportHeight));
-  var headerHeight = goog.dom.getElement('header').offsetHeight;
-  //console.log('header height: ' + String(headerHeight));
-  var contentHeight = viewportHeight - headerHeight - tabsHeight;
-  //console.log('desired iframe height: ' + String(contentHeight));
-  goog.style.setHeight(goog.dom.getElement('workspace_content'), contentHeight);
-};
-
 Ray.Main.runTest = function() {
   return Ray.Test();
 };
 
 Ray.Main.initializeLibrary = function() {
   Ray.Lib.initialize();
-};
-
-Ray.Main.loadMainBlockly = function(iframe) {
-  goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'main_blockly.html'});
-};
-
-/**
- *
- * @param {HTMLIFrameElement} iframe
- * @param {Object} funDefInfo
- * @param {goog.ui.TabBar} tabbar
- * @param {Element} workspaceContent
- */
-Ray.Main.loadFunDefBlockly = function(iframe, funDefInfo, tabbar, workspaceContent) {
-  window._funDefInfo = funDefInfo;
-  window._workspaceContent = workspaceContent;
-  window._tabbar = tabbar;
-  goog.dom.setProperties(iframe, {src: Ray.Main.DIRECTORY_PREFIX + 'fun_def_blockly.html'});
 };
 
 Ray.Main.blockToWorkspaceXml = function(blockName, block) {
@@ -108,25 +53,6 @@ Ray.Main.createBlocks = function() {
 Ray.Main.atomicTypeToTypeInstance = function(typeName) {
   var type = Ray.Types.getAtomicType(typeName);
   return new type();
-};
-
-Ray.Main.makeFunArgBlocks = function(args, funId) {
-  return Ray.Blocks.UserFun.generateArgBlocks(args, funId);
-};
-
-Ray.Main.makeFunAppBlock = function(r, name, returnType, argSpec, funId) {
-  // Leave body and envs empty here
-  var value = new r.Value.Closure(argSpec,
-                                  null, null,
-                                  returnType);
-  return Ray.Blocks.UserFun.generateAppBlock(name, value, funId);
-};
-
-Ray.Main.makeFunAppAndArgBlocks = function(r, funSpec) {
-  var argSpec = Ray.Evaluation.createFunArgSpec(r, funSpec, true);
-  var argBlocks = Ray.Main.makeFunArgBlocks(funSpec.args, funSpec.funId);
-  var appBlock = Ray.Main.makeFunAppBlock(r, funSpec.name, funSpec.returnType, argSpec, funSpec.funId);
-  return { 'args': argBlocks, 'app': appBlock };
 };
 
 Ray.Main.getFunBlockName = function(name) {
@@ -170,8 +96,4 @@ Ray.Main.Block = function(block_name, block, editable) {
   if (goog.isFunction(this.init)) {
     this.init();
   }
-};
-
-Ray.Main.compileAndRun = function(evaluateButton) {
-  return Ray.Evaluation.compileAndRun(evaluateButton);
 };

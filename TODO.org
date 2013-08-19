@@ -342,7 +342,7 @@ Talk to Joe and Daniel about moving this to integrate with the Cap'n Teach stora
 
 Go with the undefined proposal
 
-Have the evaluation button text change
+Have the evaluation button text change depending on whether the current tab is the main workspace or a function definition
 
 Why don't I have Ray.UI keep track of all the UI elements it needs.
 
