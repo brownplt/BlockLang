@@ -56,6 +56,8 @@ goog.array.forEach(baseTypes, function(ty) {
 
 Ray.Blocks.DEFAULT_BLOCK_COLOR = { R: 187, G: 187, B: 187 };
 Ray.Blocks.UNKNOWN_BLOCK_COLOR = {  R: 102, G: 102, B: 102 };
+Ray.Blocks.PASSING_TEST_BLOCK_COLOR = { R: 0, G: 255, B: 0 };
+Ray.Blocks.FAILING_TEST_BLOCK_COLOR = { R: 255, G: 0, B: 0 };
 Ray.Blocks.LIGHTEN_FACTOR = 0.4;
 
 Ray.Blocks.getColour = function(type) {
@@ -284,6 +286,21 @@ Ray.Blocks.exampleBlock = function() {
       this.outputConnection = null;
     }
   };
+
+  exampleBlock.updateColourFromTestResult = function(testPassed) {
+    this.setColour(testPassed ?
+                      Ray.Blocks.PASSING_TEST_BLOCK_COLOR :
+                      Ray.Blocks.FAILING_TEST_BLOCK_COLOR);
+  };
+
+  exampleBlock.getExpr = function() {
+    return this.getInputTargetBlock(Ray.Blocks.EXAMPLE_BLOCK_EXPR_INPUT);
+  };
+
+  exampleBlock.getResult = function() {
+    return this.getInputTargetBlock(Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT);
+  };
+
   exampleBlock.init = function() {
     this.appendDummyInput()
       .appendTitle('example:');

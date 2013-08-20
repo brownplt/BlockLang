@@ -135,13 +135,13 @@ Ray.Evaluation.runTests = function(Blockly) {
  * @param exampleBlock
  */
 Ray.Evaluation.runTest = function(exampleBlock) {
-  var exprBlock = exampleBlock.getInputTargetBlock(Ray.Blocks.EXAMPLE_BLOCK_EXPR_INPUT);
+  var exprBlock = exampleBlock.getExpr();
   if(!exprBlock || Ray.Evaluation.hasHoles(exprBlock)) {
     return false;
   }
   var expr = Ray.Evaluation.blockToCode(exprBlock);
   var exprValue = Ray.Runtime.eval(expr);
-  var resultBlock = exampleBlock.getInputTargetBlock(Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT);
+  var resultBlock = exampleBlock.getResult();
   if(!resultBlock || Ray.Evaluation.hasHoles(resultBlock)) {
     return false;
   }
@@ -149,6 +149,15 @@ Ray.Evaluation.runTest = function(exampleBlock) {
   var resultValue = Ray.Runtime.eval(result);
   var testPassed = Ray.Runtime.equals(exprValue, resultValue);
   console.log("Test " + (testPassed ? "passed" : "failed") + "!");
+  exampleBlock.updateColourFromTestResult(testPassed);
+  exampleBlock.handler.listen(exampleBlock, [exampleBlock.Blockly.Block.EventType.BLOCK_ADDED,
+                                             exampleBlock.Blockly.Block.EventType.BLOCK_REMOVED], function(e) {
+    console.log(e);
+    this.colourHue_ = undefined;
+    this.updateColour();
+    this.handler.removeAll();
+  });
+  // TODO (Have the colour cleared away if the function definition changes)
   return testPassed;
 };
 

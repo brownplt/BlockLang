@@ -345,8 +345,60 @@ Go with the undefined proposal
 
 - [X] Have the evaluation button text change depending on whether the current tab is the main workspace or a function definition
 - [X] Why don't I have Ray.UI keep track of all the UI elements it needs.
+- [X] Wait wait wait, I still want to subclass the run button!!!
 
-Wait wait wait, I still want to subclass the run button!!!
+I might want to eventually switch to something more structured for adding methods to blocks. 
 
-Ok, so I want the example blocks to change color, when they are rendered
+So instead of just having these prototypes, and constantly copying functions and data over, I could actually have a class hierarchy.
+
+Ok, so I can have the example blocks change color appropriately. 
+
+What I now need to do is have them return to their original colors upon having either of their slots changed, or having their function definition changed. 
+
+I think the best way of doing this is to have blocks dispatch events when a slot is added or removed. 
+Also, when a connection is made, we should set up parent EventTargets to be the containing block.
+
+Also, each block should have an event handler of it's own. (Which we have to initialize and dispose of properly!)
+
+So what I have the example block do is listen with its own event handler for a BLOCK_ADDED or BLOCK_REMOVED event, and react accordingly.
+
+The events should propagate up to the example block, which can then handle everything.
+
+As for changing things when I change the function involved, I want to have the example block reset when:
+
+* The body block at the time of evaluation dispatches a BLOCK_ADDED or BLOCK_REMOVED event.
+* The body block at the time of evaluation is replaced with something else. 
+I was thinking this could be implemented by keeping track of what the current body block is at the time of evaluation, 
+and the next time that there is exactly one block of the right type (so we have an unambiguous body) we make sure it is the same one (compare uids).
+
+Since we're still listening for changes on the original one while we're doing this, we don't have to worry that we are distracted by the temporary additional blocks, and will miss a change.
+This will work, since either the body is switched, in which case we should reset the example block, or the body is changed, in which case we should as well. 
+
+This makes sense. Also, we are going to treat it as a change to pull a block out and then immediately replace it. That's debatable, but pretty reasonable.
+
+That's it for tonight. Goodnight!
+
+Also, respond to Emmanuel/update the todo list with his items. 
+
+Ask Shriram what he means by everything can be undone.
+
+----------------------------------------------------------------------------------------------------
+
+Have condition to reset be anything changing in the original function body block.
+
+Also, disable run button so long as there is an invalid function definition. (Have a tooltip directing people to the icon which indicates exactly which errors they need to fix)
+
+Check and run
+
+----------------------------------------------------------------------------------------------------
+
+I can get rid of the stupid Ray.UI.FunTab.FunTab repetition. For proof, look at Blockly.Block! (Also, RunButton.RunButton!)
+
+Problem I just realized existed: If I want to disable the run button, when I have an invalid function definition, I need to have that happen pretty much immediately.
+Otherwise, someone could potentially activate it from an invalid state and break things. I could probably avoid this by setting the interval to be very very very small, 
+but then I'm wasting a bunch of cycles on polling, when I could just fire the appropriate events and be done with it.
+
+
+
+
 

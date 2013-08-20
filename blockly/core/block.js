@@ -21,9 +21,11 @@
  * @fileoverview The class representing one block.
  * @author fraser@google.com (Neil Fraser)
  */
-'use strict';
+// TODO (Figure out if I should actually be in strict mode)
+//'use strict';
 
 goog.provide('Blockly.Block');
+goog.provide('Blockly.Block.EventType');
 
 goog.require('Blockly.BlockSvg');
 goog.require('Blockly.Comment');
@@ -35,15 +37,13 @@ goog.require('Blockly.ContextMenu');
 goog.require('Blockly.Warning');
 goog.require('Blockly.Workspace');
 goog.require('Blockly.Xml');
+
+goog.require('goog.events');
+goog.require('goog.events.EventHandler');
+goog.require('goog.events.EventTarget');
 goog.require('goog.Timer');
 
 
-/**
- * Informal requirements.
- * I'm not going to actually load the scripts,
- * because I want to reuse the instance from the parent frame
- */
-// Ray.Shared
 
 
 /**
@@ -60,7 +60,11 @@ Blockly.uidCounter_ = 0;
  * @constructor
  */
 Blockly.Block = function(workspace, proto) {
+  goog.base(this);
+
   this.Blockly = Blockly;
+  this.handler = new goog.events.EventHandler(this);
+  this.registerDisposable(this.handler);
 
   this.id = ++Blockly.uidCounter_;
   this.outputConnection = null;
@@ -125,6 +129,20 @@ Blockly.Block = function(workspace, proto) {
     Blockly.bindEvent_(workspace.getCanvas(), 'blocklyWorkspaceChange', this,
                        this.onchange);
   }
+};
+goog.inherits(Blockly.Block, goog.events.EventTarget);
+
+Blockly.Block.EventType = {
+  BLOCK_ADDED: 'block added in slot', // I actually don't want to wrap this in goog.events.getUniqueId b/c this may be used across instances of Blockly
+  BLOCK_REMOVED: 'block removed from slot' // Same here
+};
+
+Blockly.Block.prototype.dispatchBlockAddedEvent = function() {
+  this.dispatchEvent(Blockly.Block.EventType.BLOCK_ADDED);
+};
+
+Blockly.Block.prototype.dispatchBlockRemovedEvent = function() {
+  this.dispatchEvent(Blockly.Block.EventType.BLOCK_REMOVED);
 };
 
 /**
@@ -267,6 +285,8 @@ Blockly.Block.prototype.unselect = function() {
  * @param {boolean} animate If true, show a disposal animation and sound.
  */
 Blockly.Block.prototype.dispose = function(healStack, animate) {
+  goog.base(this, 'dispose');
+
   this.unplug(healStack);
 
   if (animate && this.svg_) {
@@ -334,7 +354,7 @@ Blockly.Block.prototype.dispose = function(healStack, animate) {
  * Unplug this block from its superior block.  If this block is a statement,
  * optionally reconnect the block underneath with the block on top.
  * @param {boolean} healStack Disconnect child statement and reconnect stack.
- * @param {boolean} bump Move the unplugged block sideways a short distance.
+ * @param {boolean=} bump Move the unplugged block sideways a short distance.
  */
 Blockly.Block.prototype.unplug = function(healStack, bump) {
   bump = bump && !!this.getParent();

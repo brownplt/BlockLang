@@ -82,8 +82,9 @@ Blockly.HSV_SATURATION = 0.45;
 Blockly.HSV_VALUE = 0.9;
 
 /**
- * Convert a hue (HSV model) into an RGB hex triplet.
- * @param {number} hue Hue on a colour wheel (0-360).
+ * Convert a color into an RGB hex triplet.
+ * @param {*} color Could be a hex string,
+ * a HSV object, an RGB object, or just a hue
  * @return {string} RGB code, e.g. '#5ba65b'.
  */
 Blockly.makeColour = function(color) {
