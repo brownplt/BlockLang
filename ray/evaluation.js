@@ -65,11 +65,7 @@ Ray.Evaluation.checkAllAndEval = function(runButton) {
   goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Evaluation.bindFunDefBlockly);
   goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Evaluation.runTests);
 
-  var originalContent = runButton.getContent();
-  var originalTooltip = runButton.getTooltip();
-  runButton.setContent('Computing... click to stop');
-  runButton.setTooltip('Click to interrupt the current computation');
-  goog.dom.classes.add(runButton.getContentElement(), 'halt-button');
+  runButton.enterHaltMode();
   var result = null;
 
   try {
@@ -78,15 +74,15 @@ Ray.Evaluation.checkAllAndEval = function(runButton) {
     result = e;
   }
 
-  runButton.setContent(originalContent);
-  runButton.getTooltip(originalTooltip);
-  goog.dom.classes.remove(runButton.getContentElement(), 'halt-button');
+  runButton.exitHaltMode();
   return result;
 };
 
-Ray.Evaluation.checkFunTab = function(evaluateButton, Blockly) {
+Ray.Evaluation.checkFunTab = function(runButton, Blockly) {
   goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Evaluation.bindFunDefBlockly);
+  runButton.enterHaltMode();
   Ray.Evaluation.runTests(Blockly);
+  runButton.exitHaltMode();
 };
 
 /**

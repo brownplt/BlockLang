@@ -3,6 +3,7 @@ goog.provide('Ray.UI');
 
 goog.require('Ray.UI.FunDef');
 goog.require('Ray.UI.FunTab');
+goog.require('Ray.UI.RunButton');
 goog.require('Ray.UI.Util');
 
 goog.require('Ray.Evaluation');
@@ -66,9 +67,11 @@ Ray.UI.mainWorkspaceOpen = function() {
 };
 
 Ray.UI.updateRunButtonText = function() {
-  Ray.UI.runButton.setContent(Ray.UI.mainWorkspaceOpen() ?
-                              Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT :
-                              Ray.UI.Util.GO_BUTTON_FUN_TAB_TEXT);
+  if(Ray.UI.mainWorkspaceOpen()) {
+    Ray.UI.runButton.setMainWorkspaceText();
+  } else {
+    Ray.UI.runButton.setFunTabText();
+  }
 };
 
 Ray.UI.listenForTabChanges = function() {
@@ -102,9 +105,7 @@ Ray.UI.setupCreateFunButton = function(div) {
 };
 
 Ray.UI.setupRunButton = function(div) {
-  var runButton = new goog.ui.Button(undefined, Ray.UI.Util.EvaluateButtonRenderer);
-  runButton.decorate(div);
-  runButton.setContent(Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT);
+  var runButton = new Ray.UI.RunButton.RunButton(div);
   Ray.UI.runButton = runButton;
 
   goog.events.listen(Ray.UI.runButton, goog.ui.Component.EventType.ACTION, function(e) {

@@ -343,12 +343,10 @@ Talk to Joe and Daniel about moving this to integrate with the Cap'n Teach stora
 
 Go with the undefined proposal
 
-Have the evaluation button text change depending on whether the current tab is the main workspace or a function definition
+- [X] Have the evaluation button text change depending on whether the current tab is the main workspace or a function definition
+- [X] Why don't I have Ray.UI keep track of all the UI elements it needs.
 
-Why don't I have Ray.UI keep track of all the UI elements it needs.
+Wait wait wait, I still want to subclass the run button!!!
 
-Also, get rid of Ray.Shared.Ray, because that obscures the object graph.
+Ok, so I want the example blocks to change color, when they are rendered
 
-It's really ugly how I have the UI and core logic slapped together in Ray.Shared
-
-I also would like 
