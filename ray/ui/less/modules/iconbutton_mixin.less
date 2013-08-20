@@ -1,0 +1,43 @@
+
+.iconbutton (@prefix, @icon-color) {
+  /* an icon button */
+
+  .@{prefix}-button {
+    color: screen(@icon-color, @tab-bg-color);
+    border: 0;
+    margin-left: 2px;
+    padding: 0;
+    padding-left: 2px;
+    vertical-align: middle;
+  }
+
+  .goog-tab-selected .@{prefix}-button {
+    color: @icon-color;
+  }
+
+    /* State: disabled. */
+  .@{prefix}-button-disabled {
+    background-image: none !important;
+    opacity: 0.3;
+    -moz-opacity: 0.3;
+    filter: alpha(opacity=30);
+  }
+
+  .@{prefix}-button-disabled .@{prefix}-button-outer-box,
+  .@{prefix}-button-disabled .@{prefix}-button-inner-box {
+    color: #333 !important;
+    border-color: #999 !important;
+  }
+
+  /* State: hover. */
+  .@{prefix}-button-hover .@{prefix}-button-outer-box,
+  .@{prefix}-button-hover .@{prefix}-button-inner-box {
+  }
+
+  /* State: focused. */
+  .@{prefix}-button-focused .@{prefix}-button-outer-box,
+  .@{prefix}-button-focused .@{prefix}-button-inner-box {
+    border-color: orange;
+  }
+
+}

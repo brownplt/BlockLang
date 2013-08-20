@@ -10,27 +10,27 @@ goog.require('goog.ui.ControlRenderer');
 goog.require('goog.ui.CustomButtonRenderer');
 goog.require('goog.ui.FlatButtonRenderer');
 
-Ray.UI.RunButton.EvaluateButtonRenderer = goog.ui.ControlRenderer.getCustomRenderer(
-  goog.ui.FlatButtonRenderer,
-  'evaluate-button');
-
-Ray.UI.RunButton.RunButton = function(div) {
+Ray.UI.RunButton = function(div) {
   goog.base(this, undefined, Ray.UI.RunButton.EvaluateButtonRenderer);
   this.decorate(div);
   this.setContent(Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT);
   this.haltMode_ = false;
 };
-goog.inherits(Ray.UI.RunButton.RunButton, goog.ui.Button);
+goog.inherits(Ray.UI.RunButton, goog.ui.Button);
 
-Ray.UI.RunButton.RunButton.prototype.setFunTabText = function() {
+Ray.UI.RunButton.EvaluateButtonRenderer = goog.ui.ControlRenderer.getCustomRenderer(
+  goog.ui.FlatButtonRenderer,
+  'run-button');
+
+Ray.UI.RunButton.prototype.setFunTabText = function() {
   this.setContent(Ray.UI.Util.GO_BUTTON_FUN_TAB_TEXT);
 };
 
-Ray.UI.RunButton.RunButton.prototype.setMainWorkspaceText = function() {
+Ray.UI.RunButton.prototype.setMainWorkspaceText = function() {
   this.setContent(Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT);
 };
 
-Ray.UI.RunButton.RunButton.prototype.enterHaltMode = function() {
+Ray.UI.RunButton.prototype.enterHaltMode = function() {
   this.oldContent_ = this.getContent();
   this.oldTooltip_ = this.getTooltip();
   this.setContent(Ray.UI.Util.HALT_BUTTON_TEXT);
@@ -39,7 +39,7 @@ Ray.UI.RunButton.RunButton.prototype.enterHaltMode = function() {
   this.haltMode_ = true;
 };
 
-Ray.UI.RunButton.RunButton.prototype.exitHaltMode = function() {
+Ray.UI.RunButton.prototype.exitHaltMode = function() {
   if(!this.haltMode_) {
     throw 'unmatched call to exitHaltMode!';
   }

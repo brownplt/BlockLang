@@ -11,6 +11,6 @@ ray-deps.js: ray/*.js ray/ui/*.js
 css: ray/ui/css/ui.css
 	@echo "ray/ui/css/ui.css built."
 
-ray/ui/css/ui.css: ray/ui/less/*.less
+ray/ui/css/ui.css: ray/ui/less/ui.less ray/ui/less/config.less ray/ui/less/modules/*.less
 	lessc ray/ui/less/ui.less > ray/ui/css/ui.css
 

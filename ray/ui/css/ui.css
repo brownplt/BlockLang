@@ -1,215 +1,3 @@
-.edit-button {
-  color: #ffff00;
-  border: 0;
-  margin-left: 2px;
-  padding: 0;
-  padding-left: 2px;
-  vertical-align: middle;
-}
-/* Pseudo-rounded corners. */
-.edit-button-inner-box {
-  /* By default in FF2, block elements inside a moz-inline-box are stacked
-     * horizontally next to each other.  This stops that weird behavior. */
-
-  -moz-box-orient: vertical;
-  white-space: nowrap;
-  /* Prevents buttons from line breaking on android. */
-
-}
-/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
-* html .edit-button-inner-box {
-  /* IE6 needs to have the box shifted to make the borders line up. */
-
-  left: -1px;
-}
-/* IE7-only hack; ignored by all other browsers. */
-*:first-child + html .edit-button-inner-box {
-  /* IE7 needs to have the box shifted to make the borders line up. */
-
-  left: -1px;
-}
-/* IE7 BiDi fix. */
-*:first-child + html .edit-button-rtl .edit-button-inner-box {
-  /* @noflip */
-  left: 1px;
-}
-/* Safari-only hacks. */
-::root .edit-button,
-::root .edit-button-outer-box {
-  /* Required to make pseudo-rounded corners work on Safari. */
-
-  line-height: 0;
-}
-::root .edit-button-inner-box {
-  /* Required to make pseudo-rounded corners work on Safari. */
-
-  line-height: normal;
-}
-/* State: disabled. */
-.edit-button-disabled {
-  background-image: none !important;
-  opacity: 0.3;
-  -moz-opacity: 0.3;
-  filter: alpha(opacity=30);
-}
-.edit-button-disabled .edit-button-outer-box,
-.edit-button-disabled .edit-button-inner-box {
-  color: #333 !important;
-  border-color: #999 !important;
-}
-/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
-* html .edit-button-disabled {
-  margin: 2px 1px !important;
-  padding: 0 1px !important;
-}
-/* IE7-only hack; ignored by all other browsers. */
-*:first-child + html .edit-button-disabled {
-  margin: 2px 1px !important;
-  padding: 0 1px !important;
-}
-/* State: hover. */
-/* State: active, checked. */
-.edit-button-active,
-.edit-button-checked {
-  background-color: #bbb;
-  background-position: bottom left;
-}
-/* State: focused. */
-.edit-button-focused .edit-button-outer-box,
-.edit-button-focused .edit-button-inner-box {
-  border-color: orange;
-}
-/* Pill (collapsed border) styles. */
-.edit-button-collapse-right,
-.edit-button-collapse-right .edit-button-outer-box,
-.edit-button-collapse-right .edit-button-inner-box {
-  margin-right: 0;
-}
-.edit-button-collapse-left,
-.edit-button-collapse-left .edit-button-outer-box,
-.edit-button-collapse-left .edit-button-inner-box {
-  margin-left: 0;
-}
-.edit-button-collapse-left .edit-button-inner-box {
-  border-left: 1px solid #fff;
-}
-.edit-button-collapse-left.edit-button-checked .edit-button-inner-box {
-  border-left: 1px solid #ddd;
-}
-/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
-* html .edit-button-collapse-left .edit-button-inner-box {
-  left: 0;
-}
-/* IE7-only hack; ignored by all other browsers. */
-*:first-child + html .edit-button-collapse-left .edit-button-inner-box {
-  left: 0;
-}
-.unfinished-button {
-  color: #ff0000;
-  border: 0;
-  margin-left: 2px;
-  padding: 0;
-  padding-left: 2px;
-  vertical-align: middle;
-}
-/* Pseudo-rounded corners. */
-.unfinished-button-inner-box {
-  /* By default in FF2, block elements inside a moz-inline-box are stacked
-     * horizontally next to each other.  This stops that weird behavior. */
-
-  -moz-box-orient: vertical;
-  white-space: nowrap;
-  /* Prevents buttons from line breaking on android. */
-
-}
-/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
-* html .unfinished-button-inner-box {
-  /* IE6 needs to have the box shifted to make the borders line up. */
-
-  left: -1px;
-}
-/* IE7-only hack; ignored by all other browsers. */
-*:first-child + html .unfinished-button-inner-box {
-  /* IE7 needs to have the box shifted to make the borders line up. */
-
-  left: -1px;
-}
-/* IE7 BiDi fix. */
-*:first-child + html .unfinished-button-rtl .unfinished-button-inner-box {
-  /* @noflip */
-  left: 1px;
-}
-/* Safari-only hacks. */
-::root .unfinished-button,
-::root .unfinished-button-outer-box {
-  /* Required to make pseudo-rounded corners work on Safari. */
-
-  line-height: 0;
-}
-::root .unfinished-button-inner-box {
-  /* Required to make pseudo-rounded corners work on Safari. */
-
-  line-height: normal;
-}
-/* State: disabled. */
-.unfinished-button-disabled {
-  background-image: none !important;
-  opacity: 0.3;
-  -moz-opacity: 0.3;
-  filter: alpha(opacity=30);
-}
-.unfinished-button-disabled .unfinished-button-outer-box,
-.unfinished-button-disabled .unfinished-button-inner-box {
-  color: #333 !important;
-  border-color: #999 !important;
-}
-/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
-* html .unfinished-button-disabled {
-  margin: 2px 1px !important;
-  padding: 0 1px !important;
-}
-/* IE7-only hack; ignored by all other browsers. */
-*:first-child + html .unfinished-button-disabled {
-  margin: 2px 1px !important;
-  padding: 0 1px !important;
-}
-/* State: hover. */
-/* State: active, checked. */
-.unfinished-button-active,
-.unfinished-button-checked {
-  background-color: #bbb;
-  background-position: bottom left;
-}
-/* State: focused. */
-.unfinished-button-focused .unfinished-button-outer-box,
-.unfinished-button-focused .unfinished-button-inner-box {
-  border-color: orange;
-}
-/* Pill (collapsed border) styles. */
-.unfinished-button-collapse-right,
-.unfinished-button-collapse-right .unfinished-button-outer-box,
-.unfinished-button-collapse-right .unfinished-button-inner-box {
-  margin-right: 0;
-}
-.unfinished-button-collapse-left,
-.unfinished-button-collapse-left .unfinished-button-outer-box,
-.unfinished-button-collapse-left .unfinished-button-inner-box {
-  margin-left: 0;
-}
-.unfinished-button-collapse-left .unfinished-button-inner-box {
-  border-left: 1px solid #fff;
-}
-.unfinished-button-collapse-left.unfinished-button-checked .unfinished-button-inner-box {
-  border-left: 1px solid #ddd;
-}
-/* Pre-IE7 IE hack; ignored by IE7 and all non-IE browsers. */
-* html .unfinished-button-collapse-left .unfinished-button-inner-box {
-  left: 0;
-}
-/* IE7-only hack; ignored by all other browsers. */
-*:first-child + html .unfinished-button-collapse-left .unfinished-button-inner-box {
-  left: 0;
-}
 /*
  * Copyright 2009 The Closure Library Authors. All Rights Reserved.
  *
@@ -511,7 +299,7 @@
  *
  * @author brianp@google.com (Brian Peterson)
  */
-.evaluate-button {
+.run-button {
   position: relative;
   /*width: 20ex;*/
 
@@ -524,44 +312,44 @@
   cursor: pointer;
   outline: none;
 }
-.evaluate-button.halt-button {
+.run-button.halt-button {
   background-color: #bb0000;
 }
-.evaluate-button-hover.halt-button {
+.run-button-hover.halt-button {
   color: #8c1717;
   border-color: #8c1717;
-  background-color: #bbb;
+  background-color: #bbbbbb;
 }
 /* State: disabled. */
-.evaluate-button-disabled {
+.run-button-disabled {
   border-color: #888;
   color: #888;
   background-color: #ccc;
   cursor: default;
 }
 /* State: hover. */
-.evaluate-button-hover {
+.run-button-hover {
   border-color: #215e21;
   color: #215e21;
-  background-color: #bbb;
+  background-color: #bbbbbb;
 }
 /* State: active, selected, checked. */
-.evaluate-button-active,
-.evaluate-button-selected,
-.evaluate-button-checked {
+.run-button-active,
+.run-button-selected,
+.run-button-checked {
   border-color: #5b4169;
   color: #5b4169;
   background-color: #d1a8ea;
 }
 /* State: focused. */
-.evaluate-button-focused {
+.run-button-focused {
   border-color: #5b4169;
 }
 /* Pill (collapsed border) styles. */
-.evaluate-button-collapse-right {
+.run-button-collapse-right {
   margin-right: 0;
 }
-.evaluate-button-collapse-left {
+.run-button-collapse-left {
   margin-left: 0;
   border-left: none;
 }
@@ -1076,7 +864,7 @@
   position: relative;
   padding: 4px 8px 6px 8px;
   color: #ffffff;
-  background-color: #a9a9a9;
+  background-color: #7e7e7e;
   text-decoration: none;
   cursor: pointer;
   outline: none;
@@ -1170,7 +958,67 @@
 * html .goog-tab-bar-end {
   margin-left: -3px;
 }
-/* @endif */html,
+/* @endif *//* an icon button */
+.edit-button {
+  color: #ffff7e;
+  border: 0;
+  margin-left: 2px;
+  padding: 0;
+  padding-left: 2px;
+  vertical-align: middle;
+}
+.goog-tab-selected .edit-button {
+  color: #ffff00;
+}
+/* State: disabled. */
+.edit-button-disabled {
+  background-image: none !important;
+  opacity: 0.3;
+  -moz-opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+.edit-button-disabled .edit-button-outer-box,
+.edit-button-disabled .edit-button-inner-box {
+  color: #333 !important;
+  border-color: #999 !important;
+}
+/* State: hover. */
+/* State: focused. */
+.edit-button-focused .edit-button-outer-box,
+.edit-button-focused .edit-button-inner-box {
+  border-color: orange;
+}
+/* an icon button */
+.unfinished-button {
+  color: #ff7e7e;
+  border: 0;
+  margin-left: 2px;
+  padding: 0;
+  padding-left: 2px;
+  vertical-align: middle;
+}
+.goog-tab-selected .unfinished-button {
+  color: #ff0000;
+}
+/* State: disabled. */
+.unfinished-button-disabled {
+  background-image: none !important;
+  opacity: 0.3;
+  -moz-opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+.unfinished-button-disabled .unfinished-button-outer-box,
+.unfinished-button-disabled .unfinished-button-inner-box {
+  color: #333 !important;
+  border-color: #999 !important;
+}
+/* State: hover. */
+/* State: focused. */
+.unfinished-button-focused .unfinished-button-outer-box,
+.unfinished-button-focused .unfinished-button-inner-box {
+  border-color: orange;
+}
+html,
 body {
   height: 100%;
   width: 100%;
@@ -1229,7 +1077,7 @@ div.hidden_container {
   float: left;
 }
 div #results {
-  background-color: lightpink;
+  background-color: #ffb6c1;
   border: 2px solid black;
   margin: 2px;
   padding: 2px;

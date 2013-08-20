@@ -1,25 +1,27 @@
-@import "iconbutton_mixin";
+@import "config";
 
-  .iconbutton(edit, yellow);
-  .iconbutton(unfinished, red);
+@modules-path: "modules";
 
-@import "button";
-@import "common";
-@import "custombutton";
-@import "dialog";
-@import "evaluatebutton";
-@import "flatbutton";
-@import "flatmenubutton";
-@import "icontooltip";
-@import "linkbutton";
-@import "menu";
-@import "menubutton";
-@import "menuitem";
-@import "removefunctionbutton";
-@import "tab";
-@import "tabbar";
+@import "@{modules-path}/iconbutton_mixin";
+@import "@{modules-path}/button";
+@import "@{modules-path}/common";
+@import "@{modules-path}/custombutton";
+@import "@{modules-path}/dialog";
+@import "@{modules-path}/runbutton";
+@import "@{modules-path}/flatbutton";
+@import "@{modules-path}/flatmenubutton";
+@import "@{modules-path}/icontooltip";
+@import "@{modules-path}/linkbutton";
+@import "@{modules-path}/menu";
+@import "@{modules-path}/menubutton";
+@import "@{modules-path}/menuitem";
+@import "@{modules-path}/removefunctionbutton";
+@import "@{modules-path}/tab";
+@import "@{modules-path}/tabbar";
 
-@header-color: #f5deb3;
+  .iconbutton(edit, @edit-button-color);
+  .iconbutton(unfinished, @unfinished-button-color);
+
 
 html, body {
   height: 100%;
@@ -89,7 +91,7 @@ div.hidden_container {
 }
 
 div #results {
-  background-color: lightpink;
+  background-color: @results-bg-color;
   border: 2px solid black;
   margin: 2px;
   padding: 2px;

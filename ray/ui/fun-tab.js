@@ -16,6 +16,26 @@ goog.require('goog.ui.Tab');
 goog.require('goog.ui.Tooltip');
 goog.require('goog.Timer');
 
+Ray.UI.FunTab = function(Blockly) {
+  this.blockly_ = Blockly;
+  var funName = this.getFunName();
+  this.nameSpan_  = goog.dom.createDom('span', {},
+                                       [goog.dom.createTextNode(Ray.UI.FunTab.makeTabText(funName))]);
+  var funDefContent = goog.dom.createDom('div', 'goog-inline-block', [this.nameSpan_]);
+  goog.base(this, funDefContent);
+
+  this.editButton_ = Ray.UI.FunTab.makeEditIconButton();
+  this.addChild(this.editButton_, true);
+
+  var editTooltip = new goog.ui.Tooltip(this.editButton_.getContentElement(), 'Edit the function signature and description or remove this function');
+  editTooltip.className = Ray.UI.FunTab.getIconTooltipClass('edit');
+  this.editButton_.registerDisposable(editTooltip);
+
+  this.workspaceId_ = this.getFunWorkspaceId();
+};
+goog.inherits(Ray.UI.FunTab, goog.ui.Tab);
+
+
 
 Ray.UI.FunTab.makeTabText = function(funName) {
   return 'Define ' + funName + ' ';
@@ -47,32 +67,13 @@ Ray.UI.FunTab.makeEditIconButton = function() {
   return button;
 };
 
-Ray.UI.FunTab.FunTab = function(Blockly) {
-  this.blockly_ = Blockly;
-  var funName = this.getFunName();
-  this.nameSpan_  = goog.dom.createDom('span', {},
-                                       [goog.dom.createTextNode(Ray.UI.FunTab.makeTabText(funName))]);
-  var funDefContent = goog.dom.createDom('div', 'goog-inline-block', [this.nameSpan_]);
-  goog.base(this, funDefContent);
+Ray.UI.FunTab.prototype.workspaceId_ = null;
 
-  this.editButton_ = Ray.UI.FunTab.makeEditIconButton();
-  this.addChild(this.editButton_, true);
-
-  var editTooltip = new goog.ui.Tooltip(this.editButton_.getContentElement(), 'Edit the function signature and description or remove this function');
-  editTooltip.className = Ray.UI.FunTab.getIconTooltipClass('edit');
-  this.editButton_.registerDisposable(editTooltip);
-
-  this.workspaceId_ = this.getFunWorkspaceId();
-};
-goog.inherits(Ray.UI.FunTab.FunTab, goog.ui.Tab);
-
-Ray.UI.FunTab.FunTab.prototype.workspaceId_ = null;
-
-Ray.UI.FunTab.FunTab.prototype.getFunWorkspaceId = function() {
+Ray.UI.FunTab.prototype.getFunWorkspaceId = function() {
   return Ray.UI.Util.funDefDomId(this.blockly_.funId);
 };
 
-Ray.UI.FunTab.FunTab.prototype.getFunName = function() {
+Ray.UI.FunTab.prototype.getFunName = function() {
   return this.blockly_.funSpec.name;
 };
 
@@ -81,17 +82,17 @@ Ray.UI.FunTab.FunTab.prototype.getFunName = function() {
  * because I call this before I've swapped the old and new funSpecs
  * @param newName
  */
-Ray.UI.FunTab.FunTab.prototype.updateFunName = function(newName) {
+Ray.UI.FunTab.prototype.updateFunName = function(newName) {
   goog.dom.setTextContent(this.nameSpan_,
                           Ray.UI.FunTab.makeTabText(newName));
 };
 
-Ray.UI.FunTab.FunTab.prototype.onEdit = function(listener) {
+Ray.UI.FunTab.prototype.onEdit = function(listener) {
   return this.getHandler().listen(this.editButton_.getContentElement(),
                                   goog.events.EventType.CLICK, listener);
 };
 
-Ray.UI.FunTab.FunTab.prototype.updateStatus = function() {
+Ray.UI.FunTab.prototype.updateStatus = function() {
   var incompleteMessage = Ray.Evaluation.isIncompleteFunctionDefinition(this.blockly_);
   if(!incompleteMessage) {
     if(this.unfinishedButton_) {
@@ -113,7 +114,7 @@ Ray.UI.FunTab.FunTab.prototype.updateStatus = function() {
   }
 };
 
-Ray.UI.FunTab.FunTab.prototype.animateColorFromTestResults = function (allTestsPassed) {
+Ray.UI.FunTab.prototype.animateColorFromTestResults = function (allTestsPassed) {
   if(goog.isNull(allTestsPassed)) {
     return;
   }
@@ -139,7 +140,7 @@ Ray.UI.FunTab.FunTab.prototype.animateColorFromTestResults = function (allTestsP
   animation.play();
 };
 
-Ray.UI.FunTab.FunTab.prototype.clearStatus = function() {
+Ray.UI.FunTab.prototype.clearStatus = function() {
   if(this.unfinishedButton_) {
     this.removeChild(this.unfinishedButton_, true);
     this.unfinishedButton_.dispose();
@@ -149,25 +150,25 @@ Ray.UI.FunTab.FunTab.prototype.clearStatus = function() {
   goog.style.setStyle(this.getContentElement(), 'background-color', '');
 };
 
-Ray.UI.FunTab.FunTab.prototype.activate = function() {
+Ray.UI.FunTab.prototype.activate = function() {
   this.clearStatus();
   this.updateStatus();
   this.startPollingForStatus();
 };
 
-Ray.UI.FunTab.FunTab.prototype.deactivate = function() {
+Ray.UI.FunTab.prototype.deactivate = function() {
   this.stopPollingForStatus();
   this.clearStatus();
   this.updateStatus();
 };
 
-Ray.UI.FunTab.FunTab.prototype.startPollingForStatus = function() {
+Ray.UI.FunTab.prototype.startPollingForStatus = function() {
   this.timer_ = new goog.Timer(1000);
   this.timer_.addEventListener(goog.Timer.TICK, this.updateStatus, false, this);
   this.timer_.start();
 };
 
-Ray.UI.FunTab.FunTab.prototype.stopPollingForStatus = function() {
+Ray.UI.FunTab.prototype.stopPollingForStatus = function() {
   if(!this.timer_) {
     throw 'No timer to stop!';
   }

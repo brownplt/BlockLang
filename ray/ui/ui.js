@@ -105,7 +105,7 @@ Ray.UI.setupCreateFunButton = function(div) {
 };
 
 Ray.UI.setupRunButton = function(div) {
-  var runButton = new Ray.UI.RunButton.RunButton(div);
+  var runButton = new Ray.UI.RunButton(div);
   Ray.UI.runButton = runButton;
 
   goog.events.listen(Ray.UI.runButton, goog.ui.Component.EventType.ACTION, function(e) {
@@ -201,7 +201,7 @@ Ray.UI.getFunId = function() {
 Ray.UI.addFunDefWorkspaceTab = function(id) {
   var Blockly = Ray.Shared.lookupFunDefBlockly(id);
 
-  var funDefTab = new Ray.UI.FunTab.FunTab(Blockly);
+  var funDefTab = new Ray.UI.FunTab(Blockly);
   Ray.UI.tabBar.addChild(funDefTab, true);
 
   Blockly.funDefTab = funDefTab;

@@ -11,33 +11,31 @@
  * @author brianp@google.com (Brian Peterson)
  */
 
-@evaluate-text-color: white;
-
-.evaluate-button {
+.run-button {
   position: relative;
   /*width: 20ex;*/
   margin: 2px;
   border: 2px solid #000;
   padding: 2px 6px;
   font: normal 13px "Trebuchet MS", Tahoma, Arial, sans-serif;
-  color: @evaluate-text-color;
-  background-color: #32cd32;
+  color: @run-button-text-color;
+  background-color: @run-button-bg-color;
   cursor: pointer;
   outline: none;
 }
 
-.evaluate-button.halt-button {
-    background-color: #bb0000;
+.run-button.halt-button {
+    background-color: @halt-button-bg-color;
 }
 
-.evaluate-button-hover.halt-button {
-    color: #8c1717;
-    border-color: #8c1717;
-    background-color: #bbb;
+.run-button-hover.halt-button {
+    color: @halt-button-hover-color;
+    border-color: @halt-button-hover-color;
+    background-color: @run-button-hover-bg-color;
 }
 
 /* State: disabled. */
-.evaluate-button-disabled {
+.run-button-disabled {
   border-color: #888;
   color: #888;
   background-color: #ccc;
@@ -45,32 +43,32 @@
 }
 
 /* State: hover. */
-.evaluate-button-hover {
-  border-color: #215e21;
-  color: #215e21;
-  background-color: #bbb;
+.run-button-hover {
+  border-color: @run-button-hover-color;
+  color: @run-button-hover-color;
+  background-color: @run-button-hover-bg-color;
 }
 
 /* State: active, selected, checked. */
-.evaluate-button-active,
-.evaluate-button-selected,
-.evaluate-button-checked {
-  border-color: #5b4169;
-  color: #5b4169;
-  background-color: #d1a8ea;
+.run-button-active,
+.run-button-selected,
+.run-button-checked {
+  border-color: @run-button-active-color;
+  color: @run-button-active-color;
+  background-color: @run-button-active-bg-color;
 }
 
 /* State: focused. */
-.evaluate-button-focused {
+.run-button-focused {
   border-color: #5b4169;
 }
 
 /* Pill (collapsed border) styles. */
-.evaluate-button-collapse-right {
+.run-button-collapse-right {
   margin-right: 0;
 }
 
-.evaluate-button-collapse-left {
+.run-button-collapse-left {
   margin-left: 0;
   border-left: none;
 }
