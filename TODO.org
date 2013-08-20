@@ -165,6 +165,7 @@ then have it fill in the appropriate literal.
   appropriate constraints).
 - [X] Add tooltips to funTab icon buttons
 - [X] Have tabs change color on test success/failure (don't correctly handle unfinished definitions or tests)
+- [X] Have run button check all tests in main workspace, but just a function's tests when in that function's tab.
 
 * Remaining Tasks
 ** High Priority

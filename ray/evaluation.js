@@ -61,15 +61,15 @@ Ray.Evaluation.getMainExpressionBlock = function() {
   }
 };
 
-Ray.Evaluation.compileAndRun = function(evaluateButton) {
+Ray.Evaluation.checkAllAndEval = function(runButton) {
   goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Evaluation.bindFunDefBlockly);
   goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Evaluation.runTests);
 
-  var originalContent = evaluateButton.getContent();
-  var originalTooltip = evaluateButton.getTooltip();
-  evaluateButton.setContent('Computing... click to stop');
-  evaluateButton.setTooltip('Click to interrupt the current computation');
-  goog.dom.classes.add(evaluateButton.getContentElement(), 'halt-button');
+  var originalContent = runButton.getContent();
+  var originalTooltip = runButton.getTooltip();
+  runButton.setContent('Computing... click to stop');
+  runButton.setTooltip('Click to interrupt the current computation');
+  goog.dom.classes.add(runButton.getContentElement(), 'halt-button');
   var result = null;
 
   try {
@@ -78,15 +78,18 @@ Ray.Evaluation.compileAndRun = function(evaluateButton) {
     result = e;
   }
 
-  evaluateButton.setContent(originalContent);
-  evaluateButton.getTooltip(originalTooltip);
-  goog.dom.classes.remove(evaluateButton.getContentElement(), 'halt-button');
+  runButton.setContent(originalContent);
+  runButton.getTooltip(originalTooltip);
+  goog.dom.classes.remove(runButton.getContentElement(), 'halt-button');
   return result;
 };
 
+Ray.Evaluation.checkFunTab = function(evaluateButton, Blockly) {
+  goog.array.forEach(Ray.Shared.FunDefBlocklys, Ray.Evaluation.bindFunDefBlockly);
+  Ray.Evaluation.runTests(Blockly);
+};
+
 /**
- *
- * @param r
  * @param funSpec
  * @param opt_asValue
  */

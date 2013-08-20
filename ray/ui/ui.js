@@ -56,13 +56,25 @@ Ray.UI.setupTabBar = function(tabDivId, initialSelectedTabDivId) {
   var tabBar = new goog.ui.TabBar();
   tabBar.decorate(goog.dom.getElement(tabDivId));
   tabBar.getSelectedTab().workspaceId_ = initialSelectedTabDivId;
+  Ray.UI.mainBlocklyTabId = initialSelectedTabDivId;
   Ray.UI.tabBar = tabBar;
   return tabBar;
+};
+
+Ray.UI.mainWorkspaceOpen = function() {
+  return Ray.UI.mainBlocklyTabId === Ray.UI.tabBar.getSelectedTab().workspaceId_;
+};
+
+Ray.UI.updateRunButtonText = function() {
+  Ray.UI.runButton.setContent(Ray.UI.mainWorkspaceOpen() ?
+                              Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT :
+                              Ray.UI.Util.GO_BUTTON_FUN_TAB_TEXT);
 };
 
 Ray.UI.listenForTabChanges = function() {
   goog.events.listen(Ray.UI.tabBar, goog.ui.Component.EventType.SELECT, function(e) {
     Ray.UI.selectTab(e.target);
+    Ray.UI.updateRunButtonText();
   });
   goog.events.listen(Ray.UI.tabBar, goog.ui.Component.EventType.UNSELECT, function(e) {
     Ray.UI.deselectTab(e.target);
@@ -96,8 +108,13 @@ Ray.UI.setupRunButton = function(div) {
   Ray.UI.runButton = runButton;
 
   goog.events.listen(Ray.UI.runButton, goog.ui.Component.EventType.ACTION, function(e) {
-    var result = Ray.Evaluation.compileAndRun(Ray.UI.runButton);
-    goog.dom.setTextContent(Ray.UI.resultsDom, result);
+    if(Ray.UI.mainWorkspaceOpen()) {
+      var result = Ray.Evaluation.checkAllAndEval(Ray.UI.runButton);
+      goog.dom.setTextContent(Ray.UI.resultsDom, result);
+    } else {
+      var currentTabBlockly = Ray.UI.tabBar.getSelectedTab().blockly_;
+      Ray.Evaluation.checkFunTab(Ray.UI.runButton, currentTabBlockly);
+    }
   });
 
   return runButton;
