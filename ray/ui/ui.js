@@ -69,18 +69,9 @@ Ray.UI.setMainBlockly = function(Blockly) {
   Ray.UI.runButton.watchMainWorkspace(Ray.UI.mainTab);
 };
 
-Ray.UI.updateRunButtonText = function() {
-  if(Ray.UI.Util.isMainWorkspaceOpen()) {
-    Ray.UI.runButton.setMainWorkspaceText();
-  } else {
-    Ray.UI.runButton.setFunTabText();
-  }
-};
-
 Ray.UI.listenForTabChanges = function() {
   goog.events.listen(Ray.UI.tabBar, goog.ui.Component.EventType.SELECT, function(e) {
     Ray.UI.selectTab(e.target);
-    Ray.UI.updateRunButtonText();
   });
   goog.events.listen(Ray.UI.tabBar, goog.ui.Component.EventType.UNSELECT, function(e) {
     Ray.UI.deselectTab(e.target);

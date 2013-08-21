@@ -52,7 +52,8 @@ Ray.UI.FunTab.getIconTooltipClass = function(key) {
 Ray.UI.FunTab.TEST_FAILURE_COLOR = [255, 0, 0];
 Ray.UI.FunTab.TEST_SUCCESS_COLOR = [0, 255, 0];
 // How often should we update status indicators?
-Ray.UI.FunTab.TEST_COLOR_ANIMATION_MILLIS = 200;
+Ray.UI.FunTab.TEST_COLOR_ANIMATION_MILLIS = 1000;
+Ray.UI.FunTab.POLLING_INTERVAL_MILLIS = 250;
 
 Ray.UI.FunTab.makeUnfinishedIconButton = function() {
   var image = goog.dom.createDom('i', { 'class': 'icon-exclamation-sign' });
@@ -163,7 +164,7 @@ Ray.UI.FunTab.prototype.deactivate = function() {
 };
 
 Ray.UI.FunTab.prototype.startPollingForStatus = function() {
-  this.timer_ = new goog.Timer(1000);
+  this.timer_ = new goog.Timer(Ray.UI.FunTab.POLLING_INTERVAL_MILLIS);
   this.timer_.addEventListener(goog.Timer.TICK, this.updateStatus, false, this);
   this.timer_.start();
 };

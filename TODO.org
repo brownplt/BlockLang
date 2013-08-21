@@ -237,6 +237,11 @@ then have it fill in the appropriate literal.
 - [ ] Make purpose statement area much larger (input -> textarea)
 - [ ] Have individual items in the function definition dialog turn green when valid, 
   and red otherwise, with localized error messages
+- [ ] Unify tooltips to have consistent styling
+- [ ] Unify tooltips to also use the same mechanism everywhere (not
+  the case currently), so that I could switch to a message bar if
+  desired
+- [ ] Provide some sort of feedback when you run tests, and there are none
 * Immediate items to bring up with Emmanuel
 - How to evaluate expression inside function body? Should we make
   students provide values for the arguments, or just disallow this?
@@ -453,11 +458,16 @@ Then consider what to do about examples that use other functions, and whether I 
 Have a tooltip that explains what went wrong over the area of the example, when we have a failure.
 
 
+Also, the fact that the run button is disabling and enabling in
+response to events, and not by polling solves the problem of
+potentially being able to run invalid code. Given that, it's okay
+that the tab status indicator takes some time to update. 
+
 ----------------------------------------------------------------------------------------------------
 
 - [X] Fix 'empty'
 - [X] Disable run button at the appropriate times
-- [ ] Set a tooltip indicating that you can go to the tab for more
+- [X] Set a tooltip indicating that you can go to the tab for more
   information
 - [ ] Provide some feedback when you run tests, and there are none,
   so nothing happens.

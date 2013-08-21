@@ -16,8 +16,12 @@ Ray.UI.Util.funDefDomId = function(id) {
 
 // Strings needed for header buttons in the UI
 
-Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT = "Run program in main workspace";
-Ray.UI.Util.GO_BUTTON_FUN_TAB_TEXT = "Run function tests";
+Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_TEXT = "Check all and run program in main workspace";
+Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_TOOLTIP = "Make sure all tests pass and run the program in the main workspace";
+Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_DISABLED_TOOLTIP = "There must be exactly one block in the main workspace at the top level";
+Ray.UI.Util.RUN_BUTTON_FUN_TAB_TEXT = "Run function tests";
+Ray.UI.Util.RUN_BUTTON_FUN_TAB_TOOLTIP = "Run all of the tests for this function";
+Ray.UI.Util.RUN_BUTTON_FUN_TAB_DISABLED_TOOLTIP = "Hover over the error icon in the current tab to find out what's wrong";
 
 Ray.UI.Util.HALT_BUTTON_TEXT = "Computing... click to stop";
 Ray.UI.Util.HALT_BUTTON_TOOLTIP = "Click to interrupt the current computation";

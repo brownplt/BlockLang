@@ -14,7 +14,8 @@ goog.require('goog.ui.FlatButtonRenderer');
 Ray.UI.RunButton = function(div) {
   goog.base(this, undefined, Ray.UI.RunButton.EvaluateButtonRenderer);
   this.decorate(div);
-  this.setContent(Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT);
+  this.setContent(Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_TEXT);
+  this.setTooltip(Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_TOOLTIP);
   this.haltMode_ = false;
 
   this.handler = new goog.events.EventHandler(this);
@@ -27,11 +28,11 @@ Ray.UI.RunButton = function(div) {
     }
     // Create a new listener
     if(Ray.UI.Util.isFunDefTab(tab)) {
-      this.setFunTabText();
+      this.setFunTab();
       this.watchedTab_ = tab;
       this.changeListener_ = tab.Blockly.addChangeListener(goog.bind(this.checkValidFunDef, this));
     } else {
-      this.setMainWorkspaceText();
+      this.setMainWorkspace();
       this.watchedTab_ = tab;
       this.changeListener_ = tab.Blockly.addChangeListener(goog.bind(this.checkValidMainWorkspace, this));
     }
@@ -54,31 +55,35 @@ Ray.UI.RunButton.prototype.watchMainWorkspace = function(tab) {
 };
 
 Ray.UI.RunButton.prototype.checkValidFunDef = function() {
-  if(Ray.Evaluation.isIncompleteFunctionDefinition(Ray.UI.currentTab.Blockly)) {
-    this.setEnabled(false);
-    // this.setTooltip ...
-  } else {
+  var valid = !Ray.Evaluation.isIncompleteFunctionDefinition(Ray.UI.currentTab.Blockly)
+  if(valid) {
     this.setEnabled(true);
-    // this.setTooltip ...
+    this.setTooltip(Ray.UI.Util.RUN_BUTTON_FUN_TAB_TOOLTIP);
+  } else {
+    this.setEnabled(false);
+    this.setTooltip(Ray.UI.Util.RUN_BUTTON_FUN_TAB_DISABLED_TOOLTIP);
   }
 };
 
 Ray.UI.RunButton.prototype.checkValidMainWorkspace = function() {
-  if(Ray.Evaluation.hasSingleMainExpressionBlock()) {
+  var valid = Ray.Evaluation.hasSingleMainExpressionBlock();
+  if(valid) {
     this.setEnabled(true);
-    // this.setTooltip ...
+    this.setTooltip(Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_TOOLTIP);
   } else {
     this.setEnabled(false);
-    // this.setTooltip ...
+    this.setTooltip(Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_DISABLED_TOOLTIP);
   }
 };
 
-Ray.UI.RunButton.prototype.setFunTabText = function() {
-  this.setContent(Ray.UI.Util.GO_BUTTON_FUN_TAB_TEXT);
+Ray.UI.RunButton.prototype.setFunTab = function() {
+  this.setContent(Ray.UI.Util.RUN_BUTTON_FUN_TAB_TEXT);
+  this.setTooltip(Ray.UI.Util.RUN_BUTTON_FUN_TAB_TOOLTIP);
 };
 
-Ray.UI.RunButton.prototype.setMainWorkspaceText = function() {
-  this.setContent(Ray.UI.Util.GO_BUTTON_MAIN_WORKSPACE_TEXT);
+Ray.UI.RunButton.prototype.setMainWorkspace = function() {
+  this.setContent(Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_TEXT);
+  this.setTooltip(Ray.UI.Util.RUN_BUTTON_MAIN_WORKSPACE_TOOLTIP);
 };
 
 Ray.UI.RunButton.prototype.enterHaltMode = function() {
