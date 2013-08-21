@@ -1,6 +1,12 @@
 goog.provide('Ray.Generator');
 
 goog.require('Ray.Blocks');
+goog.require('Ray.Runtime');
+goog.require('Ray.Globals');
+
+var Values = Ray.Globals.Values;
+
+var RT = Ray.Runtime;
 
 var getArg = function(block, name) {
   var arg = block.getInputTargetBlock(name);
@@ -54,19 +60,26 @@ var genForm = function(block) {
 };
 
 var genValue = function(block) {
-  // Has an argSpec obj we can extract information from
-  var argSpec = block.value_.argSpec;
-  var args = [];
-  for(var i = 0; i < argSpec.positionalArgs.length; i++) {
-    args.push(getArg(block, argSpec.positionalArgs[i]));
-  }
-  if(argSpec.restArg && block.restArgCount_) {
-    for(var i = 0; i < block.restArgCount_; i++) {
-      args.push(getArg(block, 'REST_ARG' + String(i)));
+  var value = block.value_;
+  if(RT.valueType(value) === Values.Empty) {
+    return RT.empty();
+  } else if(RT.valueType(value) === Values.Primitive || RT.valueType(value) === Values.Closure) {
+    // Has an argSpec obj we can extract information from
+    var argSpec = value.argSpec;
+    var args = [];
+    for(var i = 0; i < argSpec.positionalArgs.length; i++) {
+      args.push(getArg(block, argSpec.positionalArgs[i]));
     }
+    if(argSpec.restArg && block.restArgCount_) {
+      for(var i = 0; i < block.restArgCount_; i++) {
+        args.push(getArg(block, 'REST_ARG' + String(i)));
+      }
+    }
+    // Ignoring keyword arguments for the time being
+    return RT.app(RT.name(block.name_), RT.positionalArgs.apply(null, args));
+  } else {
+    throw 'Unknown value type for block';
   }
-  // Ignoring keyword arguments for the time being
-  return RT.app(RT.name(block.name_), RT.positionalArgs.apply(null, args));
 
 };
 
@@ -75,8 +88,7 @@ var genValue = function(block) {
  * The only complication here is changing the positional argument names to P_ARGi
  * since I kept them generic to better handle changing argument names during function creation
  * @param block
- * @param r
- * @returns {*}
+  * @returns {*}
  */
 var genUserFunctionApplication = function(block) {
   var argSpec = block.value_.argSpec;
