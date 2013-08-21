@@ -17,7 +17,7 @@ goog.require('goog.ui.Tooltip');
 goog.require('goog.Timer');
 
 Ray.UI.FunTab = function(Blockly) {
-  this.blockly_ = Blockly;
+  this.Blockly = Blockly;
   var funName = this.getFunName();
   this.nameSpan_  = goog.dom.createDom('span', {},
                                        [goog.dom.createTextNode(Ray.UI.FunTab.makeTabText(funName))]);
@@ -70,11 +70,11 @@ Ray.UI.FunTab.makeEditIconButton = function() {
 Ray.UI.FunTab.prototype.workspaceId_ = null;
 
 Ray.UI.FunTab.prototype.getFunWorkspaceId = function() {
-  return Ray.UI.Util.funDefDomId(this.blockly_.funId);
+  return Ray.UI.Util.funDefDomId(this.Blockly.funId);
 };
 
 Ray.UI.FunTab.prototype.getFunName = function() {
-  return this.blockly_.funSpec.name;
+  return this.Blockly.funSpec.name;
 };
 
 /**
@@ -93,7 +93,7 @@ Ray.UI.FunTab.prototype.onEdit = function(listener) {
 };
 
 Ray.UI.FunTab.prototype.updateStatus = function() {
-  var incompleteMessage = Ray.Evaluation.isIncompleteFunctionDefinition(this.blockly_);
+  var incompleteMessage = Ray.Evaluation.isIncompleteFunctionDefinition(this.Blockly);
   if(!incompleteMessage) {
     if(this.unfinishedButton_) {
       this.removeChild(this.unfinishedButton_, true);

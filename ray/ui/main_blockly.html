@@ -45,10 +45,11 @@
             Ray.Shared.attachToBlockly(Blockly);
             Ray.Shared.setMainBlockly(Blockly);
 
-
             Blockly.inject(document.body,
                            {path: "../../blockly/", toolbox:
                                    Ray.Shared.getToolbox(false)});
+
+            Ray.UI.setMainBlockly(Blockly);
         }
     </script>
 </head>

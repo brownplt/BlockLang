@@ -455,9 +455,11 @@ Have a tooltip that explains what went wrong over the area of the example, when 
 
 ----------------------------------------------------------------------------------------------------
 
-1. Fix 'empty'
-2. Disable run button at the appropriate times
-3. Add explanatory tooltip over failing examples. 
-4. Clean up this document, and figure out where I am exactly.
-
-5. Switch to fish shell.
+- [X] Fix 'empty'
+- [X] Disable run button at the appropriate times
+- [ ] Set a tooltip indicating that you can go to the tab for more
+  information
+- [ ] Provide some feedback when you run tests, and there are none,
+  so nothing happens.
+- [ ] Add explanatory tooltip over failing examples. 
+- [ ] Clean up this document, and figure out where I am exactly.

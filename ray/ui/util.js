@@ -35,3 +35,15 @@ Ray.UI.Util.funDefBlockly = function() {
 Ray.UI.Util.mainBlockly = function () {
   return goog.dom.getElement(Ray.UI.Util.MAIN_BLOCKLY_ID);
 };
+
+Ray.UI.Util.isMainWorkspaceOpen = function() {
+  return Ray.UI.Util.isMainWorkspaceTab(Ray.UI.tabBar.getSelectedTab());
+};
+
+Ray.UI.Util.isMainWorkspaceTab = function(tab) {
+  return Ray.UI.mainBlocklyTabId === tab.workspaceId_;
+};
+
+Ray.UI.Util.isFunDefTab = function(tab) {
+  return Ray.UI.mainBlocklyTabId !== tab.workspaceId_;
+};

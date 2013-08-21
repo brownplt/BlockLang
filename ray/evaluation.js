@@ -54,11 +54,18 @@ Ray.Evaluation.getMainExpressionBlock = function() {
   var Blockly = Ray.Shared.MainBlockly;
   var workspace = Blockly.mainWorkspace;
   var topBlocks = workspace.getTopBlocks(false);
-  if(topBlocks.length > 1) {
-    throw 'Only one expression can be present at the top-level in a function definition workspace';
+  if(topBlocks.length > 1 || topBlocks.length === 0) {
+    throw 'Expecting exactly one expression at the top-level';
   } else {
     return topBlocks[0];
   }
+};
+
+Ray.Evaluation.hasSingleMainExpressionBlock = function() {
+  var Blockly = Ray.Shared.MainBlockly;
+  var workspace = Blockly.mainWorkspace;
+  var topBlocks = workspace.getTopBlocks(false);
+  return topBlocks.length === 1;
 };
 
 Ray.Evaluation.checkAllAndEval = function(runButton) {
