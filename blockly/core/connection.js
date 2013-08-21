@@ -183,7 +183,6 @@ Blockly.Connection.prototype.connect = function(otherConnection) {
 
   // Demote the inferior block so that one is a child of the superior one.
   childBlock.setParent(parentBlock);
-  childBlock.setParentEventTarget(parentBlock);
   parentBlock.dispatchBlockAddedEvent();
 
   // Rendering the child node will trigger a rendering of its parent.
@@ -261,7 +260,6 @@ Blockly.Connection.prototype.disconnect = function() {
   }
 
   parentBlock.dispatchBlockRemovedEvent();
-  childBlock.setParentEventTarget(null);
 
   if (parentBlock.rendered) {
     parentBlock.render();

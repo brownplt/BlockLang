@@ -197,7 +197,7 @@ Ray.Blocks.TypeChecker.expr = function(block, type, typeEnv) {
       if(block.isUserFunction_) {
         fun = block.value_;
       } else {
-        fun = r.lookup(funName); // Why am I looking it up when I can just typecheck against the block itself?
+        fun = Ray.Runtime.lookup(funName); // Why am I looking it up when I can just typecheck against the block itself?
         // To make sure I'm looking at an up-to-date version? (Figure this out!)
       }
 

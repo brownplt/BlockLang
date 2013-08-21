@@ -150,13 +150,22 @@ Ray.Evaluation.runTest = function(exampleBlock) {
   var testPassed = Ray.Runtime.equals(exprValue, resultValue);
   console.log("Test " + (testPassed ? "passed" : "failed") + "!");
   exampleBlock.updateColourFromTestResult(testPassed);
-  exampleBlock.handler.listen(exampleBlock, [exampleBlock.Blockly.Block.EventType.BLOCK_ADDED,
-                                             exampleBlock.Blockly.Block.EventType.BLOCK_REMOVED], function(e) {
+
+  var resetColourAndClearListener = function(e) {
     console.log(e);
     this.colourHue_ = undefined;
     this.updateColour();
     this.handler.removeAll();
-  });
+  };
+
+  var allBlockEvents = [exampleBlock.Blockly.Block.EventType.SUBBLOCK_ADDED,
+                        exampleBlock.Blockly.Block.EventType.SUBBLOCK_REMOVED,
+                        exampleBlock.Blockly.Block.EventType.PARENT_BLOCK_CHANGED,
+                        exampleBlock.Blockly.Block.EventType.BLOCK_DISPOSED];
+
+  exampleBlock.handler.listen(Ray.Evaluation.getFunBodyBlock(exampleBlock.Blockly), allBlockEvents, resetColourAndClearListener);
+  exampleBlock.handler.listen(exampleBlock, [exampleBlock.Blockly.Block.EventType.SUBBLOCK_ADDED,
+                                             exampleBlock.Blockly.Block.EventType.SUBBLOCK_REMOVED], resetColourAndClearListener);
   // TODO (Have the colour cleared away if the function definition changes)
   return testPassed;
 };

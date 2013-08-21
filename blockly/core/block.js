@@ -85,6 +85,7 @@ Blockly.Block = function(workspace, proto) {
 
   this.isInFlyout = false;
   this.workspace = workspace;
+  this.isDragging = false;
 
   workspace.addTopBlock(this);
 
@@ -133,16 +134,23 @@ Blockly.Block = function(workspace, proto) {
 goog.inherits(Blockly.Block, goog.events.EventTarget);
 
 Blockly.Block.EventType = {
-  BLOCK_ADDED: 'block added in slot', // I actually don't want to wrap this in goog.events.getUniqueId b/c this may be used across instances of Blockly
-  BLOCK_REMOVED: 'block removed from slot' // Same here
+  SUBBLOCK_ADDED: 'block added in slot', // I actually don't want to wrap this in goog.events.getUniqueId b/c this may be used across instances of Blockly
+  SUBBLOCK_REMOVED: 'block removed from slot', // Same here
+  PARENT_BLOCK_CHANGED: "block's parent has changed",
+  BLOCK_DISPOSED: 'block has been disposed'
 };
 
 Blockly.Block.prototype.dispatchBlockAddedEvent = function() {
-  this.dispatchEvent(Blockly.Block.EventType.BLOCK_ADDED);
+  this.dispatchEvent(Blockly.Block.EventType.SUBBLOCK_ADDED);
 };
 
 Blockly.Block.prototype.dispatchBlockRemovedEvent = function() {
-  this.dispatchEvent(Blockly.Block.EventType.BLOCK_REMOVED);
+  this.dispatchEvent(Blockly.Block.EventType.SUBBLOCK_REMOVED);
+};
+
+// Override this so that we don't have to directly setParentEventTarget anywhere, and events will just propagate correctly.
+Blockly.Block.prototype.getParentEventTarget = function() {
+  return this.getParent();
 };
 
 /**
@@ -285,7 +293,6 @@ Blockly.Block.prototype.unselect = function() {
  * @param {boolean} animate If true, show a disposal animation and sound.
  */
 Blockly.Block.prototype.dispose = function(healStack, animate) {
-  goog.base(this, 'dispose');
 
   this.unplug(healStack);
 
@@ -344,6 +351,9 @@ Blockly.Block.prototype.dispose = function(healStack, animate) {
     this.svg_.dispose();
     this.svg_ = null;
   }
+
+  this.dispatchEvent(Blockly.Block.EventType.BLOCK_DISPOSED);
+  goog.base(this, 'dispose');
 
   if(this.postDispose_) {
     this.postDispose_();
@@ -761,8 +771,10 @@ Blockly.Block.prototype.moveConnections_ = function(dx, dy) {
 Blockly.Block.prototype.setDragging_ = function(adding) {
   if (adding) {
     this.svg_.addDragging();
+    this.isDragging = true;
   } else {
     this.svg_.removeDragging();
+    this.isDragging = false;
   }
   // Recurse through all blocks attached under this one.
   for (var x = 0; x < this.childBlocks_.length; x++) {
@@ -950,6 +962,7 @@ Blockly.Block.prototype.getChildren = function() {
  * @param {Blockly.Block} newParent New parent block.
  */
 Blockly.Block.prototype.setParent = function(newParent) {
+  var oldParent = this.parentBlock_;
   if (this.parentBlock_) {
     // Remove this block from the old parent's child list.
     var children = this.parentBlock_.childBlocks_;
@@ -978,6 +991,13 @@ Blockly.Block.prototype.setParent = function(newParent) {
   } else {
     // Remove this block from the workspace's list of top-most blocks.
     this.workspace.removeTopBlock(this);
+  }
+
+  // Temporarily make sure parent is null so parent_change event won't be propagated anywhere
+  this.parentBlock_ = null;
+
+  if(oldParent !== newParent) {
+    this.dispatchEvent(Blockly.Block.EventType.PARENT_BLOCK_CHANGED);
   }
 
   this.parentBlock_ = newParent;

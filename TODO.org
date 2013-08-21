@@ -398,7 +398,66 @@ Problem I just realized existed: If I want to disable the run button, when I hav
 Otherwise, someone could potentially activate it from an invalid state and break things. I could probably avoid this by setting the interval to be very very very small, 
 but then I'm wasting a bunch of cycles on polling, when I could just fire the appropriate events and be done with it.
 
+How do I know when the workspace has a valid function definition?
+
+Ok, here is the solution I'm going to use: I will listen for workspaceChangedEvents, and I will also listen for events on the block that was the body block at the time of running the test.
+
+The polling problem does not exist for resetting example blocks, but I haven't solved it for updating status icons.
+
+If I get a SUBBLOCK_REMOVED or SUBBLOCK_ADDED or PARENT_BLOCK_CHANGED or BLOCK_DISPOSED event, I can reset.
+Wait, doesn't this cover all the cases, so that I don't even have to listen to the workspaceChangedEvents, since the original block alone can tell me everything I need to know?
+
+_If the original function body block hasn't fired an event, there is no way that the function definition has changed. Yay, that makes it super simple!_
+
+One other case I need to handle is the case where I add 2 or 3 blocks to the workspace, but I then remove the original one. 
+Presumably, its PARENT_BLOCK_CHANGED event won't fire, because its parent was null and still is null.
+Thus, what I need is yet another event BLOCK_DISPOSED that gets called during disposal,
+ but before the EventTarget dispose is called, since at that point I will have already gotten rid of the EventTarget stuff. 
+I can solve this just by moving the EventTarget disposal to the end, and only dispatching the event then.
 
 
 
+Also, I need to make sure that PARENT_BLOCK_CHANGED events are dispatched only when the block in question doesn't have a parent, 
+so that it doesn't bubble up. So I can just have that happen in setParent, after I've disconnected the old, and before I've connected the new.
 
+Here's another problem: when 
+
+
+Also, what about the fact that you can have an example in a function definition tab that doesn't actually test the function in question? Should it be reset when the function changes?
+
+Conversly, you can have an example in function A's tab that uses function B. When should it be reset? 
+
+Maybe I should just make the function blocks in the examples not removable, so that you can't run into the first problem.
+
+----------------------------------------------------------------------------------------------------
+
+FIGURE OUT WHAT THE SCHEDULE IS!!!!!!!!!
+
+RESPOND TO EMMANUEL'S PREVIOUS EMAIL
+
+EMPTY doesn't typecheck correctly, because there is no function value associated with it. I have to fix this.
+Actually the problem isn't in typechecking. The problem is that when
+we go to generate code for it, we dispatch on the presenct of a value_
+field, which it does have even though it is not a  function. We need
+to have some global, like Globals.Class that we can dispatch against,
+and have that field remain an implementation detail. Or we can do
+this in a more object-oriented way, and have each object provide its
+own generation. Also the way my blocks are constructed is worryingly
+ad-hoc. There should be a more principled way to go about. Maybe some
+interface they could all implement. 
+
+Also, I gotta pull the latest code, and see what I'm missing.
+
+Next thing is to fix 'empty', and to disable run button.
+Then consider what to do about examples that use other functions, and whether I should make it impossible to remove function application in example.
+Have a tooltip that explains what went wrong over the area of the example, when we have a failure.
+
+
+----------------------------------------------------------------------------------------------------
+
+1. Fix 'empty'
+2. Disable run button at the appropriate times
+3. Add explanatory tooltip over failing examples. 
+4. Clean up this document, and figure out where I am exactly.
+
+5. Switch to fish shell.
