@@ -16,6 +16,7 @@
 @import "@{modules-path}/menubutton";
 @import "@{modules-path}/menuitem";
 @import "@{modules-path}/removefunctionbutton";
+@import "@{modules-path}/resultsbox";
 @import "@{modules-path}/tab";
 @import "@{modules-path}/tabbar";
 
@@ -64,11 +65,6 @@ div.hidden_container {
   display: none;
 }
 
-#header {
-  /* margin-bottom: 4px; */
-  /* background-color: #99c0ff; */
-}
-
 #workspace_content {
   overflow: auto;
 }
@@ -77,24 +73,12 @@ div.hidden_container {
     padding: 0px;
 }
 
-.header-item {
-  margin-bottom: 4px;
+#header-left {
+  padding-bottom: 4px;
 }
 
-#create_function_button {
-  float: left;
-  margin-left: 4px;
-}
-
-#evaluate_expression_button {
-  float: left;
-}
-
-div #results {
-  background-color: @results-bg-color;
-  border: 2px solid black;
-  margin: 2px;
-  padding: 2px;
+#header-right {
+  padding-bottom: 4px;
 }
 
 .invalid-state-message {

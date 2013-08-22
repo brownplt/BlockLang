@@ -3,6 +3,7 @@ goog.provide('Ray.UI');
 
 goog.require('Ray.UI.FunDef');
 goog.require('Ray.UI.FunTab');
+goog.require('Ray.UI.ResultsBox');
 goog.require('Ray.UI.RunButton');
 goog.require('Ray.UI.Util');
 
@@ -106,7 +107,11 @@ Ray.UI.setupRunButton = function(div) {
   goog.events.listen(Ray.UI.runButton, goog.ui.Component.EventType.ACTION, function(e) {
     if(Ray.UI.Util.isMainWorkspaceOpen()) {
       var result = Ray.Evaluation.checkAllAndEval(Ray.UI.runButton);
-      goog.dom.setTextContent(Ray.UI.resultsDom, result);
+      if(result.error_) {
+        Ray.UI.resultsBox.showError(result);
+      } else {
+        Ray.UI.resultsBox.showValue(result);
+      }
     } else {
       var currentTabBlockly = Ray.UI.tabBar.getSelectedTab().Blockly;
       Ray.Evaluation.checkFunTab(Ray.UI.runButton, currentTabBlockly);
@@ -116,10 +121,10 @@ Ray.UI.setupRunButton = function(div) {
   return runButton;
 };
 
-Ray.UI.setupResultsDom = function(div) {
-  goog.style.setInlineBlock(div);
-  goog.dom.setTextContent(div, 'Results of last evaluation...');
-  Ray.UI.resultsDom = div;
+Ray.UI.setupResultsBox = function(div) {
+  var resultsBox = new Ray.UI.ResultsBox(div);
+  Ray.UI.resultsBox = resultsBox;
+  return resultsBox;
 };
 
 Ray.UI.switchDisplayedWorkspace = function(from, to) {

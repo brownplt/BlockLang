@@ -4,8 +4,8 @@
     <script type="text/javascript" src="ray-deps.js"></script>
     <title>UI Demo</title>
     <link rel="stylesheet" type="text/css" href="ink-2.2.0/css/ink-custom.css">
-    <!-- <link rel="stylesheet/less" type="text/css" href="ray/ui/less/ui.less">
-    <script type="text/javascript" src="less.js"></script> -->
+    <!--<link rel="stylesheet/less" type="text/css" href="ray/ui/less/ui.less">
+    <script type="text/javascript" src="less.js"></script>-->
     <link rel="stylesheet" type="text/css" href="ray/ui/css/ui.css">
     <script type="text/javascript">
         /** Ray Imports */
@@ -21,22 +21,12 @@
 <body>
 <div class="ink-grid">
 <div id="header" class="column-group">
-    <div class="large-50">
-
-        <div id="create_function_button"
-             class="goog-flat-button goog-inline-block header-item"
-             title="">
-            ...
-        </div>
-
-
-        <div id="run_button"
-             class="run-button goog-inline-block header-item">
-            ...
-        </div>
+    <div class="large-50" id="header-left">
+        <div id="create_function_button" class="goog-flat-button goog-inline-block header-item">...</div>
+        <div id="run_button" class="run-button goog-inline-block header-item">...</div>
     </div>
-    <div class="large-50 content-right">
-        <div id="results" class="header-item"></div>
+    <div class="large-50 content-right" id="header-right">
+        <div id="results_box" class="header-item"></div>
     </div>
 </div>
 <div class="body">
@@ -72,7 +62,7 @@
 
     Ray.UI.setupRunButton(goog.dom.getElement('run_button'));
 
-    Ray.UI.setupResultsDom(goog.dom.getElement('results'));
+    Ray.UI.setupResultsBox(goog.dom.getElement('results_box'));
 
 
     Ray.UI.funDefDialog.onCreate(Ray.UI.createFunBlockly);

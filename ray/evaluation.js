@@ -77,8 +77,10 @@ Ray.Evaluation.checkAllAndEval = function(runButton) {
 
   try {
     result = Ray.Evaluation.evaluateBlockAndFormat(Ray.Evaluation.getMainExpressionBlock());
+    result.error_ = false;
   } catch(e) {
     result = e;
+    result.error_ = true;
   }
 
   runButton.exitHaltMode();

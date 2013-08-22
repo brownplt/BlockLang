@@ -138,6 +138,10 @@
   holding
 - [ ] Have the signature not part of the canvas, so you can't drag
   things onto it.
+- [ ] Give name and purpose textfield/area in funDefDialog each a full
+  line
+- [ ] Precede each line in FunDefDialog with label in bold. ("Name:",
+  "Purpose:", "Domain:", "Range:")
 * Ideas
 Just have holes be replaced with 'undefined', and cause dynamic errors, but no static errors.
 

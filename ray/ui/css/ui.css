@@ -850,6 +850,20 @@
   cursor: hand;
 }
 /*
+ * Styling for the results box
+ */
+#results_box {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid black;
+  margin: 2px;
+  padding: 2px;
+}
+#results_box.results_box-error {
+  background-color: #ff0000;
+  color: #000000;
+}
+/*
  * Copyright 2008 The Closure Library Authors. All Rights Reserved.
  *
  * Use of this source code is governed by the Apache License, Version 2.0.
@@ -1054,33 +1068,17 @@ div.container {
 div.hidden_container {
   display: none;
 }
-#header {
-  /* margin-bottom: 4px; */
-
-  /* background-color: #99c0ff; */
-
-}
 #workspace_content {
   overflow: auto;
 }
 .ink-grid {
   padding: 0px;
 }
-.header-item {
-  margin-bottom: 4px;
+#header-left {
+  padding-bottom: 4px;
 }
-#create_function_button {
-  float: left;
-  margin-left: 4px;
-}
-#evaluate_expression_button {
-  float: left;
-}
-div #results {
-  background-color: #ffb6c1;
-  border: 2px solid black;
-  margin: 2px;
-  padding: 2px;
+#header-right {
+  padding-bottom: 4px;
 }
 .invalid-state-message {
   color: red;
