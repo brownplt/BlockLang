@@ -15,6 +15,14 @@ goog.require('goog.string');
 var Blocks = Ray.Globals.Blocks;
 var R = Ray.Runtime;
 
+Ray.Blocks.INPUT_CATEGORY_NAME = 'input';
+Ray.Blocks.OUTPUT_CATEGORY_NAME = 'output';
+Ray.Blocks.USER_FUN_CATEGORY_NAME = 'functions';
+Ray.Blocks.CONTROL_CATEGORY_NAME = 'control';
+Ray.Blocks.ARGUMENT_CATEGORY_NAME = 'arguments';
+Ray.Blocks.LIST_CATEGORY_NAME = 'list';
+Ray.Blocks.ALL_CATEGORY_NAME = 'all';
+
 Ray.Blocks.REST_ARG_PREFIX = "ray_rest_arg_";
 Ray.Blocks.BLOCK_PREFIX = "ray_";
 Ray.Blocks.PRIMITIVE_DATA_PREFIX = "ray_data_create_";
@@ -135,21 +143,21 @@ Ray.Blocks.getDrawers = function(block) {
   });
 
   goog.array.forEach(inputTypeSet, function(type) {
-    drawers.push(type + '_input');
+    drawers.push([type, Ray.Blocks.INPUT_CATEGORY_NAME]);
   });
   goog.array.forEach(outputTypes, function(type) {
-    drawers.push(type + '_output');
+    drawers.push([type, Ray.Blocks.OUTPUT_CATEGORY_NAME]);
   });
   if(block.isUserFunction_) {
-    drawers.push('functions');
+    drawers.push([Ray.Blocks.USER_FUN_CATEGORY_NAME]);
   }
 
   if(block.form_) {
-    drawers.push('forms');
+    drawers.push([Ray.Blocks.CONTROL_CATEGORY_NAME]);
   }
 
   if(block.arguments_) {
-    drawers.push('arguments');
+    drawers.push([Ray.Blocks.ARGUMENT_CATEGORY_NAME]);
   }
 
   if(drawers.length === 0) {
@@ -159,7 +167,7 @@ Ray.Blocks.getDrawers = function(block) {
 };
 
 /**
- * Generates an xml string representing the toolbox of blocks that will be available on a Blockly page.
+ * Generates an xml string representing the toolbox category tree of blocks that will be available on a Blockly page.
  * @param {Object} blockDirectory the block directory for which we will generate the toolbox
  * @param {?boolean=} opt_includeArguments Should we include arguments blocks in this block directory?
  */
@@ -170,11 +178,11 @@ Ray.Blocks.generateToolbox = function(blockDirectory, opt_includeArguments) {
   var toolbox = goog.dom.createDom('xml', {id: 'toolbox'});
   goog.array.forEach(toolboxCategories, function(category) {
     // Disabling these categories at the moment
-    if(category === 'arguments' || category === 'all') {
+    if(category === Ray.Blocks.ARGUMENT_CATEGORY_NAME || category === Ray.Blocks.ALL_CATEGORY_NAME) {
       return;
     }
     // Don't display arguments if false is passed in as opt_includeArguments
-    if(category === 'arguments' && !includeArguments) {
+    if(category === Ray.Blocks.ARGUMENT_CATEGORY_NAME && !includeArguments) {
       return;
     }
     // Otherwise, display category, even if it is empty!
@@ -184,7 +192,7 @@ Ray.Blocks.generateToolbox = function(blockDirectory, opt_includeArguments) {
     if(!goog.isArray(blockDirectory[category])) {
       goog.array.forEach(goog.object.getKeys(blockDirectory[category]), function(subcategory) {
         var attributes = {};
-        attributes.name = (subcategory === 'input' ? 'consumes' : 'produces');
+        attributes.name = (subcategory === Ray.Blocks.INPUT_CATEGORY_NAME ? 'consumes' : 'produces');
         attributes.key = subcategory;
         attributes.custom = category + '_' + attributes.key;
         var subcat = goog.dom.createDom('category');
@@ -202,17 +210,36 @@ Ray.Blocks.generateToolbox = function(blockDirectory, opt_includeArguments) {
 
 Ray.Blocks.addToBlockDirectory = function(blockDirectory, blockName, block) {
   var drawers = Ray.Blocks.getDrawers(block);
+  /* This is not nearly as complicated as it looks. Basically, I just walk down the tree structure of the block directory,
+   * making sure that things exist at each point, and creating them if they do not.
+   * I also make sure that one subcategory doesn't contain blocks and subcategories at the same time
+   */
   goog.array.forEach(drawers, function(drawer) {
-    var endIndex = drawer.search(/(input|output)/);
-    if(endIndex < 0) {
-      blockDirectory[drawer].push(blockName);
-    } else {
-      var inOrOut = drawer.substring(endIndex);
-      var type = drawer.substring(0, endIndex - 1);
-      blockDirectory[type][inOrOut].push(blockName);
+    var currentCategory = blockDirectory;
+    var key;
+    // For all but the last key, I want to find another object, and not an array,
+    // since that would mean I was inconsistent about whether the level has subcategories or blocks.
+    for(var i = 0; i < drawer.length - 1; i++) {
+      key = drawer[i];
+      if(!currentCategory[key]) {
+        currentCategory[key] = {};
+      } else if(goog.isArray(currentCategory[key])) {
+        throw 'drawer has subcategory where blockDir has list of blocks';
+      }
+      currentCategory = currentCategory[key];
     }
+
+    key = drawer[drawer.length - 1];
+    if(!currentCategory[key]) {
+      currentCategory[key] = [];
+    } else if(!goog.isArray(currentCategory[key])) {
+      throw 'drawer has list of blocks where blockDir has subcategory';
+    }
+    var finalArray = currentCategory[key];
+    finalArray.push(blockName);
   });
-  blockDirectory['all'].push(blockName);
+
+  blockDirectory[Ray.Blocks.ALL_CATEGORY_NAME].push(blockName);
   return blockDirectory;
 };
 
@@ -223,16 +250,16 @@ Ray.Blocks.emptyBlockDirectory = function() {
   });
   goog.array.forEach(baseTypes, function(ty)   {
     blockDirectory[ty] = {};
-    blockDirectory[ty]['input'] = [];
-    blockDirectory[ty]['output'] = [];
+    blockDirectory[ty][Ray.Blocks.INPUT_CATEGORY_NAME] = [];
+    blockDirectory[ty][Ray.Blocks.OUTPUT_CATEGORY_NAME] = [];
   });
 
-  blockDirectory['forms'] = [];
-  blockDirectory['functions'] = [];
-  blockDirectory['arguments'] = [];
+  blockDirectory[Ray.Blocks.CONTROL_CATEGORY_NAME] = [];
+  blockDirectory[Ray.Blocks.USER_FUN_CATEGORY_NAME] = [];
+  blockDirectory[Ray.Blocks.ARGUMENT_CATEGORY_NAME] = [];
   // Not including all, as per Emmanuel's email, since it would allow students not to use type-based reasoning
   // I'm just leaving it out of the displayed toolbox, but still putting blocks in drawers
-  blockDirectory['all'] = [];
+  blockDirectory[Ray.Blocks.ALL_CATEGORY_NAME] = [];
   return blockDirectory;
 };
 

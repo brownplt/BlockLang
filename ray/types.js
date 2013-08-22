@@ -3,6 +3,18 @@ goog.provide('Ray.Types');
 goog.require('goog.array');
 goog.require('goog.string');
 
+Ray.Types.BOOLEAN_TYPE_NAME = 'boolean';
+Ray.Types.STRING_TYPE_NAME = 'string';
+Ray.Types.CHARACTER_TYPE_NAME = 'character';
+Ray.Types.NUMBER_TYPE_NAME = 'number';
+Ray.Types.UNKNOWN_TYPE_NAME = 'unknown';
+Ray.Types.LIST_TYPE_NAME = 'list';
+Ray.Types.LIST_OF_TYPES_TYPE_NAME = 'list_of_types';
+Ray.Types.N_ARITY_TYPE_NAME = 'n_arity';
+Ray.Types.ARGUMENTS_TYPE_NAME = 'args';
+Ray.Types.FUNCTION_TYPE_NAME = 'function';
+
+
 var uniques = function(ls) {
   var set = [];
   goog.array.forEach(ls, function(elem) {
@@ -18,38 +30,39 @@ Ray.Types.getAtomicType = function(type_name) {
 };
 
 Ray.Types.atomicTypes_ = {};
-var AtomicType = function (type_name, opt_noRegister) {
+var AtomicType = function (typeName, opt_noRegister, opt_displayName) {
+  var displayName = opt_displayName || goog.string.toTitleCase(typeName);
   function AtomicTypeConstructor() {
-    this.outputType_ = type_name;
+    this.outputType_ = typeName;
   }
 
   AtomicTypeConstructor.prototype.getAllBaseTypes = function () {
-    return [type_name];
+    return [typeName];
   };
   AtomicTypeConstructor.prototype.clone = function() {
     return new AtomicTypeConstructor();
   };
   AtomicTypeConstructor.prototype.display = function() {
-    return goog.string.toTitleCase(type_name);
+    return displayName;
   };
   AtomicTypeConstructor.key = function() {
-    return type_name;
+    return typeName;
   };
   AtomicTypeConstructor.prototype.key = AtomicTypeConstructor.key;
 
   if(!opt_noRegister) {
-    Ray.Types.atomicTypes_[type_name] = AtomicTypeConstructor;
+    Ray.Types.atomicTypes_[typeName] = AtomicTypeConstructor;
   }
   return AtomicTypeConstructor;
 };
 
 // Atomic Types
-Ray.Types.Boolean = AtomicType('boolean');
-Ray.Types.Num = AtomicType('num');
-Ray.Types.Str = AtomicType('str');
-Ray.Types.Char = AtomicType('char');
+Ray.Types.Boolean = AtomicType(Ray.Types.BOOLEAN_TYPE_NAME);
+Ray.Types.Num = AtomicType(Ray.Types.NUMBER_TYPE_NAME);
+Ray.Types.Str = AtomicType(Ray.Types.STRING_TYPE_NAME);
+Ray.Types.Char = AtomicType(Ray.Types.CHARACTER_TYPE_NAME);
 // Used to capture expressions which we don't know anything about
-Ray.Types.Unknown = AtomicType('unknown', true);
+Ray.Types.Unknown = AtomicType(Ray.Types.UNKNOWN_TYPE_NAME, true, '???');
 // We don't want to register it as an ordinary type,
 // so that we don't generate a color for it.
 
@@ -65,7 +78,7 @@ Ray.Types.isAtomicType = function(type) {
 };
 
 Ray.Types.isUnknown = function(ty) {
-  return ty.outputType_ === 'unknown';
+  return ty.outputType_ === Ray.Types.UNKNOWN_TYPE_NAME;
 };
 
 // Compound Types
@@ -75,7 +88,7 @@ Ray.Types.isUnknown = function(ty) {
  * @constructor
  */
 var ListType = function(elementType) {
-  this.outputType_ = 'list';
+  this.outputType_ = Ray.Types.LIST_TYPE_NAME;
   this.elementType = elementType;
 };
 ListType.prototype.getAllBaseTypes = function() {
@@ -95,7 +108,7 @@ Ray.Types.List = ListType;
  * @constructor
  */
 var ListOfTypes = function(ls) {
-  this.outputType_ = 'list_of_types';
+  this.outputType_ = Ray.Types.LIST_OF_TYPES_TYPE_NAME;
   this.list = ls;
 };
 ListOfTypes.prototype.getAllBaseTypes = function() {
@@ -118,7 +131,7 @@ Ray.Types.ListOfTypes = ListOfTypes;
  * @constructor
  */
 var NArityType = function(elementType) {
-  this.outputType_ = 'n_arity';
+  this.outputType_ = Ray.Types.N_ARITY_TYPE_NAME;
   this.elementType = elementType;
 };
 NArityType.prototype.getAllBaseTypes = function() {
@@ -140,7 +153,7 @@ Ray.Types.NArityType = NArityType;
  * @constructor
  */
 var ArgumentsType = function(listOfTypes, nArityType) {
-  this.outputType_ = 'args';
+  this.outputType_ = Ray.Types.ARGUMENTS_TYPE_NAME;
   this.positionalArgTypes = listOfTypes || new ListOfTypes([]);
   this.restArgType = nArityType || null;
 };
@@ -183,7 +196,7 @@ Ray.Types.getAllArgumentTypes = function(argsType) {
  * @constructor
  */
 var FunctionType = function(argumentType, returnType) {
-  this.outputType_ = 'function';
+  this.outputType_ = Ray.Types.FUNCTION_TYPE_NAME;
   this.argumentsType = argumentType;
   this.returnType = returnType;
 };
@@ -239,32 +252,32 @@ Ray.Types.fn = function(args, body) {
 };
 
 Ray.Types.areMatchingTypes = function(ty1, ty2) {
-  if(ty2.outputType_ === 'unknown' ||
-     ty1.outputType_ === 'unknown') {
+  if(ty2.outputType_ === Ray.Types.UNKNOWN_TYPE_NAME ||
+     ty1.outputType_ === Ray.Types.UNKNOWN_TYPE_NAME) {
     return true;
   }
   switch(ty1.outputType_) {
-    case 'boolean':
-      return ty2.outputType_ === 'boolean';
-    case 'num':
-      return ty2.outputType_ === 'num';
-    case 'str':
-      return ty2.outputType_ === 'str';
-    case 'char':
-      return ty2.outputType_ === 'char';
-    case 'list':
-      return ty2.outputType_ === 'list' &&
+    case Ray.Types.BOOLEAN_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.BOOLEAN_TYPE_NAME;
+    case Ray.Types.NUMBER_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.NUMBER_TYPE_NAME;
+    case Ray.Types.STRING_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.STRING_TYPE_NAME;
+    case Ray.Types.CHARACTER_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.CHARACTER_TYPE_NAME;
+    case Ray.Types.LIST_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.LIST_TYPE_NAME &&
         Ray.Types.areMatchingTypes(ty1.elementType, ty2.elementType);
-    case 'list_of_types':
-      return ty2.outputType_ === 'list_of_types' &&
+    case Ray.Types.LIST_OF_TYPES_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.LIST_OF_TYPES_TYPE_NAME &&
         goog.array.every(goog.array.zip(ty1.list, ty2.list), function(pair) {
           return Ray.Types.areMatchingTypes(pair[0], pair[1]);
         });
-    case 'n_arity':
-      return ty2.outputType_ === 'n_arity' &&
+    case Ray.Types.N_ARITY_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.N_ARITY_TYPE_NAME &&
         Ray.Types.areMatchingTypes(ty1.elementType, ty2.elementType);
-    case 'args':
-      if(ty2.outputType_ === 'args' &&
+    case Ray.Types.ARGUMENTS_TYPE_NAME:
+      if(ty2.outputType_ === Ray.Types.ARGUMENTS_TYPE_NAME &&
          Ray.Types.areMatchingTypes(ty1.positionalArgTypes, ty2.positionalArgTypes)) {
 
           return (ty1.restArgType && ty2.restArgType) ?
@@ -273,8 +286,8 @@ Ray.Types.areMatchingTypes = function(ty1, ty2) {
       } else {
         return false;
       }
-    case 'function':
-      return ty2.outputType_ === 'function' &&
+    case Ray.Types.FUNCTION_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.FUNCTION_TYPE_NAME &&
         Ray.Types.areMatchingTypes(ty1.argumentsType, ty2.argumentsType) &&
         Ray.Types.areMatchingTypes(ty1.returnType, ty2.returnType);
     default:
@@ -285,29 +298,37 @@ Ray.Types.areMatchingTypes = function(ty1, ty2) {
 
 Ray.Types.areSameType = function(ty1, ty2) {
   switch(ty1.outputType_) {
-    case 'unknown':
-      return ty2.outputType_ === 'unknown';
-    case 'boolean':
-      return ty2.outputType_ === 'boolean';
-    case 'num':
-      return ty2.outputType_ === 'num';
-    case 'str':
-      return ty2.outputType_ === 'str';
-    case 'char':
-      return ty2.outputType_ === 'char';
-    case 'list':
-      return ty2.outputType_ === 'list' &&
+    case Ray.Types.UNKNOWN_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.UNKNOWN_TYPE_NAME;
+      break;
+    case Ray.Types.BOOLEAN_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.BOOLEAN_TYPE_NAME;
+      break;
+    case Ray.Types.NUMBER_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.NUMBER_TYPE_NAME;
+      break;
+    case Ray.Types.STRING_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.STRING_TYPE_NAME;
+      break;
+    case Ray.Types.CHARACTER_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.CHARACTER_TYPE_NAME;
+    break;
+    case Ray.Types.LIST_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.LIST_TYPE_NAME &&
              Ray.Types.areSameType(ty1.elementType, ty2.elementType);
-    case 'list_of_types':
-      return ty2.outputType_ === 'list_of_types' &&
+      break;
+    case Ray.Types.LIST_OF_TYPES_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.LIST_OF_TYPES_TYPE_NAME &&
              goog.array.every(goog.array.zip(ty1.list, ty2.list), function(pair) {
                return Ray.Types.areSameType(pair[0], pair[1]);
              });
-    case 'n_arity':
-      return ty2.outputType_ === 'n_arity' &&
+      break;
+    case Ray.Types.N_ARITY_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.N_ARITY_TYPE_NAME &&
              Ray.Types.areSameType(ty1.elementType, ty2.elementType);
-    case 'args':
-      if(ty2.outputType_ === 'args' &&
+      break;
+    case Ray.Types.ARGUMENTS_TYPE_NAME:
+      if(ty2.outputType_ === Ray.Types.ARGUMENTS_TYPE_NAME &&
          Ray.Types.areSameType(ty1.positionalArgTypes, ty2.positionalArgTypes)) {
 
         return (ty1.restArgType && ty2.restArgType) ?
@@ -316,10 +337,12 @@ Ray.Types.areSameType = function(ty1, ty2) {
       } else {
         return false;
       }
-    case 'function':
-      return ty2.outputType_ === 'function' &&
+      break;
+    case Ray.Types.FUNCTION_TYPE_NAME:
+      return ty2.outputType_ === Ray.Types.FUNCTION_TYPE_NAME &&
              Ray.Types.areSameType(ty1.argumentsType, ty2.argumentsType) &&
              Ray.Types.areSameType(ty1.returnType, ty2.returnType);
+      break;
     default:
       return false;
       break;
@@ -336,30 +359,30 @@ Ray.Types.areSameType = function(ty1, ty2) {
  * @returns {*}
  */
 Ray.Types.principalType_ = function(ty1, ty2) {
-  if(ty1.outputType_ === 'unknown') {
+  if(ty1.outputType_ === Ray.Types.UNKNOWN_TYPE_NAME) {
     return ty2;
-  } else if(ty2.outputType_ === 'unknown') {
+  } else if(ty2.outputType_ === Ray.Types.UNKNOWN_TYPE_NAME) {
     return ty1;
   } else {
     switch(ty1.outputType_) {
-      case 'boolean':
-      case 'num':
-      case 'str':
-      case 'char':
+      case Ray.Types.BOOLEAN_TYPE_NAME:
+      case Ray.Types.NUMBER_TYPE_NAME:
+      case Ray.Types.STRING_TYPE_NAME:
+      case Ray.Types.CHARACTER_TYPE_NAME:
         return ty1;
-
-      case 'list':
+        break;
+      case Ray.Types.LIST_TYPE_NAME:
         return new Ray.Types.List(Ray.Types.principalType_(ty1.elementType, ty2.elementType));
-
-      case 'list_of_types':
+        break;
+      case Ray.Types.LIST_OF_TYPES_TYPE_NAME:
         return new Ray.Types.ListOfTypes(goog.array.map(goog.array.zip(ty1.list, ty2.list), function(pair) {
           return Ray.Types.principalType_(pair[0], pair[1]);
         }));
-
-      case 'n_arity':
+        break;
+      case Ray.Types.N_ARITY_TYPE_NAME:
         return new Ray.Types.NArityType(Ray.Types.principalType_(ty1.elementType, ty2.elementType));
-
-      case 'args':
+        break;
+      case Ray.Types.ARGUMENTS_TYPE_NAME:
         var positionalArgTypes = goog.array.map(goog.array.zip(ty1.positionalArgTypes, ty2.positionalArgTypes), function(pair) {
           return Ray.Types.principalType_(pair[0], pair[1]);
         });
@@ -367,13 +390,14 @@ Ray.Types.principalType_ = function(ty1, ty2) {
                           Ray.Types.principalType_(ty1.restArgType, ty2.restArgType) :
                           null;
         return new Ray.Types.ArgumentsType(positionalArgTypes, restArgType);
-
-      case 'function':
+        break;
+      case Ray.Types.FUNCTION_TYPE_NAME:
         return new Ray.Types.FunctionType(Ray.Types.principalType_(ty1.argumentsType, ty2.argumentsType),
                                           Ray.Types.principalType_(ty1.returnType, ty2.returnType));
-
+        break;
       default:
         throw 'Unknown type for ty1!';
+        break;
     }
   }
 };

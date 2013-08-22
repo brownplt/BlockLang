@@ -1,133 +1,4 @@
-* DONE Then spend a day on code generation, so that we can have a representative sample of blocks to play with  
-- I also have to put an instance of Ray in place on the page, so I can use that, and I have to get the code generation working!
-- First, figure out how to generate blocks from calls to builtins. Basically,
-  look at type. If Primitive or Closure, match argument spec to determine
-  inputs. Otherwise, make an inner field for props. This will work
-  nicely with typing. 
-* DONE Figure out how I want to represent types. 
-- Feel free to have types be associated with arguments.
-
-* Misc
-File a bug report, getting cond to use a tabular layout
-Make cond default to two clauses, no else
-
-File bug reports about anything that comes up,
-- Editing hello, world in the toolbox
-- Check target sizes
-- Figure out block sizes
-- Get type drawers in place
-- Put everything that inputs or outputs a string, in one drawer, along with the string constructor
-- Separate the forms into a drawer of their own
-* DONE Make it possible to copy blocks from main workspace to function definition space
-* DONE Make tabs for each function definition
-Here's how I am going to do this:
-
-In the workspace_content div, I am going to have a whole bunch of
-divs, one for each workspace. They will all be hidden except for the
-one which is selected. I will do this by setting all of their classes
-to 'hidden_container' except for the one that is ok. I should add a
-UI method that does this.
-
-I also then need to have the create a new function definition dialog
-make sure I don't crete a function with same name as another function
-I have already created, because otherwise I could have two tabs with
-the same name. 
-
-I also need to be able to close tabs, and to be able to open new ones
-when I create a function definition. I can also have the main tab
-look different. 
-
-I need to have a global function registry, which I can edit as I go
-along. Maybe!!!
-
-* TODO Make function definitions active back in the main workpace
-Ok, so I am creating a module Ray.Shared, and I'm going to share Ray
-across all Blockly instances, and I can just put stuff in there to
-share it. 
-* TODO Add function definition functionality
-Ok, so there are a bunch of related pieces. 
-
-I need to be able to share definitions across everything.
-Since I'm already attaching an instance to everything, it shouldn't
-be that hard to share definitions, I just need to figure out when
-exactly I want to update things. 
-
-I can dynamically generate the required flyouts.
-
-Ideally I want to keep a static list of Blocks, and Generators and
-share it among everything. To do that, I can just go ahead and not
-use code generation infrastructure used by Blockly, and just generate
-the data structures myself, that way I don't have to bother with
-keeping all the data in sync across frames. I just have to have a
-current list of blocks, a currently list of functions, and a
-definition for each function. This will make my life so much easier. 
-
-I can handle this code, I shouldn't have to be so afraid of dealing
-with this data!
-
-* DONE got generators simplified, now doesn't require eval, just generates structures directly
-* TODO More function definition stuff
-Right now I am in the process of trying to switch the toolbox
-generated to use custom attributes that will then look up the
-appropriate values in Ray.Shared, and also I am switching the
-creation of the toolbox to use goog.dom, since it is much more
-maintainable that way.
-
-I got this done, but now I have to propagate function definitions
-across workspaces. 
-
-Make it so that function blocks are associated with their
-definitions, and if the number of arguments changes, they change as
-well. 
-
-** TODO Order of priorities [8/10]:
-- [X] Move defined functions to the shared set of blocks. 
-- [X] Separate out argument blocks. 
-- [X] Hook up defined function blocks to the definition, so we can change things as needed. 
-- [X] Hook up definition expressions to functions so that we have the right semantics. 
-- [X] Add a run button, and show output somehow!
-- [X] Make it possible to remove and edit functions (their types)
-  once created
-Clean up documentation, add some documentation, JSDoc comment
-everything complicated. 
-
-- [ ] When you go to tab, flyout should refresh
-
-- [ ] See if I can get mixed layouts
-
-Make sure to email every day with results
-
-Make it so you can't steal function argument blocks from a function
-definition and use them elsewhere
-
-- [X] Get function description associated with function usage blocks
-
-Things that I need to fix:
-
-Bottom block gets cut off in layout
-
-- [X] TESTS ARE NOW BROKEN, BECAUSE THEY DEPEND ON VARIABLE ARITY
-COMPARISONS, and BINOPS. Fix this!
-
-Do I actually pass extra arguments bound to rest arg to the function
-body when I have a closure and not just a primitive? I don't think
-this is tested anywhere...
-
-Have unfinished function definitions trigger errors when they are
-used during evaluation
-
-If you have partially defined functions, you can still use what you
-have defined, and throw an error if you explore unfinished branches
-
-Make constants always available
-
-Think about making it possible to just type in a value in a slot, and
-then have it fill in the appropriate literal.
-
-* Non-code things to do *
-- Mail the list about increasing drop target size
-
-* Completed Tasks
+* Completed Tasks [34/34]
 - [X] Switch from "consumes char" to "consumes", and same for "produces"
   and other types.
 - [X] Get the function name to be above the function arguments.
@@ -164,11 +35,21 @@ then have it fill in the appropriate literal.
   just have to special case this in the typechecker, and provide the
   appropriate constraints).
 - [X] Add tooltips to funTab icon buttons
-- [X] Have tabs change color on test success/failure (don't correctly handle unfinished definitions or tests)
-- [X] Have run button check all tests in main workspace, but just a function's tests when in that function's tab.
+- [X] Have tabs change color on test success/failure (don't correctly
+  handle unfinished definitions or tests)
+- [X] Have test blocks change color on test success/failure
+- [X] Have test blocks reset color when subexpressions or function
+  definition changes
+- [X] Have run button check all tests in main workspace, but just a
+  function's tests when in that function's tab.
+- [X] Have run button disabled when viewing invalid workspace
+- [X] Have run button text and tooltip change appropriately 
+- [X] Use full name of types. num -> number, str -> string, char ->
+  character. Make this easy and configurable, so I can change this globally
+- [X] Rename 'forms' to 'constructs' or 'control'
 
 * Remaining Tasks
-** High Priority
+** High Priority [0/18]
 - [ ] Double clicking is like using a repl, and is immediate evaluation,
   while running a program is the formal version which triggers tests to
   be run. (Even if you don't use something, all the tests should be run)
@@ -177,6 +58,7 @@ then have it fill in the appropriate literal.
   that explains what went wrong that is active over the whole area of
   the test block. Have a tab change color as well if there are
   failing tests in the tab.
+- [ ] Have unfinished definitions work gracefully
 - [ ] When you change a function and that causes type error, make the
   block that doesn't fit turn red or something, and then also have the
   workspaces which use that block turn red as well
@@ -195,7 +77,12 @@ then have it fill in the appropriate literal.
 - [ ] Default type of argument should be blank.
 - [ ] Test it on iPad
 - [ ] Make signature easier to open when closed
-- [ ] Move example block to next line, and add the word "For" in front so it reads "For example..."
+- [ ] Move example block to next line, and add the word "For" in front
+  so it reads "For example..."
+- [ ] Pull latest version of Blockly
+- [ ] Provide support for undoing any action
+- [ ] Make everything serializable, so I can easily load from some JS
+  data structure.
 
 ** Low Priority
 - [ ] Switch to rounded rectangles. Merge this with notch shape
@@ -207,8 +94,6 @@ then have it fill in the appropriate literal.
 - [ ] Every time there is a bug, set it up to send me an email.
 - [ ] Inside function definition dialog, you should be able to drag a name
   and type into the signature to add an argument.
-- [ ] Use full name of types. num -> number, str -> string, char ->
-  character. Make this easy and configurable, so I can change this globally
 - [ ] Have flyout automatically refresh when I switch tabs, so that I get
   most up to date set of blocks.
 - [ ] Disable copying of argument blocks from one function to
@@ -241,87 +126,19 @@ then have it fill in the appropriate literal.
 - [ ] Unify tooltips to also use the same mechanism everywhere (not
   the case currently), so that I could switch to a message bar if
   desired
-- [ ] Provide some sort of feedback when you run tests, and there are none
-* Immediate items to bring up with Emmanuel
-- How to evaluate expression inside function body? Should we make
-  students provide values for the arguments, or just disallow this?
-
-I guess that maybe the scrollbar isn't broken, because it simply
-won't let me make the canvas larger than it already was.
-
-Put examples in 'forms'
-
-You could have definitions that have holes, be indicated with a hole
-icon that would make it clear that you have to finish filling it in.
-
-
-Get function definition interface nailed down.
-
-** Alpha renaming, testing, editing arguments and function types ** 
-
-
-Pre populate example block with function on left, and fill in the
-color for the hole on the right
-
-Also have the run button run the tests in a function's workspace when
-you have the function workspace visible.
-
-Set up halt button, test button!!!!!!
-
-Because the flyout and signature create new blocks by going through
-XML (block->xml->block), I need to have all the prototype names
-registered and available for lookup.
-
-Ok, in order to register tab with the Blockly, I need to wait until
-the Blockly is registered with Ray.Shared, so I need to move all the
-tab creation stuff to inside fun-def-blockly.html or something like
-that. This is way more involved than I thought it would
-be. Basically the problem is setting everything up to communicate
-correctly.
-
-I can't get rid of block.value_ since it is used by the generators,
-but I should probably do a more fine-grained dispatch on block type,
-and generate according to that. Oops, it also is used by the
-block-typechecker as well. 
-
-* Blocks have an outputType field in two different places.
-1. a this.outputType_ field, which is used to set the
-   outputConnection's output type,
-2. Which is the 2nd type. this.outputConnection.outputType_
-
-I'm going to simplify this by removing the block outputType field,
-and renaming it colourType, and just using for blocks that don't have
-an output connection, to determine their colour.
-
-Ok, so I'm working on getting the removed functions to actually be
-removed everywhere, which requires removing the block from
-Ray.Shared.savedBlocks_, and Ray.Shared.blockDirectory_. However,
-doing this is kind of annoying and I don't really don't want to
-figure out how to get this working. I propose simplifying the
-implementation of Ray.Shared.flyoutCategory to dynamically create the
-blockDir from Ray.Shared.savedBlocks_, and then just use that.
-
-Problem is in renderDrawLeft_
-
-* Reason I'm having trouble figuring out how to do correct handling of unfinished function definitions. 
-It requires lazy evaluation, which is entirely different from what I have currently!
-
-I think I can pretty closely follow the model presented in PLAI/2e [[http://cs.brown.edu/courses/cs173/2012/book/Alternate_Application_Semantics.html#(part._.Lazy_.Application)][here]]
-
-* First thing to get going:
-** Get the compiled mode evaluation going
-*** Every function should have a finished definition, and all the test cases should be run.
-This is now working, I believe.
-
-Next order of business: 
-- [X] Get tooltips for the widgets on the tabs.
-- [X] Get tabs to change color depending on test success/failure.
-- [ ] Get test blocks to change color as well.
-
-How should I handle trying to compile while there are unfinished definitions. 
-At which point should I abandon ship, and stop?
-Where in the interface should I provide this information
-
+- [ ] Provide some sort of feedback when you run tests, and there are
+  none
+- [ ] Have results be shown as blocks
+- [ ] Figure out how to serialize everything
+- [ ] Add a 'list' category
+- [ ] See if we need 'unknown' after that
+- [ ] Add support for evaluating expressions within the body (have
+  students provide values for the arguments / or just disallow this)
+- [ ] Have the signature return when you let go of the block you are
+  holding
+- [ ] Have the signature not part of the canvas, so you can't drag
+  things onto it.
+* Ideas
 Just have holes be replaced with 'undefined', and cause dynamic errors, but no static errors.
 
 As a test, create string-last, with correct definition, and test it with "Hello, world!" --> '!'
@@ -334,99 +151,14 @@ Also, create double-a-number and test it with 20 --> 40
 (define (double-a-number n) (* 2 n))
 (check-expect (double-a-number 20) 40)
 
-Make it possible to undo all actions
-
-Rename 'forms' -> 'constructs' / 'control / ?
-
-Add a list category, and then see if we need unknown?
-
-Make the header come back as soon as you finish dragging blocks off?
-
-Eventually make the header area not usable for blocks on the canvas
-
 Talk to Joe and Daniel about moving this to integrate with the Cap'n Teach storage mechanism
 
 Go with the undefined proposal
 
-- [X] Have the evaluation button text change depending on whether the current tab is the main workspace or a function definition
-- [X] Why don't I have Ray.UI keep track of all the UI elements it needs.
-- [X] Wait wait wait, I still want to subclass the run button!!!
-
-I might want to eventually switch to something more structured for adding methods to blocks. 
-
-So instead of just having these prototypes, and constantly copying functions and data over, I could actually have a class hierarchy.
-
-Ok, so I can have the example blocks change color appropriately. 
-
-What I now need to do is have them return to their original colors upon having either of their slots changed, or having their function definition changed. 
-
-I think the best way of doing this is to have blocks dispatch events when a slot is added or removed. 
-Also, when a connection is made, we should set up parent EventTargets to be the containing block.
-
-Also, each block should have an event handler of it's own. (Which we have to initialize and dispose of properly!)
-
-So what I have the example block do is listen with its own event handler for a BLOCK_ADDED or BLOCK_REMOVED event, and react accordingly.
-
-The events should propagate up to the example block, which can then handle everything.
-
-As for changing things when I change the function involved, I want to have the example block reset when:
-
-* The body block at the time of evaluation dispatches a BLOCK_ADDED or BLOCK_REMOVED event.
-* The body block at the time of evaluation is replaced with something else. 
-I was thinking this could be implemented by keeping track of what the current body block is at the time of evaluation, 
-and the next time that there is exactly one block of the right type (so we have an unambiguous body) we make sure it is the same one (compare uids).
-
-Since we're still listening for changes on the original one while we're doing this, we don't have to worry that we are distracted by the temporary additional blocks, and will miss a change.
-This will work, since either the body is switched, in which case we should reset the example block, or the body is changed, in which case we should as well. 
-
-This makes sense. Also, we are going to treat it as a change to pull a block out and then immediately replace it. That's debatable, but pretty reasonable.
-
-That's it for tonight. Goodnight!
 
 Also, respond to Emmanuel/update the todo list with his items. 
 
 Ask Shriram what he means by everything can be undone.
-
-----------------------------------------------------------------------------------------------------
-
-Have condition to reset be anything changing in the original function body block.
-
-Also, disable run button so long as there is an invalid function definition. (Have a tooltip directing people to the icon which indicates exactly which errors they need to fix)
-
-Check and run
-
-----------------------------------------------------------------------------------------------------
-
-I can get rid of the stupid Ray.UI.FunTab.FunTab repetition. For proof, look at Blockly.Block! (Also, RunButton.RunButton!)
-
-Problem I just realized existed: If I want to disable the run button, when I have an invalid function definition, I need to have that happen pretty much immediately.
-Otherwise, someone could potentially activate it from an invalid state and break things. I could probably avoid this by setting the interval to be very very very small, 
-but then I'm wasting a bunch of cycles on polling, when I could just fire the appropriate events and be done with it.
-
-How do I know when the workspace has a valid function definition?
-
-Ok, here is the solution I'm going to use: I will listen for workspaceChangedEvents, and I will also listen for events on the block that was the body block at the time of running the test.
-
-The polling problem does not exist for resetting example blocks, but I haven't solved it for updating status icons.
-
-If I get a SUBBLOCK_REMOVED or SUBBLOCK_ADDED or PARENT_BLOCK_CHANGED or BLOCK_DISPOSED event, I can reset.
-Wait, doesn't this cover all the cases, so that I don't even have to listen to the workspaceChangedEvents, since the original block alone can tell me everything I need to know?
-
-_If the original function body block hasn't fired an event, there is no way that the function definition has changed. Yay, that makes it super simple!_
-
-One other case I need to handle is the case where I add 2 or 3 blocks to the workspace, but I then remove the original one. 
-Presumably, its PARENT_BLOCK_CHANGED event won't fire, because its parent was null and still is null.
-Thus, what I need is yet another event BLOCK_DISPOSED that gets called during disposal,
- but before the EventTarget dispose is called, since at that point I will have already gotten rid of the EventTarget stuff. 
-I can solve this just by moving the EventTarget disposal to the end, and only dispatching the event then.
-
-
-
-Also, I need to make sure that PARENT_BLOCK_CHANGED events are dispatched only when the block in question doesn't have a parent, 
-so that it doesn't bubble up. So I can just have that happen in setParent, after I've disconnected the old, and before I've connected the new.
-
-Here's another problem: when 
-
 
 Also, what about the fact that you can have an example in a function definition tab that doesn't actually test the function in question? Should it be reset when the function changes?
 
@@ -457,7 +189,6 @@ Next thing is to fix 'empty', and to disable run button.
 Then consider what to do about examples that use other functions, and whether I should make it impossible to remove function application in example.
 Have a tooltip that explains what went wrong over the area of the example, when we have a failure.
 
-
 Also, the fact that the run button is disabling and enabling in
 response to events, and not by polling solves the problem of
 potentially being able to run invalid code. Given that, it's okay
@@ -469,7 +200,14 @@ that the tab status indicator takes some time to update.
 - [X] Disable run button at the appropriate times
 - [X] Set a tooltip indicating that you can go to the tab for more
   information
-- [ ] Provide some feedback when you run tests, and there are none,
-  so nothing happens.
 - [ ] Add explanatory tooltip over failing examples. 
 - [ ] Clean up this document, and figure out where I am exactly.
+
+* Things to work on in the near future
+- Double-clicking / handling evaluation when definitions are
+  unfinished, when values are undefined
+- Tooltip with explanation over failing(/passing) examples
+- Making the results box better, perhaps have it show a results block
+  when successfully executing, and just turn red with an error
+  message otherwise. 
+- Getting vertical layouts to work fully
