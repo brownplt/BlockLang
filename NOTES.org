@@ -500,3 +500,45 @@ so that it doesn't bubble up. So I can just have that happen in setParent, after
 * Notes about changing type names 8/21/13
 
 Well, I've succeeded in doing it. It wasn't that hard, just involved pulling some constants out.
+
+* Notes about double-clicking 8/22/13
+
+Waiting to activate the single click stuff until the timeout expires
+is a problem, because then unless I drag I inadvertantly miss the
+click release and move, and so I end up dragging the block despite
+simply clicking quickly.
+
+So maybe instead what I want to do is to start the single click, and
+if I get another click in the time interval, terminateDrag(), and do
+double click stuff.
+
+I was in the middle of trying to get some kind of highlighting going
+when I double click on stuff, which requires making sure that I have
+unselected this block, but I don't know where select and unselect
+happen. I should just break at select and unselect and watch it all
+unfold before my eyes.
+
+Note: this clicking mechanism should work fine on IE, since I'm
+actually using mousedown, and not the click event!
+
+I now have the highlighting working! Make sure to disable this effect
+on blocks in mutator dialogs, and test cases. 
+
+Have the example block test case be fixed. 
+
+Special case a function body of the wrong type. Highlight in red the
+body and return type.
+
+Have the header stick around.
+
+Create a block called "body:". 
+
+Send a message to Kathi, Emu, and Shriram with choices for body.
+
+* Plan
+- [ ] First, get results box css'ed up to look nice. Also, abstract
+  it a little bit so that I can send messages to it, clear it, so forth.
+- [ ] Second, get evaluation working, and have block evaluation
+  results go to results box.
+- [ ] Then send an email with updates, responses to Emu's previous
+  message. 

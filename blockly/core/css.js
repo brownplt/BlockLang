@@ -44,6 +44,7 @@ Blockly.Css.inject = function() {
 
 Blockly.Css.FONT_COLOR = '#000';
 Blockly.Css.SIGNATURE_BACKGROUND_COLOR = '#bbb';
+Blockly.Css.BLOCK_EVAL_HIGHLIGHT_COLOR = '#6e17e8';
 
 
 Blockly.Css.CONTENT = [
@@ -89,6 +90,13 @@ Blockly.Css.CONTENT = [
   '  stroke: #fc3;',
   '}',
   '.blocklySelected>.blocklyPathLight {',
+  '  display: none;',
+  '}',
+  '.blocklyEvaluated>.blocklyPath {',
+  '  stroke-width: 3px;',
+  '  stroke: ' + Blockly.Css.BLOCK_EVAL_HIGHLIGHT_COLOR + ';',
+  '}',
+  '.blocklyEvaluated>.blocklyPathLight {',
   '  display: none;',
   '}',
   '.blocklyDragging>.blocklyPath,',

@@ -417,6 +417,23 @@ Blockly.BlockSvg.prototype.updateDisabled = function() {
 };
 
 /**
+ * Evaluate this block. Highlight it visually.
+ */
+Blockly.BlockSvg.prototype.addEvalHighlight = function() {
+  Blockly.addClass_(/** @type {!Element} */ (this.svgGroup_),
+                                           'blocklyEvaluated');
+  this.svgGroup_.parentNode.appendChild(this.svgGroup_);
+};
+
+/**
+ * Remove evaluation highlighting from this block.
+ */
+Blockly.BlockSvg.prototype.removeEvalHighlight = function() {
+  Blockly.removeClass_(/** @type {!Element} */ (this.svgGroup_),
+                                              'blocklyEvaluated');
+};
+
+/**
  * Select this block.  Highlight it visually.
  */
 Blockly.BlockSvg.prototype.addSelect = function() {

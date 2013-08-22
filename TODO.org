@@ -211,3 +211,9 @@ that the tab status indicator takes some time to update.
   when successfully executing, and just turn red with an error
   message otherwise. 
 - Getting vertical layouts to work fully
+- [X] Changing the type names to the unabbreviated versions!
+
+* Get double clicking to evaluate working
+
+In order to do this, I have to figure out first where
+block.onMouseDown is called, so I can know what I'm going to have to intercept.

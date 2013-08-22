@@ -65,6 +65,8 @@ Blockly.Block = function(workspace, proto) {
   this.Blockly = Blockly;
   this.handler = new goog.events.EventHandler(this);
   this.registerDisposable(this.handler);
+  this.receiveDoubleClicks_ = null;
+  this.timeout_ = null;
 
   this.id = ++Blockly.uidCounter_;
   this.outputConnection = null;
@@ -139,6 +141,8 @@ Blockly.Block.EventType = {
   PARENT_BLOCK_CHANGED: "block's parent has changed",
   BLOCK_DISPOSED: 'block has been disposed'
 };
+
+Blockly.Block.MAX_DOUBLE_CLICK_DELAY = 200;
 
 Blockly.Block.prototype.dispatchBlockAddedEvent = function() {
   this.dispatchEvent(Blockly.Block.EventType.SUBBLOCK_ADDED);
@@ -437,13 +441,50 @@ Blockly.Block.prototype.moveBy = function(dx, dy) {
 
 /**
  * Handle a mouse-down on an SVG block.
- * @param {!Event} e Mouse down event.
+ * @param e
  * @private
  */
 Blockly.Block.prototype.onMouseDown_ = function(e) {
+  if(!this.receiveDoubleClicks_) {
+    // Treat as single click
+    this.receiveDoubleClicks_ = true;
+    var self = this;
+    this.timeout_ = setTimeout(function() {
+      //console.log('Time up!')
+      self.receiveDoubleClicks_ = false;
+    } , Blockly.Block.MAX_DOUBLE_CLICK_DELAY);
+    this.onSingleMouseDown_(e);
+  } else {
+    // Must be double click
+    //console.log('Double click');
+    this.receiveDoubleClicks_ = false;
+    clearTimeout(this.timeout_);
+    this.timeout_ = null;
+    this.onDoubleMouseDown_(e);
+  }
+};
+
+Blockly.Block.prototype.onDoubleMouseDown_ = function(e) {
+  Blockly.Block.terminateDrag_();
+  Blockly.removeAllRanges();
+  this.unselect();
+  this.svg_.addEvalHighlight();
+  var self = this;
+  setTimeout(function() {
+    self.svg_.removeEvalHighlight();
+  }, 500);
+};
+
+/**
+ * Handle a mouse-down on an SVG block.
+ * @param {!Event} e Mouse down event.
+ * @private
+ */
+Blockly.Block.prototype.onSingleMouseDown_ = function(e) {
   if (this.isInFlyout) {
     return;
   }
+
   // Update Blockly's knowledge of its own location.
   Blockly.svgResize();
   Blockly.Block.terminateDrag_();
@@ -460,6 +501,8 @@ Blockly.Block.prototype.onMouseDown_ = function(e) {
     // dragged instead.
     return;
   } else {
+
+
     // Left-click (or middle click)
     Blockly.removeAllRanges();
     Blockly.setCursorHand_(true);
