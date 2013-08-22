@@ -531,7 +531,9 @@ body and return type.
 
 Have the header stick around.
 
-Create a block called "body:". 
+Create a block called "body:" to hold the body. Or alternatively have some space on
+the canvas that is for the body. The basic idea is that we want to
+have type-checking for the body, so you can't have an incorrect body type.
 
 Send a message to Kathi, Emu, and Shriram with choices for body.
 
@@ -542,3 +544,5 @@ Send a message to Kathi, Emu, and Shriram with choices for body.
   results go to results box.
 - [ ] Then send an email with updates, responses to Emu's previous
   message. 
+
+For 25 minutes, work on the results box!

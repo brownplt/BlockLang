@@ -90,6 +90,7 @@ Ray.UI.setupCreateFunButton = function(div) {
   var createFunButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
   createFunButton.decorate(div);
   createFunButton.setContent(Ray.UI.Util.CREATE_FUN_BUTTON_TEXT);
+  createFunButton.setTooltip(Ray.UI.Util.CREATE_FUN_BUTTON_TOOLTIP);
   goog.events.listen(createFunButton, goog.ui.Component.EventType.ACTION, function(e) {
     Ray.UI.funDefDialog.asCreate();
     Ray.UI.funDefDialog.setVisible(true);

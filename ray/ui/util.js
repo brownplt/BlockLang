@@ -28,6 +28,7 @@ Ray.UI.Util.HALT_BUTTON_TOOLTIP = "Click to interrupt the current computation";
 Ray.UI.Util.HALT_BUTTON_CLASS = 'halt-button';
 
 Ray.UI.Util.CREATE_FUN_BUTTON_TEXT = "Create a new function";
+Ray.UI.Util.CREATE_FUN_BUTTON_TOOLTIP = "Define a new function to use in your program";
 
 Ray.UI.Util.DIRECTORY_PREFIX = "ray/ui/";
 
