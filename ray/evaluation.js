@@ -76,7 +76,9 @@ Ray.Evaluation.checkAllAndEval = function(runButton) {
   var result = null;
 
   try {
-    result = Ray.Evaluation.evaluateBlockAndFormat(Ray.Evaluation.getMainExpressionBlock());
+    var block = Ray.Evaluation.getMainExpressionBlock();
+    var code = Ray.Evaluation.blockToCode(block);
+    result = Ray.Evaluation.evaluateCode(code);
     result.error_ = false;
   } catch(e) {
     result = e;

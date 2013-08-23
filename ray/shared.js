@@ -53,6 +53,12 @@ Ray.Shared.setBlocks = function(blocks) {
   Ray.Shared.blockDirectory_ = Ray.Blocks.generateBlockDirectory(blocks);
 };
 
+Ray.Shared.getSavedBlock = function(externalBlockName) {
+  return goog.array.find(Ray.Shared.savedBlocks_, function(savedBlock) {
+    return savedBlock.externalName_ === externalBlockName;
+  });
+};
+
 /**
  *
  * @param {?boolean=} opt_includeArguments
@@ -63,9 +69,7 @@ Ray.Shared.getToolbox = function(opt_includeArguments) {
 };
 
 Ray.Shared.addToSavedBlocks = function(block) {
-  if(goog.array.find(Ray.Shared.savedBlocks_, function(savedBlock) {
-    return savedBlock.externalName_ === block.externalName_;
-  })) {
+  if(Ray.Shared.getSavedBlock(block.externalName_)) {
     throw 'Would overwrite pre-existing block!';
   }
   Ray.Shared.savedBlocks_.push(block);

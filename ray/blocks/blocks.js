@@ -327,19 +327,19 @@ Ray.Blocks.defineConditionalBlocks = function() {
  */
 Ray.Blocks.definePrimitiveDataBlocks = function() {
   var primitiveDataBlocks = [];
-  function PrimitiveDataBlock(typeName, type) {
+  function PrimitiveDataBlock(blockClass, type) {
     this.helpUrl = Ray.Blocks.HELP_URL;
-    this.datatype_ = typeName;
+    this.datatype_ = type.display();
     this.outputType_ = type;
-    this.externalName_ = Ray.Blocks.primitiveDataBlockName(typeName);
-    this.blockClass_ = Blocks[goog.string.toTitleCase(typeName)];
+    this.externalName_ = Ray.Blocks.primitiveDataBlockName(type.display());
+    this.blockClass_ = blockClass;
     this.renderAsExpression_ = true;
     this.priority_ = Priorities.PRIMITIVE_DATA_VALUE;
     primitiveDataBlocks.push(this);
   }
 
   // Boolean
-  var booleanBlock = new PrimitiveDataBlock('boolean', new Ray.Types.Boolean());
+  var booleanBlock = new PrimitiveDataBlock(Blocks.Boolean, new Ray.Types.Boolean());
   booleanBlock.init = function() {
     var dropdown = new this.Blockly.FieldDropdown([['true', 'TRUE'],['false', 'FALSE']]);
     this.appendDummyInput()
@@ -347,7 +347,7 @@ Ray.Blocks.definePrimitiveDataBlocks = function() {
   };
 
   // Number
-  var numberBlock = new PrimitiveDataBlock('num', new Ray.Types.Num());
+  var numberBlock = new PrimitiveDataBlock(Blocks.Num, new Ray.Types.Num());
   numberBlock.init = function() {
     var textfield = new this.Blockly.FieldTextInput('0', this.Blockly.FieldTextInput.numberValidator);
     this.appendDummyInput()
@@ -355,7 +355,7 @@ Ray.Blocks.definePrimitiveDataBlocks = function() {
   };
 
   //String
-  var stringBlock = new PrimitiveDataBlock('str', new Ray.Types.Str());
+  var stringBlock = new PrimitiveDataBlock(Blocks.Str, new Ray.Types.Str());
   stringBlock.init = function() {
     var textfield = new this.Blockly.FieldTextInput('Hello, World!');
     this.appendDummyInput()
@@ -365,7 +365,7 @@ Ray.Blocks.definePrimitiveDataBlocks = function() {
   };
 
   //Chars
-  var charBlock = new PrimitiveDataBlock('char', new Ray.Types.Char());
+  var charBlock = new PrimitiveDataBlock(Blocks.Char, new Ray.Types.Char());
   charBlock.init = function() {
     var charValidator = function(text) {
       return text.length === 1 ? text : null;

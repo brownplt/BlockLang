@@ -3,6 +3,7 @@ goog.provide('Ray.Generator');
 goog.require('Ray.Blocks');
 goog.require('Ray.Runtime');
 goog.require('Ray.Globals');
+goog.require('Ray.Numbers');
 
 var Values = Ray.Globals.Values;
 
@@ -106,20 +107,20 @@ var genUserFunctionApplication = function(block) {
 };
 
 var genDatatype = function(block) {
-  switch(block.datatype_) {
-    case('boolean'):
+  switch(block.blockClass_) {
+    case(Ray.Globals.Blocks.Boolean):
       var b = block.getTitleValue('B');
       return RT.bool(b === 'TRUE');
       break;
-    case('num'):
+    case(Ray.Globals.Blocks.Num):
       var n = block.getTitleValue('N');
-      return RT.num(RT.numbers.fromString(n));
+      return RT.num(Ray.Numbers.fromString(n));
       break;
-    case('str'):
+    case(Ray.Globals.Blocks.Str):
       var s = block.getTitleValue('S');
       return RT.str(s);
       break;
-    case('char'):
+    case(Ray.Globals.Blocks.Char):
       var c = block.getTitleValue('C');
       return RT.char(c);
       break;
