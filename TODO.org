@@ -62,27 +62,28 @@
 - [ ] When you change a function and that causes type error, make the
   block that doesn't fit turn red or something, and then also have the
   workspaces which use that block turn red as well
-- [ ] Add in image atomic type.
-- [ ] Add support for world-programming, via big-bang primitives. 
+- [ ] Add in image atomic type. !!
+- [ ] Add support for world-programming, via big-bang primitives. !!
 - [ ] Test adding so many functions that the tab bar is longer than
   the screen width 
-- [ ] Get function body displayable in pop-up alongside function usage
+- [ ] Get function body displayable in pop-up alongside function
+  usage !!
 - [ ] Make it possible to define a value by right-clicking, saying
-  "Name a value" (Not inside functions)
-- [ ] Hook up to WeScheme
+  "Name a value" (Not inside functions) !!
+- [ ] Hook up to WeScheme !!
 - [ ] Make failed attempts to connect react more violently to that
   failure. Maybe have block to which you can't connect get repelled!
 - [ ] Make drop targets for blocks larger, so that it's easier to connect
   them.
 - [ ] Default type of argument should be blank.
-- [ ] Test it on iPad
+- [ ] Test it on iPad !!
 - [ ] Make signature easier to open when closed
 - [ ] Move example block to next line, and add the word "For" in front
   so it reads "For example..."
 - [ ] Pull latest version of Blockly
-- [ ] Provide support for undoing any action
+- [ ] Provide support for undoing any action !!
 - [ ] Make everything serializable, so I can easily load from some JS
-  data structure.
+  data structure. !!
 
 ** Low Priority
 - [ ] Switch to rounded rectangles. Merge this with notch shape
@@ -221,3 +222,5 @@ that the tab status indicator takes some time to update.
 
 In order to do this, I have to figure out first where
 block.onMouseDown is called, so I can know what I'm going to have to intercept.
+
+* Send Kathi email telling her to test on iPad

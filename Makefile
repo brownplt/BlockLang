@@ -1,6 +1,19 @@
-.PHONY: all deps css
+.PHONY: assets deps css production development
 
-all: deps css
+all: production development assets
+
+production: assets demo.html
+
+development: assets dev_demo.html
+
+demo.html: demo_template.html
+	sed 's/<!--PRODUCTION \(.*\)-->/\1/' demo_template.html > demo.html
+
+dev_demo.html: demo_template.html
+	sed 's/<!--DEVELOPMENT \(.*\)-->/\1/' demo_template.html > dev_demo.html
+
+
+assets: deps css
 
 deps: ray-deps.js
 	@echo "ray-deps.js built."
