@@ -2,14 +2,21 @@
  * Styling for the results box
  */
 #results_box {
+
+  span {
+    float: left;
+    padding: 2px;
+  }
+
   background-color: @results-box-bg-color;
   color: @results-box-text-color;
   border: 1px solid black;
   margin: 2px;
-  padding: 2px;
+  padding: 0px;
 
-  &.results_box-error {
-    background-color: @results-box-error-bg-color;
-    color: @results-box-error-text-color;
-  }
+}
+
+.results_box-error {
+  background-color: @results-box-error-bg-color;
+  color: @results-box-error-text-color;
 }

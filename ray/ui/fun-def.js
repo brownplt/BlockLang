@@ -1,7 +1,6 @@
 goog.provide('Ray.UI.FunDef');
 
 goog.require('Ray.Types');
-goog.require('Blockly');
 
 goog.require('goog.array');
 goog.require('goog.dom');
@@ -304,10 +303,8 @@ Ray.UI.FunDef.Dialog.prototype.createDom = function() {
   this.resetValidity();
 
   goog.dom.append(elem, goog.dom.createElement('br'));
-  var blocklyContainer = goog.dom.createElement('div');
-  goog.dom.setProperties(blocklyContainer, {
-    'style': "height : 400px; width: 400px;"
-  });
+  var blocklyContainer = goog.dom.createDom('iframe', {'src': "Javascript:''"});
+  goog.style.setSize(blocklyContainer, 200, 200);
   goog.dom.append(elem, blocklyContainer);
   this.blocklyContainer_ = blocklyContainer;
   return this;
@@ -399,9 +396,7 @@ Ray.UI.FunDef.Dialog.prototype.enterDocument = function() {
                            this.updatePreviewAndValidate);
   this.getHandler().listen(this.returnType_, goog.ui.Component.EventType.CHANGE,
                            this.updatePreviewAndValidate);
-  Blockly.inject(this.blocklyContainer_, {
-    'path': '../', 'readOnly': true
-  });
+  Ray.UI.Util.loadBlocklyAsObjField(this, this.blocklyContainer_);
 };
 Ray.UI.FunDef.Dialog.prototype.resetValidity = function() {
   var message = this.message_;
@@ -428,6 +423,12 @@ Ray.UI.FunDef.Dialog.prototype.updatePreviewAndValidate = function(e) {
     return;
   }
 
+  if(!this.Blockly_) {
+    setTimeout(goog.bind(this.updatePreviewAndValidate, this), 200);
+    return;
+  }
+
+
   var funSpec = this.getFunSpec();
   var blockProto = {
     outputType_: funSpec.returnType,
@@ -441,10 +442,10 @@ Ray.UI.FunDef.Dialog.prototype.updatePreviewAndValidate = function(e) {
     }, this);
   };
 
-  var block = new Blockly.Block(Blockly.mainWorkspace, blockProto);
+  var block = new this.Blockly_.Block(this.Blockly_.mainWorkspace, blockProto);
   block.initSvg();
   block.render();
-  Blockly.svgResize();
+  this.Blockly_.svgResize();
 
   goog.array.forEach(funSpec.args, function(arg) {
     var argBlockProto = {
@@ -454,14 +455,14 @@ Ray.UI.FunDef.Dialog.prototype.updatePreviewAndValidate = function(e) {
         this.makeTitleRow(arg.getName());
       }
     };
-    var argBlock = new Blockly.Block(Blockly.mainWorkspace, argBlockProto);
+    var argBlock = new this.Blockly_.Block(this.Blockly_.mainWorkspace, argBlockProto);
     argBlock.initSvg();
     argBlock.render();
     block.getInput(arg.getName()).connection.connect(argBlock.outputConnection);
-  });
+  }, this);
 
   var xy = block.getRelativeToSurfaceXY();
-  block.moveBy(Blockly.BlockSvg.SEP_SPACE_X + Blockly.BlockSvg.TAB_WIDTH - xy.x, Blockly.BlockSvg.SEP_SPACE_Y - xy.y);
+  block.moveBy(this.Blockly_.BlockSvg.SEP_SPACE_X + this.Blockly_.BlockSvg.TAB_WIDTH - xy.x, this.Blockly_.BlockSvg.SEP_SPACE_Y - xy.y);
   this.block = block;
 };
 Ray.UI.FunDef.Dialog.prototype.isInvalid = function() {
@@ -493,7 +494,15 @@ Ray.UI.FunDef.Dialog.prototype.setVisible = function(visible) {
   goog.base(this, 'setVisible', visible);
   this.updatePreviewAndValidate();
   if(visible) {
-    Blockly.svgResize();
+    var self = this;
+    var resizeBlockly = function() {
+      if(self.Blockly_) {
+        self.Blockly_.svgResize();
+      } else {
+        setTimeout(resizeBlockly, 200);
+      }
+    };
+    resizeBlockly();
   }
 };
 

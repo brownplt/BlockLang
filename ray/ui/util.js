@@ -32,6 +32,11 @@ Ray.UI.Util.CREATE_FUN_BUTTON_TOOLTIP = "Define a new function to use in your pr
 
 Ray.UI.Util.DIRECTORY_PREFIX = "ray/ui/";
 
+Ray.UI.Util.MAIN_BLOCKLY_FILENAME = 'main_blockly.html';
+Ray.UI.Util.FUN_DEF_BLOCKLY_FILENAME = 'fun_def_blockly.html';
+
+Ray.UI.Util.READ_ONLY_BLOCKLY_FILENAME = 'read_only_blockly.html';
+
 Ray.UI.Util.MAIN_BLOCKLY_ID = "blockly_main";
 Ray.UI.Util.FUN_DEF_BLOCKLY_ID = "blockly_function_definition";
 Ray.UI.Util.funDefBlockly = function() {
@@ -51,4 +56,19 @@ Ray.UI.Util.isMainWorkspaceTab = function(tab) {
 
 Ray.UI.Util.isFunDefTab = function(tab) {
   return Ray.UI.mainBlocklyTabId !== tab.workspaceId_;
+};
+
+Ray.UI.Util.loadBlocklyAsObjField = function(obj, iframe) {
+  var setField = function(Blockly) {
+    obj.Blockly_ = Blockly;
+    console.log('Blockly loaded');
+    console.log(obj);
+  };
+
+  Ray.UI.Util.loadBlocklyIFrameThenCall(iframe, setField);
+};
+
+Ray.UI.Util.loadBlocklyIFrameThenCall = function(iframe, callback) {
+  window._callback = callback;
+  goog.dom.setProperties(iframe, {'src': Ray.UI.Util.DIRECTORY_PREFIX + Ray.UI.Util.READ_ONLY_BLOCKLY_FILENAME});
 };

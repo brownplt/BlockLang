@@ -541,6 +541,13 @@ type.
   it a little bit so that I can send messages to it, clear it, so forth.
 - [ ] Second, get evaluation working, and have block evaluation
   results go to results box.
+
+This is going to be way harder than I thought, since I can't just use
+the same blockly. I could load an iframe, but I hate to do that. I
+might have to.
+
+Ok, I now have the iframe issue sorted out.
+
 - [ ] Third, get results box to have a little Blockly canvas with
   block-form of result.
 - [X] Then send an email with updates, responses to Emu's previous
