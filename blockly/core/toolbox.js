@@ -142,30 +142,22 @@ Blockly.Toolbox.populate_ = function() {
   var rootOut = Blockly.Toolbox.tree_;
   rootOut.blocks = [];
   function syncTrees(treeIn, treeOut) {
-    for (var i = 0, childIn; childIn = treeIn.childNodes[i]; i++) {
-      if (!childIn.tagName) {
-        // Skip over text.
-        continue;
-      }
-      var name = childIn.tagName.toUpperCase();
-      if (name == 'CATEGORY') {
-        var childOut = rootOut.createNode(childIn.getAttribute('name'));
-        childOut.blocks = [];
-        treeOut.add(childOut);
-        var custom = childIn.getAttribute('custom');
-        if (custom) {
-          // Variables and procedures have special categories that are dynamic.
-          childOut.blocks = custom;
-        } else {
-          syncTrees(childIn, childOut);
-        }
-      } else if (name == 'BLOCK') {
-        treeOut.blocks.push(childIn);
+    var childNodes = treeIn.getChildren();
+    for (var i = 0, childIn; childIn = childNodes[i]; i++) {
+
+      var childOut = rootOut.createNode(childIn.getDisplayName());
+      childOut.blocks = [];
+      treeOut.add(childOut);
+      // Set the blocks attribute
+      if (childIn.isLeaf()) {
+        childOut.blocks = childIn.getPath();
+        childOut.blocks.isPath = true;
+      } else {
+        syncTrees(childIn, childOut);
       }
     }
   }
   syncTrees(Blockly.languageTree, Blockly.Toolbox.tree_);
-
   if (rootOut.blocks.length) {
     throw 'Toolbox cannot have both blocks and categories in the root level.';
   }

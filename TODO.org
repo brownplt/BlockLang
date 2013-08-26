@@ -143,6 +143,7 @@
   line
 - [ ] Precede each line in FunDefDialog with label in bold. ("Name:",
   "Purpose:", "Domain:", "Range:")
+- [ ] Fix number validation for blocks
 * Ideas
 Just have holes be replaced with 'undefined', and cause dynamic errors, but no static errors.
 
@@ -224,3 +225,20 @@ In order to do this, I have to figure out first where
 block.onMouseDown is called, so I can know what I'm going to have to intercept.
 
 * Send Kathi email telling her to test on iPad
+
+- [ ] Make all blocks global, and just have them show up or not, depending on what Blockly is requesting it.
+
+I just switched to generating a category tree, and now I am running into problems when generating the toolbox from that, so I should have the category tree handle that itself.
+
+I now correctly generate the xml, but I can't look things up. The problem is Ray.Shared.lookupInBlockDirectory, which has a key as an argument which is incorrect. 
+
+I am changing sync trees to not go through XML, because that is dumb. 
+
+That should solve problems.
+
+I have to solve the problem with undefined values not being correctly
+handled. That is a very high priority, since that will have a large
+effect on making the system less brittle, as lots of attempts to
+evaluate when everything is not perfect currently run into errors,
+when they shouldn't necessarily. Though maybe that's just the result
+of me failing to understand the check all and evaluate button sufficiently.

@@ -299,7 +299,7 @@ Blockly.Flyout.prototype.show = function(xmlList) {
   // Create the blocks to be shown in this flyout.
   var blocks = [];
   var gaps = [];
-  if(goog.isString(xmlList)) {
+  if(xmlList.isPath) {
     Blockly.Ray_.Shared.flyoutCategory(xmlList, blocks, gaps, margin, this.workspace_, Blockly);
   } else {
     for (var i = 0, xml; xml = xmlList[i]; i++) {

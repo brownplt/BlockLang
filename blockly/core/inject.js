@@ -56,11 +56,12 @@ Blockly.inject = function(container, opt_options) {
 Blockly.parseOptions_ = function(options) {
   var editable = !options['readOnly'];
   if (editable) {
-    var tree = options['toolbox'] || '<xml />';
+    if(!options['toolbox']) { throw 'No toolbox provided!'; }
+    var tree = options['toolbox'];
     if (typeof tree == 'string') {
       tree = Blockly.Xml.textToDom(tree);
     }
-    var hasCategories = !!tree.getElementsByTagName('category').length;
+    var hasCategories = true;
     var hasTrashcan = options['trashcan'];
     if (hasTrashcan === undefined) {
       hasTrashcan = hasCategories;

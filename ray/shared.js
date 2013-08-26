@@ -93,16 +93,8 @@ Ray.Shared.removeFromSavedBlocks = function(funId) {
  * @param blockDir
  * @returns {*}
  */
-Ray.Shared.lookupInBlockDirectory = function(key, blockDir) {
-  var keys = key.split('_');
-  var currCategory = blockDir;
-  for(var i = 0; i < keys.length; i++) {
-    currCategory = currCategory[keys[i]];
-    if(!currCategory) {
-      return null;
-    }
-  }
-  return currCategory;
+Ray.Shared.lookupInBlockDirectory = function(path, blockDir) {
+  return blockDir.getItems(path);
 };
 
 Ray.Shared.lookupInSharedBlockDirectory_ = function(key) {
