@@ -241,4 +241,24 @@ handled. That is a very high priority, since that will have a large
 effect on making the system less brittle, as lots of attempts to
 evaluate when everything is not perfect currently run into errors,
 when they shouldn't necessarily. Though maybe that's just the result
-of me failing to understand the check all and evaluate button sufficiently.
+of me failing to understand the check all and evaluate button
+sufficiently.
+
+Have the result block window resize to match the block size, or at
+least figure out a way to work that into the page better. 
+
+Ok, curent idea is to work on serialization.
+
+* More TODO
+
+- [ ] Get multiple result blocks to stack / OR have results evaluate
+  alongside blocks
+- [ ] Account for changes in title values when resetting example
+  block colors
+
+Prioritize UI features over deep integration, I don't need to be able
+to turn arbitrary Racket code into Block code for the moment.
+
+
+
+

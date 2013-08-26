@@ -318,6 +318,13 @@ Ray.Shared.destroyFunGlobally = function(Blockly, funId) {
   Blockly.mainWorkspace.dispose();
 
   Ray.Shared.removeFromSavedBlocks(funId);
+  Ray.Shared.unregisterFunDefBlockly(Blockly);
+};
+
+Ray.Shared.unregisterFunDefBlockly = function(Blockly) {
+  if(!goog.array.remove(Ray.Shared.FunDefBlocklys, Blockly)) {
+    throw 'Unable to unregister FunDefBlockly!';
+  }
 };
 
 Ray.Shared.getArgBlockProto = function(Blockly, argIx) {

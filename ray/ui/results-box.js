@@ -36,8 +36,8 @@ Ray.UI.ResultsBox = function(div) {
 
 Ray.UI.ResultsBox.ERROR_CLASS = 'results_box-error';
 
-Ray.UI.ResultsBox.INITIAL_BLOCKLY_WIDTH = 200;
-Ray.UI.ResultsBox.INITIAL_BLOCKLY_HEIGHT = 80;
+Ray.UI.ResultsBox.INITIAL_BLOCKLY_WIDTH = 100;
+Ray.UI.ResultsBox.INITIAL_BLOCKLY_HEIGHT = 50;
 
 Ray.UI.ResultsBox.prototype.showError = function(errorMsg) {
   goog.style.setElementShown(this.blocklyContainer_, false);
