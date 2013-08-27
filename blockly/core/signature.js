@@ -99,14 +99,16 @@ Blockly.Signature.prototype.createDom = function() {
     <g></g>
   </g>
   */
-  this.svgGroup_ = Blockly.createSvgElement('g', {}, null);
-  this.svgOpenGroup_ = Blockly.createSvgElement('g', {}, this.svgGroup_);
+  this.svgGroup_ = Blockly.createSvgElement('g', {'class': 'svgGroup_'}, null);
+  this.svgOpenGroup_ = Blockly.createSvgElement('g', {'class': 'svgOpenGroup_'}, this.svgGroup_);
   this.svgOpenGroup_.style.display = 'block';
   this.svgBackground_ = Blockly.createSvgElement(
     'path',
     {'class': 'blocklySignatureBackground'}, this.svgOpenGroup_);
-  this.svgOptions_ = Blockly.createSvgElement('g', {}, this.svgOpenGroup_);
+  this.svgOptions_ = Blockly.createSvgElement('g', {'class': 'svgOptions_'}, this.svgOpenGroup_);
   this.svgOptions_.appendChild(this.workspace_.createDom());
+
+  this.svgText_ = Blockly.createSvgElement('g', {'class': 'svgText_'}, this.svgOpenGroup_);
 
   this.svgClosedGroup_ = Blockly.createSvgElement('g', {}, this.svgGroup_);
   this.svgClosedGroup_.style.display = 'block';
@@ -182,8 +184,8 @@ Blockly.Signature.prototype.getMetrics = function() {
 };
 
 /**
- * Sets the Y translation of the signature to match the scrollbars.
- * @param {!Object} yRatio Contains a y property which is a float
+ * Sets the X translation of the signature to match the scrollbars.
+ * @param {!Object} xRatio Contains a x property which is a float
  *     between 0 and 1 specifying the degree of scrolling.
  */
 Blockly.Signature.prototype.setMetrics = function(xRatio) {
@@ -193,7 +195,9 @@ Blockly.Signature.prototype.setMetrics = function(xRatio) {
         -metrics.contentWidth * xRatio.x - metrics.contentLeft;
   }
   var x = this.svgOptions_.scrollX + metrics.absoluteLeft;
-  this.svgOptions_.setAttribute('transform', 'translate(' + x + ', 0)');
+  var translation = 'translate(' + x + ', 0)';
+  this.svgOptions_.setAttribute('transform', translation);
+  this.svgText_.setAttribute('transform', translation);
 };
 
 Blockly.Signature.prototype.positionClosed_ = function() {
@@ -338,9 +342,9 @@ Blockly.Signature.prototype.close = function() {
   }
   this.buttons_.splice(0);
 
-  if(this.openGroupTextNodes_) {
-    goog.array.forEach(this.openGroupTextNodes_, goog.dom.removeNode);
-    this.openGroupTextNodes_ = null;
+  if(this.svgTextNodes_) {
+    goog.array.forEach(this.svgTextNodes_, goog.dom.removeNode);
+    this.svgTextNodes_ = null;
   }
 
 
@@ -349,15 +353,22 @@ Blockly.Signature.prototype.close = function() {
 
 };
 
+/**
+ * adds text to the signature at location
+ * @param text
+ * @param cursorX
+ * @param margin
+ * @returns {!SVGElement}
+ */
 Blockly.Signature.prototype.makeTextAt = function(text, cursorX, margin) {
   var textElem = Blockly.createSvgElement('text', {
     'class': 'blocklyText blocklySignatureText',
     'x': cursorX,
     'y': margin + Blockly.BlockSvg.TAB_HEIGHT + Blockly.BlockSvg.MIN_BLOCK_Y
-  }, this.svgOpenGroup_);
+  }, this.svgText_);
   var textNode = document.createTextNode(text);
   goog.dom.appendChild(textElem, textNode);
-  this.openGroupTextNodes_.push(textElem);
+  this.svgTextNodes_.push(textElem);
   return textElem;
 };
 
@@ -386,7 +397,7 @@ Blockly.Signature.prototype.markChildrenInSignature = function(block) {
 Blockly.Signature.prototype.open = function() {
   Blockly.removeAllRanges();
   this.close();
-  this.openGroupTextNodes_ = [];
+  this.svgTextNodes_ = [];
   if(this.openWrapper_) {
     Blockly.unbindEvent_(this.openWrapper_);
     this.openWrapper_ = null;
