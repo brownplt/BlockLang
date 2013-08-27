@@ -261,3 +261,8 @@ to turn arbitrary Racket code into Block code for the moment.
 
 Next objective: make it possible to load from xml the entire state
 of the application
+
+- [ ] Make functions that can take in and return lists
+- [ ] Paste at cursor
+- [ ] Figure out numeric equality
+- [ ] Why is simply evaluating true not working!

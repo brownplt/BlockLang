@@ -60,6 +60,7 @@ Ray.UI.ResultsBox.prototype.resetSize = function() {
 Ray.UI.ResultsBox.prototype.showError = function(errorMsg) {
   goog.style.setElementShown(this.blocklyContainer_, false);
   goog.style.setElementShown(this.messageSpan_, false);
+
   goog.dom.setTextContent(this.errorMessageSpan_, errorMsg);
   goog.style.setElementShown(this.errorMessageSpan_, true);
 };
@@ -78,8 +79,10 @@ Ray.UI.ResultsBox.prototype.showValue = function(value) {
   block.moveBy(this.Blockly_.BlockSvg.SEP_SPACE_X + this.Blockly_.BlockSvg.TAB_WIDTH - xy.x, this.Blockly_.BlockSvg.SEP_SPACE_Y - xy.y);
 
   goog.style.setElementShown(this.errorMessageSpan_, false);
+  goog.style.setElementShown(this.messageSpan_, false);
+
   goog.style.setElementShown(this.blocklyContainer_, true);
-  goog.style.setElementShown(this.messageSpan_, true);
+
 };
 
 Ray.UI.ResultsBox.prototype.getPrimitiveDataBlockFromValue = function(value) {
