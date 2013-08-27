@@ -39,6 +39,24 @@ Ray.UI.ResultsBox.ERROR_CLASS = 'results_box-error';
 Ray.UI.ResultsBox.INITIAL_BLOCKLY_WIDTH = 100;
 Ray.UI.ResultsBox.INITIAL_BLOCKLY_HEIGHT = 50;
 
+Ray.UI.ResultsBox.prototype.getSize = function() {
+  return goog.style.getSize(this.div_);
+};
+
+Ray.UI.ResultsBox.prototype.getMarginWidth = function() {
+  var marginBox = goog.style.getMarginBox(this.div_);
+  return marginBox.left + marginBox.right;
+};
+
+Ray.UI.ResultsBox.prototype.setSize = function(width, height) {
+  goog.style.setSize(this.div_, width, height);
+};
+
+Ray.UI.ResultsBox.prototype.resetSize = function() {
+  goog.style.setStyle(this.div_, 'width', '');
+  goog.style.setStyle(this.div_, 'height', '');
+};
+
 Ray.UI.ResultsBox.prototype.showError = function(errorMsg) {
   goog.style.setElementShown(this.blocklyContainer_, false);
   goog.style.setElementShown(this.messageSpan_, false);

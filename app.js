@@ -22,8 +22,6 @@ function loadPage() {
                                           goog.dom.getElement('workspace_tabs'),
                                           goog.dom.getElement('workspace_container'));
 
-  Ray.UI.resizeWorkspaceContainer();
-  goog.events.listen(window, goog.events.EventType.RESIZE, Ray.UI.resizeWorkspaceContainer);
 
   Ray.UI.setupCreateFunButton(goog.dom.getElement('create_function_button'));
 
@@ -31,6 +29,8 @@ function loadPage() {
 
   Ray.UI.setupResultsBox(goog.dom.getElement('results_box'));
 
+  Ray.UI.resizePage();
+  goog.events.listen(window, goog.events.EventType.RESIZE, Ray.UI.resizePage);
 
   Ray.UI.funDefDialog.onCreate(Ray.UI.createFunBlockly);
 

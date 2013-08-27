@@ -10,18 +10,20 @@
 </head>
 <body>
 <div class="ink-grid">
-<div id="header" class="column-group">
-    <div class="large-50" id="header-left">
-        <div id="create_function_button" class="goog-flat-button goog-inline-block header-item">...</div>
-        <div id="run_button" class="run-button goog-inline-block header-item">...</div>
-    </div>
-    <div class="large-50 content-right" id="header-right">
-        <div id="results_box" class="header-item"></div>
-    </div>
-</div>
-<div class="body">
-    <div id="workspace_tabs" class="goog-tab-bar goog-tab-bar-top">
-        <div id="tab_blockly_main" class="goog-tab goog-tab-selected">Main Workspace</div>
+    <div id="header" class="column-group">
+        <div class="large-50" id="header-left">
+            <div id="button_row" class="column-group">
+                <div id="create_function_button" class="goog-flat-button goog-inline-block header-item">...</div>
+                <div id="run_button" class="run-button goog-inline-block header-item">...</div>
+            </div>
+            <div id="workspace_tabs" class="goog-tab-bar goog-tab-bar-top">
+                <div id="tab_blockly_main" class="goog-tab goog-tab-selected">Main Workspace</div>
+            </div>
+        </div>
+
+        <div class="large-50 content-right goog-tab-bar-top" id="header-right">
+            <div id="results_box" class="header-item"></div>
+        </div>
     </div>
     <div class="goog-tab-bar-clear"></div>
     <div id="workspace_container" class="goog-tab-content">
@@ -29,7 +31,6 @@
             <iframe id="blockly_main" src="Javascript:''"></iframe>
         </div>
     </div>
-</div>
 </div>
 <script>
     loadPage();

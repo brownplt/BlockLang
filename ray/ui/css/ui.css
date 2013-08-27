@@ -1080,11 +1080,9 @@ div.hidden_container {
 .ink-grid {
   padding: 0px;
 }
-#header-left {
-  padding-bottom: 4px;
-}
 #header-right {
-  padding-bottom: 4px;
+  padding-bottom: 0px;
+  padding-top: 0px !important;
 }
 .invalid-state-message {
   color: red;

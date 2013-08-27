@@ -35,14 +35,50 @@ Ray.UI.mainDom = function() {
   return goog.dom.getElement('blockly_main');
 };
 
-Ray.UI.resizeWorkspaceContainer = function() {
-  var tabsHeight = Ray.UI.tabs.offsetHeight;
-  //console.log('workspace_tabs offsetHeight: ' + String(tabsHeight));
+Ray.UI.resetTabBarPadding = function() {
+  var tabBar = Ray.UI.tabBar;
+  goog.style.setStyle(tabBar.getContentElement(), 'padding-top', '');
+};
+
+Ray.UI.setTabBarPadding = function(height) {
+  var tabBar = Ray.UI.tabBar;
+  goog.style.setStyle(tabBar.getContentElement(), 'paddingTop', height);
+
+};
+
+Ray.UI.getTabBarPadding = function() {
+  var tabBar = Ray.UI.tabBar;
+  return goog.style.getCascadedStyle(tabBar.getContentElement(), 'padding-top');
+};
+
+Ray.UI.resizePage = function() {
   var viewportHeight = window.innerHeight;
   //console.log('window height: ' + String(viewportHeight));
   var headerHeight = Ray.UI.header.offsetHeight;
   //console.log('header height: ' + String(headerHeight));
-  var contentHeight = viewportHeight - headerHeight - tabsHeight;
+
+  Ray.UI.resultsBox.resetSize();
+  Ray.UI.resetTabBarPadding();
+
+  var headerLeftHeight = goog.dom.getElement('header-left').offsetHeight;
+  var headerRightHeight = goog.dom.getElement('header-right').offsetHeight;
+  var headerRightWidth = goog.dom.getElement('header-right').offsetWidth;
+
+  var difference;
+  if(headerLeftHeight <= headerRightHeight) {
+    difference = headerRightHeight - headerLeftHeight;
+    Ray.UI.setTabBarPadding(Ray.UI.getTabBarPadding() + difference);
+  } else {
+    difference = headerLeftHeight - headerRightHeight;
+    var resultsBoxSize = Ray.UI.resultsBox.getSize();
+    Ray.UI.resultsBox.setSize(resultsBoxSize.width, resultsBoxSize.height + difference);
+  }
+
+  var resultsBoxSize = Ray.UI.resultsBox.getSize();
+  var resultBoxMarginWidth = Ray.UI.resultsBox.getMarginWidth();
+  Ray.UI.resultsBox.setSize(headerRightWidth - resultBoxMarginWidth, resultsBoxSize.height);
+
+  var contentHeight = viewportHeight - headerHeight;
   //console.log('desired iframe height: ' + String(contentHeight));
   goog.style.setHeight(Ray.UI.workspaceContainer, contentHeight);
 };
