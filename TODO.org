@@ -265,4 +265,15 @@ of the application
 - [ ] Make functions that can take in and return lists
 - [ ] Paste at cursor
 - [ ] Figure out numeric equality
-- [ ] Why is simply evaluating true not working!
+- [ ] Why is simply evaluating true not working! FIXED
+- [ ] FIXED FIREFOX ISSUE
+- [ ] Fixed race condition
+
+New problem discovered! When I go to delete a function, the current
+tab is still polling that function, and so it could poll after
+deletion has started, in which case deletion will throw errors
+because some fields are null.
+
+
+New problem discovered. Signatures blocks are incorrectly spaced, the
+text overlaps them. 

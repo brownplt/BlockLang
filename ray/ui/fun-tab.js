@@ -170,11 +170,12 @@ Ray.UI.FunTab.prototype.startPollingForStatus = function() {
 };
 
 Ray.UI.FunTab.prototype.stopPollingForStatus = function() {
-  if(!this.timer_) {
-    throw 'No timer to stop!';
+  if(this.timer_) {
+    this.timer_.stop();
+    this.timer_.dispose();
+    this.timer_ = null;
+    return true;
+  } else {
+    return false;
   }
-
-  this.timer_.stop();
-  this.timer_.dispose();
-  this.timer_ = null;
-}
+};

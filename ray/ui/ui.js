@@ -275,6 +275,9 @@ Ray.UI.openFunDefEditor = function(Blockly) {
   });
   dialog.onDelete(function(e) {
     console.log('\'Delete\' clicked!');
+    if(Ray.UI.currentTab === Blockly.funDefTab) {
+      Ray.UI.currentTab.stopPollingForStatus();
+    }
     Ray.Shared.destroyFunGlobally(Blockly, Blockly.funId);
     Ray.UI.removeFunDef(Blockly.funId, Blockly.funDefTab);
   });

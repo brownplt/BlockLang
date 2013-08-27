@@ -626,8 +626,7 @@ Ray.Runtime.equals = function(valueA, valueB) {
         return valueA.b === valueB.b;
         break;
       case Ray.Globals.Values.Num:
-        // TODO (Make this work)
-        throw "Haven't got numeric equality figured out yet";
+        return Ray.Numbers.equals(valueA.n, valueB.n);
         break;
       case Ray.Globals.Values.Str:
         return valueA.s === valueB.s;
