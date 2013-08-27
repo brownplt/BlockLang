@@ -4,8 +4,33 @@ goog.require('Ray.Evaluation');
 goog.require('Ray.Blocks');
 goog.require('Ray.Blocks.TypeChecker');
 goog.require('Ray.Types');
+goog.require('Ray.UserFun');
+
+goog.require('goog.dom.xml');
 
 goog.require('Blockly');
+
+Ray.Shared.serialize = function() {
+  console.log('Serializing!');
+  var xml = goog.dom.createDom('xml');
+  var mainWorkspaceXml = Blockly.Xml.workspaceToDom(Ray.Shared.MainBlockly.mainWorkspace);
+  goog.dom.xml.setAttributes(mainWorkspaceXml, {'kind' : 'main'});
+  goog.dom.appendChild(xml, mainWorkspaceXml);
+  goog.array.forEach(Ray.Shared.FunDefBlocklys, function(Blockly) {
+    var userFunXml = goog.dom.createDom('user_function');
+
+    var funSpecXml = Ray.UserFun.funSpecToXml(Blockly);
+    goog.dom.appendChild(userFunXml, funSpecXml);
+
+    var funDefWorkspaceXml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+    goog.dom.xml.setAttributes(funDefWorkspaceXml, {'kind' : 'user_function', 'fun_id' : String(Blockly.funId) });
+    goog.dom.appendChild(userFunXml, funDefWorkspaceXml);
+
+    goog.dom.appendChild(xml, userFunXml);
+  }, this);
+  console.log(xml);
+  return xml;
+};
 
 Ray.Shared.saveBlockXml = function(block) {
   var blockXml = Blockly.Xml.blockToDom_(block);

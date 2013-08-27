@@ -35,7 +35,7 @@ goog.provide('Blockly.Xml');
  * @return {!Element} XML document.
  */
 Blockly.Xml.workspaceToDom = function(workspace) {
-  var xml = goog.dom.createDom('xml');
+  var xml = goog.dom.createDom('workspace');
   var blocks = workspace.getTopBlocks(true);
   for (var i = 0, block; block = blocks[i]; i++) {
     var element = Blockly.Xml.blockToDom_(block);
@@ -109,9 +109,6 @@ Blockly.Xml.blockToDom_ = function(block) {
     if (!empty) {
       element.appendChild(container);
     }
-  }
-  if (hasValues) {
-    element.setAttribute('inline', block.inputsInline);
   }
   if (block.collapsed) {
     element.setAttribute('collapsed', true);

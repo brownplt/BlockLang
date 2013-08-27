@@ -853,11 +853,14 @@
  * Styling for the results box
  */
 #results_box {
+  height: 50px;
+  width: 100px;
   background-color: #ffffff;
   color: #000000;
   border: 1px solid black;
   margin: 2px;
   padding: 0px;
+  overflow: hidden;
 }
 #results_box span {
   float: left;

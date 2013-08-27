@@ -9,46 +9,46 @@ var Values = Ray.Globals.Values;
 
 var RT = Ray.Runtime;
 
-var getArg = function(block, name) {
+Ray.Generator.getArgument = function(block, name) {
   var arg = block.getInputTargetBlock(name);
   if(!arg) {
     throw 'Missing argument!';
   } else {
-    return gen(arg);
+    return Ray.Generator.generate(arg);
   }
 };
 
-var genForm = function(block) {
+Ray.Generator.fromForm = function(block) {
   var args = [];
   var i;
 
   switch(block.form_) {
     case('and'):
       for(i = 0; i < block.restArgCount_; i++) {
-        args.push(getArg(block, 'REST_ARG' + String(i)));
+        args.push(Ray.Generator.getArgument(block, 'REST_ARG' + String(i)));
       }
       return RT.and.apply(null, args);
       break;
     case('or'):
       for(i = 0; i < block.restArgCount_; i++) {
-        args.push(getArg(block, 'REST_ARG' + String(i)));
+        args.push(Ray.Generator.getArgument(block, 'REST_ARG' + String(i)));
       }
       return RT.or.apply(null, args);
       break;
     case('if'):
-      var pred = getArg(block, 'PRED');
-      var thenExpr = getArg(block, 'THEN_EXPR');
-      var elseExpr = getArg(block, 'ELSE_EXPR');
+      var pred = Ray.Generator.getArgument(block, 'PRED');
+      var thenExpr = Ray.Generator.getArgument(block, 'THEN_EXPR');
+      var elseExpr = Ray.Generator.getArgument(block, 'ELSE_EXPR');
       return RT._if(pred, thenExpr, elseExpr);
       break;
     case('cond'):
       for(i = 0; i <= block.testClauseCount_; i++) {
-        var test = getArg(block, 'CONDITION' + String(i));
-        var body = getArg(block, 'BODY' + String(i));
+        var test = Ray.Generator.getArgument(block, 'CONDITION' + String(i));
+        var body = Ray.Generator.getArgument(block, 'BODY' + String(i));
         args.push([test,body]);
       }
       if(this.elseClause_) {
-        var elseClause = getArg(block, 'ELSE');
+        var elseClause = Ray.Generator.getArgument(block, 'ELSE');
         return RT.cond(args, elseClause);
       } else {
         return RT.cond(args);
@@ -60,7 +60,7 @@ var genForm = function(block) {
   }
 };
 
-var genValue = function(block) {
+Ray.Generator.fromValue = function(block) {
   var value = block.value_;
   if(RT.valueType(value) === Values.Empty) {
     return RT.empty();
@@ -69,11 +69,11 @@ var genValue = function(block) {
     var argSpec = value.argSpec;
     var args = [];
     for(var i = 0; i < argSpec.positionalArgs.length; i++) {
-      args.push(getArg(block, argSpec.positionalArgs[i]));
+      args.push(Ray.Generator.getArgument(block, argSpec.positionalArgs[i]));
     }
     if(argSpec.restArg && block.restArgCount_) {
       for(var i = 0; i < block.restArgCount_; i++) {
-        args.push(getArg(block, 'REST_ARG' + String(i)));
+        args.push(Ray.Generator.getArgument(block, 'REST_ARG' + String(i)));
       }
     }
     // Ignoring keyword arguments for the time being
@@ -91,22 +91,22 @@ var genValue = function(block) {
  * @param block
   * @returns {*}
  */
-var genUserFunctionApplication = function(block) {
+Ray.Generator.fromUserFunction = function(block) {
   var argSpec = block.value_.argSpec;
   var args = [];
   for(var i = 0; i < argSpec.positionalArgs.length; i++) {
-    args.push(getArg(block, 'P_ARG' + String(i)));
+    args.push(Ray.Generator.getArgument(block, 'P_ARG' + String(i)));
   }
   if(argSpec.restArg && block.restArgCount_) {
     for(var i = 0; i < block.restArgCount_; i++) {
-      args.push(getArg(block, 'REST_ARG' + String(i)));
+      args.push(Ray.Generator.getArgument(block, 'REST_ARG' + String(i)));
     }
   }
 
   return RT.app(RT.name(block.name_), RT.positionalArgs.apply(null, args));
 };
 
-var genDatatype = function(block) {
+Ray.Generator.fromDatatype = function(block) {
   switch(block.blockClass_) {
     case(Ray.Globals.Blocks.Boolean):
       var b = block.getTitleValue('B');
@@ -130,26 +130,25 @@ var genDatatype = function(block) {
   }
 };
 
-var genArgument = function(block) {
+Ray.Generator.fromArgument = function(block) {
   return RT.name(block.name_);
 };
 
-var gen = function(block) {
+Ray.Generator.generate = function(block) {
   if(block.isUserFunction_) {
     //throw 'Handle user functions!';
-    return genUserFunctionApplication(block);
+    return Ray.Generator.fromUserFunction(block);
   } else if(block.value_) {
-    return genValue(block);
+    return Ray.Generator.fromValue(block);
   } else if(block.form_) {
-    return genForm(block);
+    return Ray.Generator.fromForm(block);
   } else if(block.datatype_) {
-    return genDatatype(block);
+    return Ray.Generator.fromDatatype(block);
   } else if(block.arguments_) {
-    return genArgument(block);
+    return Ray.Generator.fromArgument(block);
   } else {
     throw "Unknown type of block! Can't generate!";
   }
 };
 
-Ray.Generator.generate = gen;
 

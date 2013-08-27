@@ -259,6 +259,5 @@ Ok, curent idea is to work on serialization.
 Prioritize UI features over deep integration, I don't need to be able
 to turn arbitrary Racket code into Block code for the moment.
 
-
-
-
+Next objective: make it possible to load from xml the entire state
+of the application
