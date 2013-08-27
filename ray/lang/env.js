@@ -61,7 +61,7 @@ ExtendEnv.prototype = {
     return new ExtendEnv(this.name, this.value, this.env.clone());
   },
   toString: function() {
-    return '(' + this.name + ': ' + (this.value.R.display(this.value)) + ', ' + this.env.toString() + ')';
+    return '(' + this.name + ': ' + (this.value.display()) + ', ' + this.env.toString() + ')';
   },
   lookup: function(name) {
     return this.name === name ? this.value : this.env.lookup(name);
@@ -99,7 +99,7 @@ FastEnv.prototype = {
   toString: function() {
     var str = "";
     goog.object.forEach(this.env, function(value, name) {
-      str += '(' + name + ': ' + value.R.display(value) + ', ';
+      str += '(' + name + ': ' + value.display() + ', ';
     });
     str += 'empty-env';
     var envKeys = goog.object.getKeys(this.env);

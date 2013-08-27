@@ -36,8 +36,8 @@ function loadPage() {
 
   Ray.UI.listenForTabChanges();
 
-//Ray.Main.initializeMainBlocklyDom();
-  Ray.UI.initializeFunDefBlocklyDom();
+  // Ray.Main.initializeMainBlocklyDom();
+  // Ray.UI.initializeFunDefBlocklyDom();
   Ray.UI.loadMainBlockly(Ray.UI.Util.mainBlockly());
 
   goog.events.listen(window, goog.events.EventType.BEFOREUNLOAD, function(e) {

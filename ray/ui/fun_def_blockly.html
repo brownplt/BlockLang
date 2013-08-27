@@ -64,10 +64,18 @@
                                                   Blockly.getMainWorkspaceMetrics,
                                                   true);
             goog.dom.insertSiblingAfter(signatureSvg, Blockly.mainWorkspace.getBubbleCanvas());
+
+            var funDefTab = Ray.UI.addFunDefWorkspaceTab(Blockly.funSpec.funId);
+            Ray.UI.tabBar.setSelectedTab(funDefTab);
+            /**
+             * I have to open the signature after I've switched to the workspace since Firefox (<= 23.0.1)
+             * will throw an exception if I try to call getBBox on an SVGElement that is hidden,
+             * so I have to make sure that the whole tab is being shown in order to computer the
+             * rendering for the signature.
+             */
             Blockly.mainWorkspace.signature_.open();
 
-            var funDefTab = Ray.UI.addFunDefWorkspaceTab(Blockly.funSpec.funId)
-            Ray.UI.tabBar.setSelectedTab(funDefTab);
+
         }
     </script>
 </head>

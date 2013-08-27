@@ -150,9 +150,9 @@ Blockly.Signature.prototype.dispose = function() {
  * signature.  The following properties are computed:
  * .viewHeight: Height of the visible rectangle,
  * .viewWidth: Width of the visible rectangle,
- * .contentHeight: Height of the contents,
- * .viewTop: Offset of top edge of visible rectangle from parent,
- * .contentTop: Offset of the top-most content from the y=0 coordinate,
+ * .contentWidth: Width of the contents,
+ * .viewLeft: Offset of left edge of visible rectangle from parent,
+ * .contentLeft: Offset of the left-most content from the x=0 coordinate,
  * .absoluteTop: Top-edge of view.
  * .absoluteLeft: Left-edge of view.
  * @return {Object} Contains size and position metrics of the signature.
@@ -175,7 +175,7 @@ Blockly.Signature.prototype.getMetrics = function() {
     viewWidth: viewWidth,
     contentWidth: optionBox.width + optionBox.x,
     viewLeft: -this.svgOptions_.scrollX,
-    contentTop: 0,
+    contentLeft: 0,
     absoluteTop: 0,
     absoluteLeft: this.CORNER_RADIUS
   };
