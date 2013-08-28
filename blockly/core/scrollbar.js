@@ -644,7 +644,7 @@ Blockly.ScrollbarSvg.prototype.resize = function(opt_metrics) {
       // Only show the scrollbar if needed.
       // Ideally this would also apply to scrollbar pairs, but that's a bigger
       // headache (due to interactions with the corner square).
-      this.setVisible(outerLength < hostMetrics.contentHeight);
+      this.setVisible(outerLength < hostMetrics.contentWidth);
     }
     this.ratio_ = outerLength / hostMetrics.contentWidth;
     if (this.ratio_ === -Infinity || this.ratio_ === Infinity ||
@@ -759,6 +759,7 @@ Blockly.ScrollbarSvg.prototype.setVisible = function(visible) {
  */
 Blockly.ScrollbarSvg.prototype.onMouseDownBar_ = function(e) {
   Blockly.hideChaff(true);
+  Blockly.removeAllRanges();
   if (Blockly.isRightButton(e)) {
     // Right-click.
     // Scrollbars have no context menu.
@@ -800,6 +801,7 @@ Blockly.ScrollbarSvg.prototype.onMouseDownBar_ = function(e) {
  */
 Blockly.ScrollbarSvg.prototype.onMouseDownKnob_ = function(e) {
   Blockly.hideChaff(true);
+  Blockly.removeAllRanges();
   this.onMouseUpKnob_();
   if (Blockly.isRightButton(e)) {
     // Right-click.
@@ -825,6 +827,7 @@ Blockly.ScrollbarSvg.prototype.onMouseDownKnob_ = function(e) {
  * @private
  */
 Blockly.ScrollbarSvg.prototype.onMouseMoveKnob_ = function(e) {
+  Blockly.removeAllRanges();
   var currentMouse = this.horizontal_ ? e.clientX : e.clientY;
   var mouseDelta = currentMouse - this.startDragMouse;
   var knobValue = this.startDragKnob + mouseDelta;

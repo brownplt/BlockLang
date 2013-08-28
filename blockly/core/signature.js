@@ -153,6 +153,7 @@ Blockly.Signature.prototype.dispose = function() {
  * .viewHeight: Height of the visible rectangle,
  * .viewWidth: Width of the visible rectangle,
  * .contentWidth: Width of the contents,
+ * .contentHeight: Height of the contents
  * .viewLeft: Offset of left edge of visible rectangle from parent,
  * .contentLeft: Offset of the left-most content from the x=0 coordinate,
  * .absoluteTop: Top-edge of view.
@@ -170,12 +171,12 @@ Blockly.Signature.prototype.getMetrics = function() {
     var optionBox = this.svgOptions_.getBBox();
   } catch (e) {
     // Firefox has trouble with hidden elements (Bug 528969).
-    var optionBox = {width: 0, x: 0};
+    var optionBox = {height: 0, y: 0};
   }
   return {
     viewHeight: viewHeight,
     viewWidth: viewWidth,
-    contentWidth: optionBox.width + optionBox.x,
+    contentWidth: optionBox.width + 2 * this.CORNER_RADIUS,
     viewLeft: -this.svgOptions_.scrollX,
     contentLeft: 0,
     absoluteTop: 0,
@@ -299,10 +300,14 @@ Blockly.Signature.prototype.positionOpen_ = function() {
   var y = metrics.absoluteTop;
 
   this.svgGroup_.setAttribute('transform',
-                              'translate(' + metrics.absoluteLeft + ',' + y + ')');
+                              'translate(' + (metrics.absoluteLeft - 1) + ',' + y + ')');
 
   // Record the height for Blockly.Signature.getMetrics.
   this.width_ = metrics.viewWidth;
+
+  if(this.scrollbar_) {
+    this.scrollbar_.resize();
+  }
 };
 
 /**
@@ -419,7 +424,7 @@ Blockly.Signature.prototype.open = function() {
 
   // Lay out the blocks horizontally.
   var signatureHeight = 0;
-  var cursorX = margin + Blockly.BlockSvg.NOTCH_WIDTH;
+  var cursorX = margin; // + Blockly.BlockSvg.NOTCH_WIDTH;
 
   //var funTitle = this.makeTextAt(Blockly.funName, cursorX, margin);
   //cursorX += this.advanceCursor(funTitle, margin);

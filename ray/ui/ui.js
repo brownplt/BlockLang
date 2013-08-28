@@ -14,6 +14,7 @@ goog.require('Ray.UserFun');
 goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.classes');
+goog.require('goog.dom.xml');
 goog.require('goog.ui.ControlRenderer');
 goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.FlatButtonRenderer');
@@ -22,6 +23,37 @@ goog.require('goog.ui.LinkButtonRenderer');
 goog.require('goog.ui.LabelInput');
 goog.require('goog.ui.Tab');
 goog.require('goog.ui.TabBar');
+
+Ray.UI.serialize = function() {
+  console.log('Serializing!');
+  var xml = goog.dom.createDom('xml');
+  var mainWorkspaceXml = Blockly.Xml.workspaceToDom(Ray.Shared.MainBlockly.mainWorkspace);
+  goog.dom.xml.setAttributes(mainWorkspaceXml, {'kind' : 'main'});
+  goog.dom.appendChild(xml, mainWorkspaceXml);
+  goog.array.forEach(Ray.Shared.FunDefBlocklys, function(Blockly) {
+    var userFunXml = goog.dom.createDom('user_function');
+
+    var funSpecXml = Ray.UserFun.funSpecToXml(Blockly);
+    goog.dom.appendChild(userFunXml, funSpecXml);
+
+    var funDefWorkspaceXml = Blockly.Xml.workspaceToDom(Blockly.mainWorkspace);
+    goog.dom.xml.setAttributes(funDefWorkspaceXml, {'kind' : 'user_function', 'fun_id' : String(Blockly.funId) });
+    goog.dom.appendChild(userFunXml, funDefWorkspaceXml);
+
+    goog.dom.appendChild(xml, userFunXml);
+  }, this);
+  console.log(xml);
+  return xml;
+};
+
+Ray.UI.loadXmlString = function(string) {
+  Ray.UI.deserialize(goog.dom.xml.loadXml(string));
+};
+
+Ray.UI.deserialize = function(xml) {
+
+};
+
 
 
 Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
