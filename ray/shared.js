@@ -184,6 +184,18 @@ Ray.Shared.precedesOtherBlock_ = function(block1, block2) {
   }
 };
 
+
+Ray.Shared.conflictingFunctionName = function(funName) {
+  var userFunNames = goog.array.map(Ray.Shared.FunDefBlocklys, function(Blockly) {
+    return Blockly.funSpec.name;
+  });
+
+  var sameName = function(name) { return funName === name; };
+  return goog.array.find(userFunNames, sameName) ||
+         goog.array.find(Ray.Runtime.getAllBoundIdentifiers(), sameName);
+
+};
+
 Ray.Shared.funBlockInstanceDB = {};
 
 

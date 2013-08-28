@@ -1,4 +1,4 @@
-* Completed Tasks [34/34]
+* Completed Tasks [35/35]
 - [X] Switch from "consumes char" to "consumes", and same for "produces"
   and other types.
 - [X] Get the function name to be above the function arguments.
@@ -47,6 +47,7 @@
 - [X] Use full name of types. num -> number, str -> string, char ->
   character. Make this easy and configurable, so I can change this globally
 - [X] Rename 'forms' to 'constructs' or 'control'
+- [X] Make function names unique
 
 * Remaining Tasks
 ** High Priority [0/18]
@@ -91,7 +92,7 @@
 - [ ] Move the button to open function editing dialog to the signature
 - [ ] Make it possible to define a value by right-clicking, saying
   "Name a value" (Inside functions)
-- [ ] Make function names unique
+
 - [ ] Every time there is a bug, set it up to send me an email.
 - [ ] Inside function definition dialog, you should be able to drag a name
   and type into the signature to add an argument.
@@ -268,6 +269,7 @@ of the application
 - [ ] Why is simply evaluating true not working! FIXED
 - [ ] FIXED FIREFOX ISSUE
 - [ ] Fixed race condition
+- [ ] Fixed signature text translation bug
 
 New problem discovered! When I go to delete a function, the current
 tab is still polling that function, and so it could poll after

@@ -1,5 +1,6 @@
 goog.provide('Ray.UI.FunDef');
 
+goog.require('Ray.Shared');
 goog.require('Ray.Types');
 
 goog.require('goog.array');
@@ -468,6 +469,14 @@ Ray.UI.FunDef.Dialog.prototype.updatePreviewAndValidate = function(e) {
 Ray.UI.FunDef.Dialog.prototype.isInvalid = function() {
   var funSpec = this.getFunSpec();
 
+  if(funSpec.name.length === 0) {
+    return 'Function name must contain at least one character';
+  }
+
+  if(Ray.Shared.conflictingFunctionName(funSpec.name)) {
+    return "Function name can't be the same as already existing function";
+  }
+
   var argNames = [];
   for(var i = 0; i < funSpec.args.length; i++) {
     var arg = funSpec.args[i];
@@ -486,7 +495,7 @@ Ray.UI.FunDef.Dialog.prototype.isInvalid = function() {
   }
 
   if(funSpec.name.length === 0) {
-    return 'Function name must contain at least one character';
+
   }
   return false;
 };

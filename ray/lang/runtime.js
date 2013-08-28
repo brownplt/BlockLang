@@ -697,6 +697,10 @@ Ray.Runtime.lookup = function(name) {
   return null;
 };
 
+Ray.Runtime.getAllBoundIdentifiers = function() {
+  return this.topLevel_.allBoundNames().concat(this.builtins.allBoundNames());
+};
+
 /**
  * Allows for dispatch on AST nodes (works with values and expressions)
  * @param node
