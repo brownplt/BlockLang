@@ -318,7 +318,7 @@ Ray.Lib.initialize = function() {
   }, Types.num()));
 
   Ray.Lib.addBuiltin('string-ref', RT.prim(RT.p_spec(['str', Types.str()], ['k', Types.num()]), function(str, k) {
-    var c = stRT.s.charAt(k.n);
+    var c = str.s.charAt(k.n);
     if(!c) {
       throw new RT.Error("Invalid index passed to string-ref!");
     }
@@ -331,9 +331,9 @@ Ray.Lib.initialize = function() {
   }, Types.str()));
 
   Ray.Lib.addBuiltin('substring', RT.prim(RT.p_spec(['str', Types.str()], ['start', Types.num()], ['end', Types.num()]), function(str, start, end) {
-    if(start.n >= 0 && start.n <= stRT.s.length &&
-      end.n >= start.n &&  end.n <= stRT.s.length) {
-      return new RT.Value.Str(stRT.s.substring(start.n, end.n));
+    if(start.n >= 0 && start.n <= str.s.length &&
+      end.n >= start.n &&  end.n <= str.s.length) {
+      return new RT.Value.Str(str.s.substring(start.n, end.n));
     } else {
       throw new RT.Error("Invalid indices passed to substring");
     }

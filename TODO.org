@@ -1,4 +1,4 @@
-* Completed Tasks [35/35]
+* Completed Tasks [39/39]
 - [X] Switch from "consumes char" to "consumes", and same for "produces"
   and other types.
 - [X] Get the function name to be above the function arguments.
@@ -48,9 +48,15 @@
   character. Make this easy and configurable, so I can change this globally
 - [X] Rename 'forms' to 'constructs' or 'control'
 - [X] Make function names unique
+- [X] Fixed bug in firefox caused by calling getBBox on hidden svg element
+- [X] Fixed race condition
+- [X] Fixed signature text translation bug
+- [X] Fixed hidden horizontal scroll bar on signature
+- [X] Make everything serializable, so I can easily load from some JS
+  data structure. !! (or XML blob)
 
 * Remaining Tasks
-** High Priority [0/18]
+** High Priority [1/19]
 - [ ] Double clicking is like using a repl, and is immediate evaluation,
   while running a program is the formal version which triggers tests to
   be run. (Even if you don't use something, all the tests should be run)
@@ -83,8 +89,6 @@
   so it reads "For example..."
 - [ ] Pull latest version of Blockly
 - [ ] Provide support for undoing any action !!
-- [ ] Make everything serializable, so I can easily load from some JS
-  data structure. !!
 
 ** Low Priority
 - [ ] Switch to rounded rectangles. Merge this with notch shape
@@ -214,7 +218,7 @@ that the tab status indicator takes some time to update.
 - Double-clicking / handling evaluation when definitions are
   unfinished, when values are undefined
 - Tooltip with explanation over failing(/passing) examples
-- Making the results box better, perhaps have it show a results block
+- [X] Making the results box better, perhaps have it show a results block
   when successfully executing, and just turn red with an error
   message otherwise. 
 - Getting vertical layouts to work fully
@@ -267,15 +271,108 @@ of the application
 - [ ] Paste at cursor
 - [ ] Figure out numeric equality
 - [ ] Why is simply evaluating true not working! FIXED
-- [ ] FIXED FIREFOX ISSUE
-- [ ] Fixed race condition
-- [ ] Fixed signature text translation bug
 
 New problem discovered! When I go to delete a function, the current
 tab is still polling that function, and so it could poll after
 deletion has started, in which case deletion will throw errors
 because some fields are null.
 
-
 New problem discovered. Signatures blocks are incorrectly spaced, the
 text overlaps them. 
+
+* ----------------------------------------------------------------------------------------------------
+Ok, so I now have deserialization sorta working
+
+Here is a sample program to deserialize:
+* ----------
+<xml>
+  <workspace kind="main">
+    <block type="ray_substring" x="39"
+           y="65">
+      <value name="str">
+        <block type="ray_string-append">
+          <mutation
+              rest_args="2">
+          </mutation>
+        </block>
+      </value>
+    </block>
+  </workspace>
+  <user_function>
+    <user_function_specification
+        fun_id="0">
+      <name>string-last
+      </name>
+      <description>gets the last
+      character of the passed-in string
+      </description>
+      <arg name="x"
+           type="String">
+      </arg>
+      <return_type
+          type="Character">
+      </return_type>
+    </user_function_specification>
+    <workspace
+        kind="user_function" fun_id="0">
+      <block type="ray_string-ref" x="143"
+             y="36">
+        <value name="str">
+          <block
+              type="ray_function_0_arg_0">
+          </block>
+        </value>
+        <value name="k">
+          <block
+              type="ray_-">
+            <value name="x">
+              <block type="ray_string-length">
+                <value
+                    name="x">
+                  <block
+                      type="ray_function_0_arg_0">
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value
+                name="y">
+              <block type="ray_data_create_Number">
+                <title
+                    name="N">1
+                </title>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+      <block
+          type="example" x="215" y="240">
+        <value name="EXPR">
+          <block
+              type="ray_user_function_0">
+            <value name="P_ARG0">
+              <block
+                  type="ray_data_create_String">
+                <title name="S">Hello,
+                World!
+                </title>
+              </block>
+            </value>
+          </block>
+        </value>
+        <value
+            name="RESULT">
+          <block type="ray_data_create_Character">
+            <title
+                name="C">!
+            </title>
+          </block>
+        </value>
+      </block>
+    </workspace>
+  </user_function>
+</xml>
+* ----------
+When I get back, try deserializing that, and set up a server around
+it to load and save stuff. 

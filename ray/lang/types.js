@@ -407,3 +407,11 @@ Ray.Types.principalType = function(types) {
     return Ray.Types.principalType_(curr, ty);
   }, new Ray.Types.Unknown());
 };
+
+Ray.Types.textToType = function(text) {
+  var constructor = Ray.Types.atomicTypes_[text.toLowerCase()];
+  if(!constructor) {
+    throw "text couldn't be parsed to type!";
+  }
+  return new constructor();
+};

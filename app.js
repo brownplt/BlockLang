@@ -30,9 +30,9 @@ function loadPage() {
   Ray.UI.setupResultsBox(goog.dom.getElement('results_box'));
 
   Ray.UI.resizePage();
-  goog.events.listen(window, goog.events.EventType.RESIZE, Ray.UI.resizePage);
+  Ray.UI.setupResizeListener();
 
-  Ray.UI.funDefDialog.onCreate(Ray.UI.createFunBlockly);
+  Ray.UI.setupDialogCreateFunListener();
 
   Ray.UI.listenForTabChanges();
 

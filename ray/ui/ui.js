@@ -32,6 +32,7 @@ Ray.UI.serialize = function() {
   goog.dom.appendChild(xml, mainWorkspaceXml);
   goog.array.forEach(Ray.Shared.FunDefBlocklys, function(Blockly) {
     var userFunXml = goog.dom.createDom('user_function');
+    goog.dom.xml.setAttributes(userFunXml, {'fun_id': String(Blockly.funId) });
 
     var funSpecXml = Ray.UserFun.funSpecToXml(Blockly);
     goog.dom.appendChild(userFunXml, funSpecXml);
@@ -46,11 +47,26 @@ Ray.UI.serialize = function() {
   return xml;
 };
 
-Ray.UI.loadXmlString = function(string) {
-  Ray.UI.deserialize(goog.dom.xml.loadXml(string));
+Ray.UI.loadXmlString = function(xmlString) {
+  var xml = goog.dom.xml.loadXml(xmlString);
+  Ray.UI.deserialize(xml.childNodes[0]);
 };
 
 Ray.UI.deserialize = function(xml) {
+  console.log('Deserializing');
+  var mainWorkspaceXml = goog.dom.getFirstElementChild(xml);
+  var userFuns = goog.array.toArray(goog.dom.getChildren(xml)).slice(1);
+  goog.array.forEach(userFuns, function(userFun) {
+    if(userFun.tagName !== 'user_function') {
+      throw 'Unknown tag!';
+    }
+    var funSpecXml = userFun.childNodes[0];
+    var funSpec = Ray.UserFun.xmlToFunSpec(funSpecXml);
+
+    var funDefWorkspaceXml = userFun.childNodes[1];
+    Ray.UI.createFunBlockly(funSpec, funDefWorkspaceXml);
+  });
+  Ray.Shared.MainBlockly.Xml.domToWorkspace(Ray.Shared.MainBlockly.mainWorkspace, mainWorkspaceXml);
 
 };
 
@@ -114,6 +130,10 @@ Ray.UI.resizePage = function() {
   //console.log('desired iframe height: ' + String(contentHeight));
   goog.style.setHeight(Ray.UI.workspaceContainer, contentHeight);
 };
+Ray.UI.setupResizeListener = function() {
+  goog.events.listen(window, goog.events.EventType.RESIZE, Ray.UI.resizePage);
+};
+
 
 Ray.UI.saveWorkspaceHeaderTabsContainer = function(header, tabs, container) {
   Ray.UI.header = header;
@@ -153,6 +173,9 @@ Ray.UI.setupFunDefDialog = function(domHelper) {
   dialog.testPopulate_();
   Ray.UI.funDefDialog = dialog;
   return dialog;
+};
+Ray.UI.setupDialogCreateFunListener = function() {
+  Ray.UI.funDefDialog.onCreate(Ray.UI.createFunBlockly);
 };
 
 Ray.UI.setupCreateFunButton = function(div) {
@@ -236,7 +259,10 @@ Ray.UI.loadMainBlockly = function(iframe) {
  * @param {HTMLIFrameElement} iframe
  * @param {Object} funDefInfo
  */
-Ray.UI.loadFunDefBlockly = function(iframe, funDefInfo) {
+Ray.UI.loadFunDefBlockly = function(iframe, funDefInfo, opt_initialWorkspaceXml) {
+  if(opt_initialWorkspaceXml) {
+    window._initialWorkspaceXml = opt_initialWorkspaceXml;
+  }
   window._funDefInfo = funDefInfo;
   goog.dom.setProperties(iframe, {src: Ray.UI.Util.DIRECTORY_PREFIX + 'fun_def_blockly.html'});
 };
@@ -317,8 +343,7 @@ Ray.UI.openFunDefEditor = function(Blockly) {
   dialog.setVisible(true);
 };
 
-Ray.UI.createFunBlockly = function() {
-  var funSpec = Ray.UI.funDefDialog.getFunSpec();
+Ray.UI.createFunBlockly = function(funSpec, opt_initialWorkspaceXml) {
   funSpec.funId = Ray.UI.getFunId();
   var funBlocks = Ray.UserFun.makeFunAppAndArgBlocks(funSpec);
   var funArgBlocks = funBlocks.args;
@@ -333,6 +358,6 @@ Ray.UI.createFunBlockly = function() {
     funName: funSpec.name,
     funSpec: funSpec
   };
-  Ray.UI.loadFunDefBlockly(funDefWorkspace, funDefInfo);
+  Ray.UI.loadFunDefBlockly(funDefWorkspace, funDefInfo, opt_initialWorkspaceXml);
   // We will create the tab and load it from the iframe
 };

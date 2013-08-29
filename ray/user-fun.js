@@ -57,3 +57,49 @@ Ray.UserFun.funSpecToXml = function(Blockly) {
   goog.dom.appendChild(xml, funReturnTypeElement);
   return xml;
 };
+
+Ray.UserFun.xmlToFunSpec = function(xml) {
+  if(xml.tagName !== 'user_function_specification') {
+    throw 'Unknown tag!';
+  }
+
+  var children = goog.array.toArray(goog.dom.getChildren(xml));
+  var name = null, desc = null, returnType = null;
+  var args = [];
+  var child;
+  while(child = children.shift()) {
+    switch(child.tagName) {
+      case 'name':
+        name = goog.dom.getTextContent(child);
+        break;
+      case 'description':
+        desc = goog.dom.getTextContent(child);
+        break;
+      case 'arg':
+        var argName = child.getAttribute('name');
+        var argTypeName = child.getAttribute('type');
+        var argType = Ray.Types.textToType(argTypeName);
+        var arg = new Ray.UI.Arg(argName, argType);
+        args.push(arg);
+        break;
+      case 'return_type':
+        var returnTypeName = child.getAttribute('type');
+        returnType = Ray.Types.textToType(returnTypeName);
+        break;
+      default:
+        throw 'Unknown tag';
+        break;
+    }
+  }
+
+  if(!name || !desc || !returnType) {
+    throw 'Missing name, desc, or return type';
+  }
+
+  return {
+    'name': name,
+    'desc': desc,
+    'args': args,
+    'returnType': returnType
+  };
+};

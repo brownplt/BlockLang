@@ -41,6 +41,7 @@
             Ray.Shared.attachToBlockly(Blockly);
             Ray.Shared.registerFunDefBlockly(Blockly);
             var funDefInfo = window.parent._funDefInfo;
+            var initialWorkspaceXml = window.parent._initialWorkspaceXml;
 
             Blockly.funArgBlockProtos = funDefInfo.funArgBlockProtos;
             Blockly.funAppBlockProto = funDefInfo.funAppBlockProto;
@@ -51,6 +52,10 @@
             Blockly.inject(document.body,
                            {path: "../../blockly/", toolbox:
                                    Ray.Shared.getToolbox(true)});
+
+            if(initialWorkspaceXml) {
+                Blockly.Xml.domToWorkspace(Blockly.mainWorkspace, initialWorkspaceXml);
+            }
 
             var signature = new Blockly.Signature();
 
