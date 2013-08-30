@@ -1,12 +1,23 @@
 <html>
 <head>
-    <script type="text/javascript" src="closure-library/closure/goog/base.js"></script>
-    <script type="text/javascript" src="ray-deps.js"></script>
     <title>UI Demo</title>
+    <!--DEVELOPMENT
+      <script type="text/javascript" src="closure-library/closure/goog/base.js"></script>
+      <script type="text/javascript" src="ray-deps.js"></script>
+    DEVELOPMENT-->
     <link rel="stylesheet" type="text/css" href="ink-2.2.0/css/ink-custom.css">
-    <!--DEVELOPMENT <link rel="stylesheet/less" type="text/css" href="ray/ui/less/ui.less"> <script type="text/javascript" src="less.js"></script>-->
+    <!--DEVELOPMENT
+      <link rel="stylesheet/less" type="text/css" href="ray/ui/less/ui.less">
+      <script type="text/javascript" src="less.js"></script>
+      <script type="text/javascript">src="less."less.watch(true);</script>
+    DEVELOPMENT-->
+
+    <!--DEVELOPMENT <script>less.watch(true);</script> -->
     <!--PRODUCTION <link rel="stylesheet" type="text/css" href="ray/ui/css/ui.css">-->
-    <script type="text/javascript" src="app.js"></script>
+
+    <!--DEVELOPMENT <script type="text/javascript" src="app.js"></script>-->
+    <!--PRODUCTION <script type="text/javascript" src="app_compiled.js"></script>-->
+
 </head>
 <body>
 <div class="ink-grid">
@@ -35,6 +46,7 @@
 <script>
     loadPage();
 </script>
+
 </body>
 
 </html>

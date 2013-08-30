@@ -4,7 +4,7 @@ goog.provide('Ray.Evaluation');
 goog.require('Ray.Runtime');
 goog.require('Ray.Blocks');
 goog.require('Ray.Generator');
-goog.require('Ray.Shared');
+// goog.require('Ray.Shared');
 goog.require('Ray.Types');
 
 goog.require('goog.array');

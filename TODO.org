@@ -376,3 +376,9 @@ Here is a sample program to deserialize:
 * ----------
 When I get back, try deserializing that, and set up a server around
 it to load and save stuff. 
+
+* Next items on the todo list
+
+Make a block for function body, and make it not deletable
+
+Correctly interpret undefined values. 

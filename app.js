@@ -1,3 +1,6 @@
+
+goog.provide('Ray.App');
+
 /** Ray Imports */
 goog.require('Ray.Main');
 goog.require('Ray.Shared');

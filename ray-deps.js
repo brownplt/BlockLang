@@ -40,7 +40,7 @@ goog.addDependency('../../../ray/blocks/category-tree.js', ['Ray.Blocks.Category
 goog.addDependency('../../../ray/blocks/config.js', ['Ray.Blocks.Config'], []);
 goog.addDependency('../../../ray/blocks/misc.js', ['Ray.Blocks.misc'], ['Blockly', 'Ray.Blocks.CategoryTree', 'Ray.Blocks.Config', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml', 'goog.string']);
 goog.addDependency('../../../ray/blocks/user-fun.js', ['Ray.Blocks.UserFun'], ['Blockly', 'Ray.Blocks.misc', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml', 'goog.string']);
-goog.addDependency('../../../ray/evaluation.js', ['Ray.Evaluation'], ['Ray.Blocks', 'Ray.Generator', 'Ray.Runtime', 'Ray.Shared', 'Ray.Types', 'goog.array']);
+goog.addDependency('../../../ray/evaluation.js', ['Ray.Evaluation'], ['Ray.Blocks', 'Ray.Generator', 'Ray.Runtime', 'Ray.Types', 'goog.array']);
 goog.addDependency('../../../ray/generate.js', ['Ray.Generator'], ['Ray.Blocks', 'Ray.Globals', 'Ray.Numbers', 'Ray.Runtime']);
 goog.addDependency('../../../ray/globals.js', ['Ray.Globals'], []);
 goog.addDependency('../../../ray/jquery.js', ['Ray.JQuery'], []);
