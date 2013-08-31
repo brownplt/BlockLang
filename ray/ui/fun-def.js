@@ -124,7 +124,7 @@ Ray.UI.ArgUI.prototype.createDom = function() {
 
   goog.style.setInlineBlock(argType.getContentElement());
 
-  var removeIcon = goog.dom.createDom('i', {class: 'icon-remove'});
+  var removeIcon = goog.dom.createDom('i', {'class': 'icon-remove'});
   var argRemoveButton = Ray.UI.FunDef.makeButton_(removeIcon);
   this.argRemoveButton_ = argRemoveButton;
 
@@ -190,7 +190,7 @@ Ray.UI.ArgListContainer.prototype.createDom = function() {
   goog.dom.classes.set(containerDiv, 'arg-list-container');
 
   var argsDiv = goog.dom.createDom('div', {
-    class: 'arg-list'
+    'class': 'arg-list'
   });
   goog.dom.append(containerDiv, argsDiv);
   this.argListElement_ = argsDiv;
@@ -199,7 +199,7 @@ Ray.UI.ArgListContainer.prototype.createDom = function() {
     this.addChild(new Ray.UI.ArgUI(arg), true);
   }, this);
 
-  var addIcon = goog.dom.createDom('i', {class: 'icon-plus'});
+  var addIcon = goog.dom.createDom('i', {'class': 'icon-plus'});
   var argAddButton = Ray.UI.FunDef.makeButton_(addIcon);
   this.argAddButton_ = argAddButton;
   argAddButton.render(containerDiv);

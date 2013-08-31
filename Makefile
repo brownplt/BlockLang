@@ -1,6 +1,7 @@
 .PHONY: deps css production development compiled
 
 RAY_JS := $(wildcard ray/*.js) $(wildcard ray/ui/*.js) $(wildcard ray/blocks/*.js) $(wildcard ray/lang/*.js)
+BLOCKLY_JS := $(wildcard blockly/core/*.js)
 MAIN_PAGE_NAME := demo
 MAIN_PAGE := $(MAIN_PAGE_NAME).html
 MAIN_PAGE_TEMPLATE := $(MAIN_PAGE_NAME)_template.html
@@ -25,8 +26,15 @@ $(DEV_PAGE): $(MAIN_PAGE_TEMPLATE)
 # Compilation
 compiled: app_compiled.js
 	@echo "finished compiling ray and blockly."
-app_compiled.js: $(RAY_JS) app.js
-	closure-library/closure/bin/build/closurebuilder.py --root="ray" --root="blockly" --root="closure-library" app.js --output_mode="list" --namespace="Ray.App"
+app_compiled.js: $(RAY_JS) $(BLOCKLY_JS) app.js
+	closure-library/closure/bin/build/closurebuilder.py \
+    --root="ray" \
+    --root="blockly" \
+    --root="closure-library" app.js \
+    --output_mode="compiled" \
+    --namespace="Ray.App" \
+    --compiler_jar="compiler.jar" \
+    --output_file="app_compiled.js"
 
 # Deps for uncompiled mode
 deps: ray-deps.js

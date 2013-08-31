@@ -299,7 +299,7 @@ Ray.Lib.initialize = function() {
   /**
    * Strings
    */
-  Ray.Lib.addBuiltin('make-string', RT.prim(RT.p_spec(['k', Types.num()], ['c', Types.char()]), function(k, c) {
+  Ray.Lib.addBuiltin('make-string', RT.prim(RT.p_spec(['k', Types.num()], ['c', Types._char()]), function(k, c) {
     var str = "";
     for(var i = 0; i < k.n; i++) {
       str += c.c;
@@ -307,7 +307,7 @@ Ray.Lib.initialize = function() {
     return new RT.Value.Str(str);
   }, Types.str()));
 
-  Ray.Lib.addBuiltin('string', RT.prim(RT.rest_spec('ls', Types.char()), function(ls) {
+  Ray.Lib.addBuiltin('string', RT.prim(RT.rest_spec('ls', Types._char()), function(ls) {
     var str = "";
     goog.array.forEach(ls, function(c) { str += c.c; });
     return new RT.Value.Str(str);
@@ -323,7 +323,7 @@ Ray.Lib.initialize = function() {
       throw new RT.Error("Invalid index passed to string-ref!");
     }
     return new RT.Value.Char(c);
-  }, Types.char()));
+  }, Types._char()));
 
   Ray.Lib.addBuiltin('string-append', RT.prim(RT.rest_spec('ls', Types.str()), function(ls) {
     var str = goog.array.reduce(ls, function(str, s) { return str + s.s; }, "");

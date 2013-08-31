@@ -897,7 +897,7 @@ Ray.Runtime.num = function(n) {
 Ray.Runtime.str = function(s) {
   return new R.Expr.Str(s);
 };
-Ray.Runtime.char = function(c) {
+Ray.Runtime._char = function(c) {
   return new R.Expr.Char(c);
 };
 Ray.Runtime.pair = function(car, cdr) {

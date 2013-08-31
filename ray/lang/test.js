@@ -275,11 +275,11 @@ Ray.Test = function() {
 
 
 
-  describe("First, I bind <code>double</code> at the top level to:");
-  var double = RT.fn(RT.p_spec(['x', Ray.Types.num()]),
+  describe("First, I bind <code>double_num</code> at the top level to:");
+  var double_num = RT.fn(RT.p_spec(['x', Ray.Types.num()]),
                     RT.app(RT.name('*'), RT.positionalArgs(RT.name('x'), RT.num(2))), Ray.Types.num());
-  display(double, false);
-  RT.bindTopLevel('double', double);
+  display(double_num, false);
+  RT.bindTopLevel('double', double_num);
   describe("The binding is available everywhere.");
   displayEvaluation(RT.app(RT.name('double'), RT.positionalArgs(RT.num(5))));
 
@@ -312,7 +312,7 @@ Ray.Test = function() {
   displayEvaluation(double_last_of_5);
 
   describe("If we now change a binding at the top level, this will be reflected in any other definitions that rely upon it");
-  describe("I will now change the definition of <code>double</code> to a function of one argument that always just returns the string <code>\"double\"</code>");
+  describe("I will now change the definition of <code>double_num</code> to a function of one argument that always just returns the string <code>\"double\"</code>");
   var double_str = RT.fn(RT.p_spec(['x', Ray.Types.num()]), RT.str("double"), Ray.Types.str());
   RT.bindTopLevel('double', double_str);
   displayEvaluation(RT.app(RT.name('double'), RT.positionalArgs(RT.num(5))));

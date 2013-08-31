@@ -221,7 +221,7 @@ Ray.Types.num = function() {
 Ray.Types.str = function() {
   return new Ray.Types.Str();
 };
-Ray.Types.char = function() {
+Ray.Types._char = function() {
   return new Ray.Types.Char();
 };
 Ray.Types.unknown = function() {

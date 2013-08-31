@@ -122,7 +122,7 @@ Ray.Generator.fromDatatype = function(block) {
       break;
     case(Ray.Globals.Blocks.Char):
       var c = block.getTitleValue('C');
-      return RT.char(c);
+      return RT._char(c);
       break;
     default:
       throw 'Unknown datatype!';

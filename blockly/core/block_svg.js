@@ -28,8 +28,6 @@ goog.provide('Blockly.BlockSvg');
 goog.require('goog.userAgent');
 goog.require('goog.color');
 
-Blockly.BlockSvg.DEFAULT_INPUT_COLOR = '#999999';
-
 /**
  * Class for a block's SVG representation.
  * @param {!Blockly.Block} block The underlying block object.
@@ -56,6 +54,8 @@ Blockly.BlockSvg = function(block) {
                       'blocklyDraggable');
   }
 };
+
+Blockly.BlockSvg.DEFAULT_INPUT_COLOR = '#999999';
 
 /**
  * Constant for identifying rows that are to be rendered inline.
