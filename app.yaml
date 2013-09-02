@@ -19,10 +19,14 @@ handlers:
 - url: /closure-library
   static_dir: closure-library
 
+- url: /ray/blockly/.*\.html
+  script: entry.application
+
 - url: /ray
   static_dir: ray
+  application_readable: true
 
-- url: /.*
+- url: /
   script: entry.application
 
 libraries:

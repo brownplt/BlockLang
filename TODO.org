@@ -395,3 +395,7 @@ Ok, I now have to put the source in my template, and then hook it up
 to saving
 
 Fix the weird tab sizing issue
+
+I think the problem I am having now is that I can't get an html file
+from ray/blockly, since I am serving it as a static file. I think I
+can just set application-readable to true to fix this!

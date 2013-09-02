@@ -20,7 +20,9 @@
     {% endif %}
 
     {% if DEVELOPMENT %}
-      <script type="text/javascript" src="app.js"></script>
+      <script>
+          goog.require('Ray.App');
+      </script>
     {% else %}
       <script type="text/javascript" src="app_compiled.js"></script>
     {% endif %}

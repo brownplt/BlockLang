@@ -30,7 +30,7 @@ Ray.UI.Util.HALT_BUTTON_CLASS = 'halt-button';
 Ray.UI.Util.CREATE_FUN_BUTTON_TEXT = "Create a new function";
 Ray.UI.Util.CREATE_FUN_BUTTON_TOOLTIP = "Define a new function to use in your program";
 
-Ray.UI.Util.DIRECTORY_PREFIX = "ray/ui/";
+Ray.UI.Util.DIRECTORY_PREFIX = "ray/blockly/";
 
 Ray.UI.Util.MAIN_BLOCKLY_FILENAME = 'main_blockly.html';
 Ray.UI.Util.FUN_DEF_BLOCKLY_FILENAME = 'fun_def_blockly.html';

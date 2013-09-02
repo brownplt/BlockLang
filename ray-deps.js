@@ -34,6 +34,9 @@ goog.addDependency('../../../blockly/core/variables.js', ['Blockly.Variables'], 
 goog.addDependency('../../../blockly/core/warning.js', ['Blockly.Warning'], []);
 goog.addDependency('../../../blockly/core/workspace.js', ['Blockly.Workspace'], ['Blockly.ScrollbarPair', 'Blockly.Trashcan', 'Blockly.Xml']);
 goog.addDependency('../../../blockly/core/xml.js', ['Blockly.Xml'], []);
+goog.addDependency('../../../ray/blockly/fun_def_blockly.js', ['Ray.FunDefBlockly'], ['Blockly', 'Blockly.Xml']);
+goog.addDependency('../../../ray/blockly/main_blockly.js', ['Ray.MainBlockly'], ['Blockly', 'Blockly.Xml']);
+goog.addDependency('../../../ray/blockly/read_only_blockly.js', ['Ray.ReadOnlyBlockly'], ['Blockly', 'Blockly.Xml']);
 goog.addDependency('../../../ray/blocks/block-typechecker.js', ['Ray.Blocks.TypeChecker'], ['Ray.Env', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types']);
 goog.addDependency('../../../ray/blocks/blocks.js', ['Ray.Blocks'], ['Blockly', 'Ray.Blocks.TypeChecker', 'Ray.Blocks.UserFun', 'Ray.Blocks.misc', 'Ray.Globals', 'Ray.Runtime', 'Ray.Types', 'goog.array', 'goog.color', 'goog.dom', 'goog.dom.xml', 'goog.string']);
 goog.addDependency('../../../ray/blocks/category-tree.js', ['Ray.Blocks.CategoryTree'], ['Ray.Blocks.Config', 'goog.dom', 'goog.dom.xml', 'goog.object']);

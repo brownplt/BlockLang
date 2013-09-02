@@ -7,7 +7,7 @@ from google.appengine.api import users
 import webapp2
 import jinja2
 
-DEVELOPMENT = True
+DEVELOPMENT = False
 
 JINJA_ENV = jinja2.Environment(
   loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -19,9 +19,6 @@ JINJA_ENV.filters['escape_double_quotes'] = escape_double_quotes
 
 class Program(ndb.Model):
   source = ndb.TextProperty()
-
-
-
 
 class MainPage(webapp2.RequestHandler):
   def get(self):
@@ -59,7 +56,13 @@ class MainPage(webapp2.RequestHandler):
     self.response.headers['Content-Type'] = 'text/plain'
     self.response.write('Program saved!')
 
+class BlocklyIFrame(webapp2.RequestHandler):
+  def get(self, blockly_html):
+    logging.debug('blockly_html: {}'.format(blockly_html))
+    template = JINJA_ENV.get_template('ray/blockly/' + blockly_html)
+    self.response.write(template.render(DEVELOPMENT=DEVELOPMENT))
 
 application = webapp2.WSGIApplication([
+  ('/ray/blockly/(.*\.html)', BlocklyIFrame),
   ('/', MainPage),
 ], debug=True)
