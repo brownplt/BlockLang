@@ -10,7 +10,8 @@ goog.require('goog.dom');
 goog.require('goog.events');
 goog.require('goog.events.EventType');
 
-function loadPage() {
+function loadPage(opt_loadString) {
+
   // This is the entry point for the application
   Ray.Main.initializeLibrary();
   var blocks = Ray.Main.createBlocks();
@@ -27,8 +28,8 @@ function loadPage() {
 
 
   Ray.UI.setupCreateFunButton(goog.dom.getElement('create_function_button'));
-
   Ray.UI.setupRunButton(goog.dom.getElement('run_button'));
+  Ray.UI.setupLogoutButton(goog.dom.getElement('logout_button'));
 
   Ray.UI.setupResultsBox(goog.dom.getElement('results_box'));
 
@@ -41,7 +42,7 @@ function loadPage() {
 
   // Ray.Main.initializeMainBlocklyDom();
   // Ray.UI.initializeFunDefBlocklyDom();
-  Ray.UI.loadMainBlockly(Ray.UI.Util.mainBlockly());
+  Ray.UI.loadMainBlockly(Ray.UI.Util.mainBlockly(), opt_loadString);
 
   goog.events.listen(window, goog.events.EventType.BEFOREUNLOAD, function(e) {
     return 'If you leave the page, any unsaved programs will be lost!';

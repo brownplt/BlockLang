@@ -382,3 +382,16 @@ it to load and save stuff.
 Make a block for function body, and make it not deletable
 
 Correctly interpret undefined values. 
+
+Logging in and logging out now works!
+
+* TODO
+- [ ] I want to add a save button. I need that button to make a POST
+  request with the appropriate data.
+- [ ] Logout can just make the request, and then do the logout stuff. 
+- [ ] Loading is also kinda tricky
+
+Ok, I now have to put the source in my template, and then hook it up
+to saving
+
+Fix the weird tab sizing issue

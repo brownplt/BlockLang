@@ -14,7 +14,9 @@ goog.require('Ray.UserFun');
 goog.require('goog.array');
 goog.require('goog.dom');
 goog.require('goog.dom.classes');
+goog.require('goog.dom.dataset');
 goog.require('goog.dom.xml');
+goog.require('goog.net.XhrIo');
 goog.require('goog.ui.ControlRenderer');
 goog.require('goog.ui.CustomButton');
 goog.require('goog.ui.FlatButtonRenderer');
@@ -23,6 +25,9 @@ goog.require('goog.ui.LinkButtonRenderer');
 goog.require('goog.ui.LabelInput');
 goog.require('goog.ui.Tab');
 goog.require('goog.ui.TabBar');
+goog.require('goog.Uri.QueryData');
+
+
 
 Ray.UI.serialize = function() {
   console.log('Serializing!');
@@ -52,6 +57,12 @@ Ray.UI.loadXmlString = function(xmlString) {
   Ray.UI.deserialize(xml.childNodes[0]);
 };
 
+Ray.UI.toXmlString = function() {
+  var xml = Ray.UI.serialize();
+  var xmlString = goog.dom.xml.serialize(xml);
+  return xmlString;
+};
+
 Ray.UI.deserialize = function(xml) {
   console.log('Deserializing');
   var mainWorkspaceXml = goog.dom.getFirstElementChild(xml);
@@ -70,6 +81,12 @@ Ray.UI.deserialize = function(xml) {
 
 };
 
+Ray.UI.saveCurrentProgram = function() {
+  var post = new goog.net.XhrIo();
+  var queryData = new goog.Uri.QueryData();
+  queryData.add('source', Ray.UI.toXmlString());
+  post.send('/', 'POST', queryData.toString());
+};
 
 
 Ray.UI.VISIBLE_CONTAINER_CLASS = "container";
@@ -100,11 +117,10 @@ Ray.UI.getTabBarPadding = function() {
 };
 
 Ray.UI.resizePage = function() {
-  var viewportHeight = window.innerHeight;
-  //console.log('window height: ' + String(viewportHeight));
-  var headerHeight = Ray.UI.header.offsetHeight;
-  //console.log('header height: ' + String(headerHeight));
 
+  /*
+   * Set the height of the header, by adjusting either the results box or the left-hand side to match the opposite side
+   */
   Ray.UI.resultsBox.resetSize();
   Ray.UI.resetTabBarPadding();
 
@@ -126,9 +142,17 @@ Ray.UI.resizePage = function() {
   var resultBoxMarginWidth = Ray.UI.resultsBox.getMarginWidth();
   Ray.UI.resultsBox.setSize(headerRightWidth - resultBoxMarginWidth, resultsBoxSize.height);
 
+  /*
+   * Set the height of the content area
+   */
+  var viewportHeight = window.innerHeight;
+  var headerHeight = Ray.UI.header.offsetHeight;
   var contentHeight = viewportHeight - headerHeight;
-  //console.log('desired iframe height: ' + String(contentHeight));
   goog.style.setHeight(Ray.UI.workspaceContainer, contentHeight);
+
+  /*
+   * Set the height of the tabs so that they are all the same size
+   */
 };
 Ray.UI.setupResizeListener = function() {
   goog.events.listen(window, goog.events.EventType.RESIZE, Ray.UI.resizePage);
@@ -212,6 +236,17 @@ Ray.UI.setupRunButton = function(div) {
   return runButton;
 };
 
+Ray.UI.setupLogoutButton = function(div)  {
+  var logoutButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
+  logoutButton.decorate(div);
+  logoutButton.logoutUrl = goog.dom.dataset.get(div, 'logoutUrl');
+  goog.events.listen(logoutButton, goog.ui.Component.EventType.ACTION, function(e) {
+    console.log('logging out!');
+    Ray.UI.saveCurrentProgram();
+    window.location = logoutButton.logoutUrl;
+  });
+};
+
 Ray.UI.setupResultsBox = function(div) {
   var resultsBox = new Ray.UI.ResultsBox(div);
   Ray.UI.resultsBox = resultsBox;
@@ -250,7 +285,10 @@ Ray.UI.deselectTab = function(tab) {
   }
 };
 
-Ray.UI.loadMainBlockly = function(iframe) {
+Ray.UI.loadMainBlockly = function(iframe, opt_loadString) {
+  if(opt_loadString) {
+    window._loadString = opt_loadString;
+  }
   goog.dom.setProperties(iframe, {src: Ray.UI.Util.DIRECTORY_PREFIX + 'main_blockly.html'});
 };
 
@@ -305,8 +343,9 @@ Ray.UI.addFunDefWorkspaceTab = function(id) {
     Ray.UI.openFunDefEditor(Blockly);
   });
 
-
+  Ray.UI.resizePage();
   return funDefTab;
+
 };
 
 Ray.UI.removeFunDef = function(id, funDefTab) {
@@ -360,4 +399,6 @@ Ray.UI.createFunBlockly = function(funSpec, opt_initialWorkspaceXml) {
   };
   Ray.UI.loadFunDefBlockly(funDefWorkspace, funDefInfo, opt_initialWorkspaceXml);
   // We will create the tab and load it from the iframe
+  Ray.UI.resizePage();
+
 };

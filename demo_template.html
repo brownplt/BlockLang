@@ -1,22 +1,29 @@
+<!DOCTYPE html>
+{% autoescape true %}
 <html>
 <head>
     <title>UI Demo</title>
-    <!--DEVELOPMENT
+
+    {% if DEVELOPMENT %}
       <script type="text/javascript" src="closure-library/closure/goog/base.js"></script>
       <script type="text/javascript" src="ray-deps.js"></script>
-    DEVELOPMENT-->
+    {% endif %}
+
     <link rel="stylesheet" type="text/css" href="ink-2.2.0/css/ink-custom.css">
-    <!--DEVELOPMENT
+
+    {% if DEVELOPMENT %}
       <link rel="stylesheet/less" type="text/css" href="ray/ui/less/ui.less">
       <script type="text/javascript" src="less.js"></script>
-      <script type="text/javascript">src="less."less.watch(true);</script>
-    DEVELOPMENT-->
+      <!--<script type="text/javascript">less.watch(true);</script>-->
+    {% else %}
+      <link rel="stylesheet" type="text/css" href="ray/ui/css/ui.css">
+    {% endif %}
 
-    <!--DEVELOPMENT <script>less.watch(true);</script> -->
-    <!--PRODUCTION <link rel="stylesheet" type="text/css" href="ray/ui/css/ui.css">-->
-
-    <!--DEVELOPMENT <script type="text/javascript" src="app.js"></script>-->
-    <!--PRODUCTION <script type="text/javascript" src="app_compiled.js"></script>-->
+    {% if DEVELOPMENT %}
+      <script type="text/javascript" src="app.js"></script>
+    {% else %}
+      <script type="text/javascript" src="app_compiled.js"></script>
+    {% endif %}
 
 </head>
 <body>
@@ -26,6 +33,10 @@
             <div id="button_row" class="column-group">
                 <div id="create_function_button" class="goog-flat-button goog-inline-block header-item">...</div>
                 <div id="run_button" class="run-button goog-inline-block header-item">...</div>
+                <span class="greeting">{{ greeting }}</span>
+                <div id="logout_button"
+                     class="goog-flat-button logout_button goog-inline-block header-item"
+                     data-logout-url="{{ logoutUrl|safe }}">Logout</div>
             </div>
             <div id="workspace_tabs" class="goog-tab-bar goog-tab-bar-top">
                 <div id="tab_blockly_main" class="goog-tab goog-tab-selected">Main Workspace</div>
@@ -44,9 +55,12 @@
     </div>
 </div>
 <script>
+  {% if source %}
+    loadPage('{{ source|safe|escape_double_quotes }}');
+  {% else %}
     loadPage();
+  {% endif %}
 </script>
-
 </body>
-
 </html>
+{% endautoescape %}

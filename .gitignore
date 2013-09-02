@@ -3,6 +3,7 @@
 *.py~
 *.html~
 *.org~
+*.yaml~
 .idea
 whalesong
 whalesong-gui
