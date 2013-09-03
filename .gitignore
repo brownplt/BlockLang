@@ -5,9 +5,8 @@
 *.org~
 *.yaml~
 .idea
-whalesong
-whalesong-gui
 *.svg~
 *.rkt~
+*~
 .DS_Store
 twistd.pid

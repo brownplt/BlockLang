@@ -11,18 +11,15 @@ COMPILED_TARGETS := app_compiled.js ray/fun_def_blockly_compiled.js ray/main_blo
 
 RAY_JS := $(wildcard ray/*.js) $(wildcard ray/ui/*.js) $(wildcard ray/blocks/*.js) $(wildcard ray/lang/*.js)
 BLOCKLY_JS := $(wildcard blockly/core/*.js)
-MAIN_PAGE_NAME := demo
-MAIN_PAGE_TEMPLATE := $(MAIN_PAGE_NAME)_template.html
 
-
-all: production development
+all: $(COMPILED_TARGETS)
 
 # This should be the deployed page
-production: $(COMPILED_TARGETS) css $(MAIN_PAGE_TEMPLATE) 
+production: $(COMPILED_TARGETS) css
 	@echo "finished building for production."
 
 # Loads less dynamically, loads js dynamically
-development: deps $(MAIN_PAGE_TEMPLATE)
+development: deps
 	@echo "finished building for development."
 
 # Compilation

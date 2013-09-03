@@ -1,33 +1,17 @@
-<!DOCTYPE html>
-{% autoescape true %}
-<html>
-<head>
-    <title>UI Demo</title>
+{% extends "layout/__base.html" %}
 
-    {% if DEVELOPMENT %}
-      <script type="text/javascript" src="closure-library/closure/goog/base.js"></script>
-      <script type="text/javascript" src="ray-deps.js"></script>
-    {% endif %}
+{% block title %}UI Demo{% endblock title %}
 
-    <link rel="stylesheet" type="text/css" href="ink-2.2.0/css/ink-custom.css">
+{% block page_js %}
+  {% if DEVELOPMENT %}
+    <script type="text/javascript" src="/app.js"></script>
+  {% else %}
+    <script type="text/javascript" src="/app_compiled.js"></script>
+  {% endif %}
+{% endblock page_js %}
 
-    {% if DEVELOPMENT %}
-      <link rel="stylesheet/less" type="text/css" href="ray/ui/less/ui.less">
-      <script type="text/javascript" src="less.js"></script>
-      <!--<script type="text/javascript">less.watch(true);</script>-->
-    {% else %}
-      <link rel="stylesheet" type="text/css" href="ray/ui/css/ui.css">
-    {% endif %}
-
-    {% if DEVELOPMENT %}
-      <script type="text/javascript" src="app.js"></script>
-    {% else %}
-      <script type="text/javascript" src="app_compiled.js"></script>
-    {% endif %}
-
-</head>
-<body>
-<div class="ink-grid">
+{% block body %}
+  <div class="ink-grid">
     <div id="header" class="column-group">
         <div class="large-75" id="header-left">
             <div id="button_row" class="column-group">
@@ -53,14 +37,12 @@
             <iframe id="blockly_main" src="Javascript:''"></iframe>
         </div>
     </div>
-</div>
-<script>
-  {% if source %}
-    loadPage("{{ source|safe|escape_double_quotes }}");
-  {% else %}
-    loadPage();
-  {% endif %}
-</script>
-</body>
-</html>
-{% endautoescape %}
+  </div>
+  <script>
+    {% if source %}
+      loadPage('{{ source|safe|escape_double_quotes }}');
+    {% else %}
+      loadPage();
+    {% endif %}
+  </script>
+{% endblock body %}

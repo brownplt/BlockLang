@@ -1,3 +1,2 @@
 #! /usr/bin/env bash 
-make all
 dev_appserver.py --admin_port=8001 --port=8000 --log_level=debug .
