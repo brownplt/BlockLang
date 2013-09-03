@@ -59,13 +59,18 @@
 ** High Priority [1/19]
 - [ ] Double clicking is like using a repl, and is immediate evaluation,
   while running a program is the formal version which triggers tests to
-  be run. (Even if you don't use something, all the tests should be run)
+  be run. (Even if you don't use something, all the tests should be
+  run)
+  I currently have the UI in place for double clicking, but haven't
+  hooked it up to evaluation.
 - [ ] Have failed tests change color to red upon failure, and
   successful ones to turn green upon success, and then have a tooltip
   that explains what went wrong that is active over the whole area of
   the test block. Have a tab change color as well if there are
   failing tests in the tab.
-- [ ] Have unfinished definitions work gracefully
+  I have everything here but the tooltip on the test block with an
+  explanation of what went wrong.
+- [ ] Have unfinished definitions work gracefully  
 - [ ] When you change a function and that causes type error, make the
   block that doesn't fit turn red or something, and then also have the
   workspaces which use that block turn red as well
@@ -78,6 +83,8 @@
 - [ ] Make it possible to define a value by right-clicking, saying
   "Name a value" (Not inside functions) !!
 - [ ] Hook up to WeScheme !!
+  I have accounts working, and need to add the interface elements for
+  listing programs. 
 - [ ] Make failed attempts to connect react more violently to that
   failure. Maybe have block to which you can't connect get repelled!
 - [ ] Make drop targets for blocks larger, so that it's easier to connect
@@ -399,3 +406,13 @@ Fix the weird tab sizing issue
 I think the problem I am having now is that I can't get an html file
 from ray/blockly, since I am serving it as a static file. I think I
 can just set application-readable to true to fix this!
+
+* ----------------------------------------------------------------------------------------------------
+
+Many programs per account
+support for undefined functions
+block or notch for function body
+
+October 1st is when Bootstrap materials are frozen for release.
+
+Send Kathi todo list

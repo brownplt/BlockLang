@@ -78,6 +78,7 @@ Ray.UI.deserialize = function(xml) {
     Ray.UI.createFunBlockly(funSpec, funDefWorkspaceXml);
   });
   Ray.Shared.MainBlockly.Xml.domToWorkspace(Ray.Shared.MainBlockly.mainWorkspace, mainWorkspaceXml);
+  Ray.UI.tabBar.setSelectedTab(Ray.UI.mainTab);
 
 };
 
