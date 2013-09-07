@@ -6,8 +6,10 @@
 
   {% block closure_base %}
     {% if DEVELOPMENT %}
-      <script type="text/javascript" src="/closure-library/closure/goog/base.js"></script>
-      <script type="text/javascript" src="/ray-deps.js"></script>
+      {% block closure_loader_scripts %}
+        <script type="text/javascript" src="/closure-library/closure/goog/base.js"></script>
+        <script type="text/javascript" src="/ray-deps.js"></script>
+      {% endblock closure_loader_scripts %}
     {% endif %}
   {% endblock closure_base %}
 
@@ -16,7 +18,7 @@
   {% endblock ink_css %}
     
   {% block styles %}
-    {% if DEVELOPMENT %}
+    {% if USE_LESS %}
       <link rel="stylesheet/less" type="text/css" href="/ray/ui/less/ui.less">
       <script type="text/javascript" src="/less.js"></script>
       <!--<script type="text/javascript">less.watch(true);</script>-->

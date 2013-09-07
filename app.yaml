@@ -22,6 +22,9 @@ handlers:
 - url: /ray/blockly/.*\.html
   script: entry.application
 
+- url: /editor/.*
+  script: entry.application
+
 - url: /ray
   static_dir: ray
   application_readable: true

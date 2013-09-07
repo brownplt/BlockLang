@@ -104,3 +104,47 @@ div.hidden_container {
 .invalid-state-message {
     color: red;
 }
+
+// Maybe separate this into a different file
+
+.list-heading { 
+  font-weight: bold;
+}
+
+.program-list {
+  width: 100%;
+}
+
+.program-list-item { 
+  clear: left;
+  display: block;
+  width: 100%;
+  list-style: none;
+  margin: 0px;
+  padding: 8px 0px 8px 4px;
+  
+  & > * { 
+    padding-right: 10px;
+    float: left;
+  }
+
+  &:hover { 
+    &.list-heading {
+      background-color: inherit;
+    }
+    background-color: white;
+  }
+
+  
+
+  overflow: auto;
+}
+
+.program-name { 
+  width: 33%;  
+  display: block;
+}
+
+.program-last-modified { 
+  width: 33%;
+}

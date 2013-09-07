@@ -416,3 +416,17 @@ block or notch for function body
 October 1st is when Bootstrap materials are frozen for release.
 
 Send Kathi todo list
+
+* ----------------------------------------------------------------------------------------------------
+
+So I am trying to set up the list of programs with a row at the bottom
+to create a new program, but in order to do
+that, I need to pass all the program names to the page initially, so
+I can reject any invalid names. 
+
+This is getting quite annoying, so I wonder if maybe it's easier to
+just set this all up by just having the page make a request to the
+API, and getting JSON back with all the program names, and using that
+instead of having to read in all these data attributes. 
+
+This would simplify interaction quite a bit.

@@ -83,10 +83,20 @@ Ray.UI.deserialize = function(xml) {
 };
 
 Ray.UI.saveCurrentProgram = function() {
-  var post = new goog.net.XhrIo();
-  var queryData = new goog.Uri.QueryData();
-  queryData.add('source', Ray.UI.toXmlString());
-  post.send('/', 'POST', queryData.toString());
+  if(Ray.UI.programName) {
+    var post = new goog.net.XhrIo();
+    var queryData = new goog.Uri.QueryData();
+    queryData.add('source', Ray.UI.toXmlString());
+    var postUrl = '/editor/' + String(Ray.UI.programName);
+    post.send(postUrl, 'POST', queryData.toString());
+    return true;
+  } else {
+    return false;
+  }
+};
+
+Ray.UI.setProgramName = function(opt_programName) {
+  Ray.UI.programName = opt_programName || null;
 };
 
 
@@ -242,9 +252,17 @@ Ray.UI.setupLogoutButton = function(div)  {
   logoutButton.decorate(div);
   logoutButton.logoutUrl = goog.dom.dataset.get(div, 'logoutUrl');
   goog.events.listen(logoutButton, goog.ui.Component.EventType.ACTION, function(e) {
-    console.log('logging out!');
     Ray.UI.saveCurrentProgram();
     window.location = logoutButton.logoutUrl;
+  });
+};
+
+
+Ray.UI.setupSaveButton = function(div) {
+  var saveButton = new goog.ui.Button(undefined, goog.ui.FlatButtonRenderer.getInstance());
+  saveButton.decorate(div);
+  goog.events.listen(saveButton, goog.ui.Component.EventType.ACTION, function(e) {
+    Ray.UI.saveCurrentProgram();
   });
 };
 

@@ -18,6 +18,8 @@
                 <div id="create_function_button" class="goog-flat-button goog-inline-block header-item">...</div>
                 <div id="run_button" class="run-button goog-inline-block header-item">...</div>
                 <span class="greeting">{{ greeting }}</span>
+                <div id="save_button"
+                     class="goog-flat-button save_button goog-inline-block header-item">Save Program</div>
                 <div id="logout_button"
                      class="goog-flat-button logout_button goog-inline-block header-item"
                      data-logout-url="{{ logoutUrl|safe }}">Logout</div>
@@ -40,9 +42,9 @@
   </div>
   <script>
     {% if source %}
-      loadPage('{{ source|safe|escape_double_quotes }}');
+      loadProgram('{{ source|safe|escape_double_quotes }}', '{{ program_name }}');
     {% else %}
-      loadPage();
+      loadProgram(null, '{{ program_name }}');
     {% endif %}
   </script>
 {% endblock body %}
