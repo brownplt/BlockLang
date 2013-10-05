@@ -8,7 +8,7 @@ from google.appengine.api import users
 import webapp2
 import jinja2
 
-DEVELOPMENT = False
+DEVELOPMENT = True
 TEMPLATE_DIR = 'templates'
 EDITOR_PAGE = 'editor.html'
 INDEX_PAGE = 'index.html'

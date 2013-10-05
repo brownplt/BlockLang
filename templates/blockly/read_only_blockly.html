@@ -5,7 +5,7 @@
   {{ super() }}
   {% if DEVELOPMENT %}
     <script>
-      goog.require('Ray.ReadOnlyBlockly);
+      goog.require('Ray.ReadOnlyBlockly');
     </script>
   {% else %}
     <script type="text/javascript" src="/ray/blockly/read_only_blockly_compiled.js"></script>

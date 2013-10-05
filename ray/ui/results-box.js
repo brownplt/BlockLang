@@ -71,6 +71,9 @@ Ray.UI.ResultsBox.prototype.showValue = function(value) {
     return;
   }
 
+  // Remove any blocks that are already on the workspace
+  this.Blockly_.mainWorkspace.clear();
+
   var block = this.getPrimitiveDataBlockFromValue(value);
   block.initSvg();
   block.render();
