@@ -12,6 +12,7 @@
     goog.require('goog.array');
     goog.require('goog.dom');
     goog.require('goog.dom.dataset');
+    goog.require('goog.events');
     goog.require('goog.net.XhrIo');
     goog.require('goog.ui.Button');
     goog.require('goog.ui.FlatButtonRenderer');
@@ -42,7 +43,7 @@
         <span class="program-last-modified goog-inline-block">
           {{ program.last_modified|datetimeformat }}
         </span>
-        <div class="goog-flat-button goog-inline-block" title="Delete this program">
+        <div class="goog-flat-button goog-inline-block delete-button" title="Delete this program">
           <i class="icon-remove"></i>
         </div>
       </li>
@@ -59,9 +60,37 @@
     </li>
   </ul>
   <script>
-    goog.array.forEach(goog.dom.getElementsByClass('goog-flat-button'), function(elem) { 
-      var button = new goog.ui.Button(null, goog.ui.FlatButtonRenderer.getInstance());
-      button.decorate(elem);
+    var changeEvents = [goog.events.EventType.PROPERTYCHANGE,
+                        goog.events.EventType.KEYUP,
+                        goog.events.EventType.INPUT,
+                        goog.events.EventType.PASTE];
+
+
+    // Deleting existing programs
+    var deleteProgramXhr = new goog.net.XhrIo();
+
+    goog.array.forEach(goog.dom.getElementsByClass('delete-button'), function(elem) {
+      var deleteButton = new goog.ui.Button(null, goog.ui.FlatButtonRenderer.getInstance());
+      deleteButton.decorate(elem);
+      goog.events.listen(deleteButton, goog.ui.Component.EventType.ACTION, function(e) {
+        var listItemLi = goog.dom.getAncestorByClass(deleteButton.getContentElement(), 'program-list-item');
+        var programNameDiv = goog.dom.getFirstElementChild(goog.dom.getFirstElementChild(listItemLi));
+        var programName = goog.dom.dataset.get(programNameDiv, 'programName');
+        var deleteProgramUrl = '/programs/' + programName;
+
+        deleteButton.setEnabled(false);
+
+        goog.events.listen(deleteProgramXhr, goog.net.EventType.COMPLETE, function(e) {
+          if(deleteProgramXhr.isSuccess()) {
+            goog.dom.removeNode(listItemLi);
+          } else {
+            throw 'Failed to delete program';
+          }
+        });
+
+        deleteProgramXhr.send(deleteProgramUrl, 'DELETE');
+      });
+
     });
 
     var currentProgramNames = [];
@@ -75,14 +104,26 @@
       });
     });
 
+    // Set up create program row in table
     var createProgramButton = new goog.ui.Button(null, goog.ui.FlatButtonRenderer.getInstance());
     createProgramButton.decorate(goog.dom.getElement('create-program-button'));
 
     var createProgramName = new goog.ui.LabelInput();
     createProgramName.decorate(goog.dom.getElement('create-program-name'));
-    
-    var postNewProgram = new goog.net.XhrIo();
 
+    // Don't let users create multiple programs with the same name
+    goog.events.listen(createProgramName.getContentElement(), changeEvents, function(e) {
+      var programName = createProgramName.getValue();
+      if(goog.array.contains(currentProgramNames, programName)) {
+        createProgramButton.setEnabled(false);
+      } else {
+        createProgramButton.setEnabled(true);
+      }
+    });
+    
+
+    // Creating new programs
+    var postNewProgram = new goog.net.XhrIo();
     goog.events.listen(createProgramButton, goog.ui.Component.EventType.ACTION, function(e) { 
       var programName = createProgramName.getValue();
       if(goog.array.contains(currentProgramNames, programName)) { 
@@ -90,6 +131,14 @@
       } else { 
         var queryData = new goog.Uri.QueryData();
         queryData.add('program-name', programName);
+        createProgramButton.setEnabled(false);
+        goog.events.listenOnce(postNewProgram, goog.net.EventType.COMPLETE, function(e) {
+          if(postNewProgram.isSuccess()) {
+            window.location.href = postNewProgram.getResponseText();
+          } else { 
+            throw 'Failed to create a new program';
+          }
+        });
         postNewProgram.send('/', 'POST', queryData.toString());
       }
     });    

@@ -25,6 +25,9 @@ handlers:
 - url: /editor/.*
   script: entry.application
 
+- url: /programs/.*
+  script: entry.application
+
 - url: /ray
   static_dir: ray
   application_readable: true

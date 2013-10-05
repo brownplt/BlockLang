@@ -86,26 +86,47 @@ class ProgramEditor(webapp2.RequestHandler):
     logging.debug('Request arguments: ' + str(self.request.arguments()))
     logging.debug(source)
     google_account = users.get_current_user()
-    if google_account:
-      user = User.get_user(google_account)      
-      if not user:
-        self.abort(401)
-
-      programs = Program.query(Program.name == program_name, ancestor=user.key)
-      if not programs.count():
-        self.abort(401)
-
-      program = programs.get()
-      program.source = source
-      program.put()
-
-      self.response.headers['Content-Type'] = 'text/plain'
-      self.response.write('Program saved!')
-    else:
+    if not google_account:
       self.abort(401)
 
+    user = User.get_user(google_account)      
+    if not user:
+      self.abort(401)
+
+    programs = Program.query(Program.name == program_name, ancestor=user.key)
+    if not programs.count():
+      self.abort(401)
+
+    program = programs.get()
+    program.source = source
+    program.put()
+
+    self.response.headers['Content-Type'] = 'text/plain'
+    self.response.write('Program saved!')
+
+class ProgramManager(webapp2.RequestHandler):
+  def delete(self, program_name):
+    # Delete a program 
+    google_account = users.get_current_user()
+    if not google_account:
+      self.abort(401)
+
+    user = User.get_user(google_account)
+    programs = Program.query(Program.name == program_name, ancestor=user.key)
+    if not programs.count():
+      self.abort(401)
+
+    program = programs.get()
+    program.key.delete()
+
+    self.response.write('Success')
+
+
+
 class ProgramIndex(webapp2.RequestHandler):
+
   def get(self):
+    # Show the program index
     logging.debug('hello')
     google_account = users.get_current_user()
     if google_account: 
@@ -121,19 +142,20 @@ class ProgramIndex(webapp2.RequestHandler):
     else: 
       self.redirect(users.create_login_url(self.request.uri))
 
+
   def post(self):
+    # Create a new program 
     google_account = users.get_current_user()
     if not google_account:
       self.abort(401)
 
     user = User.get_user(google_account)
     program_name = self.request.get('program-name')
-      
     program = Program(name=program_name, 
                       parent=user.key)
     program.put()
+    self.response.write(program_editor_url(program))
 
-    self.redirect(program_editor_url(program))
 
 class BlocklyIFrame(webapp2.RequestHandler):
   def get(self, blockly_html):
@@ -144,5 +166,6 @@ class BlocklyIFrame(webapp2.RequestHandler):
 application = webapp2.WSGIApplication([
   ('/ray/blockly/(.*\.html)', BlocklyIFrame),
   ('/editor/(.*)', ProgramEditor),
+  ('/programs/(.*)', ProgramManager),
   ('/', ProgramIndex),
 ], debug=True)
