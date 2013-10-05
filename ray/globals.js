@@ -70,6 +70,7 @@ Blocks.Argument = 12;
 Blocks.And = 13;
 Blocks.Or = 14;
 Blocks.Example = 15;
+Blocks.FunBody = 16;
 
 Ray.Globals.Priorities = {};
 var Priorities = Ray.Globals.Priorities;

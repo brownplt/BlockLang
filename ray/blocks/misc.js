@@ -28,6 +28,8 @@ Ray.Blocks.HELP_URL = "#";
 Ray.Blocks.EXAMPLE_BLOCK_NAME = 'example';
 Ray.Blocks.EXAMPLE_BLOCK_EXPR_INPUT = 'EXPR';
 Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT = 'RESULT';
+Ray.Blocks.FUN_BODY_BLOCK_NAME = 'fun_body';
+Ray.Blocks.FUN_BODY_BLOCK_INPUT = 'FUN_BODY';
 
 Ray.Blocks.blockName = function(name) {
   return Ray.Blocks.BLOCK_PREFIX + goog.string.htmlEscape(name);
@@ -250,7 +252,7 @@ Ray.Blocks.exampleBlock = function() {
   var exampleBlock = {};
   exampleBlock.name_ = Ray.Blocks.EXAMPLE_BLOCK_NAME;
   exampleBlock.externalName_ = Ray.Blocks.EXAMPLE_BLOCK_NAME;
-  exampleBlock.renderAsExpression_ = true;
+  exampleBlock.renderAsExpression_ = false;
   exampleBlock.type = Ray.Blocks.EXAMPLE_BLOCK_NAME;
   exampleBlock.blockClass_ = Ray.Globals.Blocks.Example;
   exampleBlock.preInit_ = function() {
@@ -283,4 +285,31 @@ Ray.Blocks.exampleBlock = function() {
     this.appendValueWithType(Ray.Blocks.EXAMPLE_BLOCK_RESULT_INPUT, new Ray.Types.Unknown());
   };
   return exampleBlock;
+};
+
+Ray.Blocks.FunBodyBlock = function() {
+  var funBodyBlock = {};
+  funBodyBlock.name_ = Ray.Blocks.FUN_BODY_BLOCK_NAME;
+  funBodyBlock.externalName_ = Ray.Blocks.FUN_BODY_BLOCK_NAME;
+  funBodyBlock.renderAsExpression_ = false;
+  funBodyBlock.type_ = Ray.Blocks.FUN_BODY_BLOCK_TYPE;
+  funBodyBlock.blockClass_ = Ray.Globals.Blocks.FunBody;
+  funBodyBlock.preInit_ = function() {
+    if(this.outputConnection) {
+      this.outputConnection.dispose();
+      this.outputConnection = null;
+    }
+  };
+
+  funBodyBlock.getBody = function() {
+    return this.getInputTargetBlock(Ray.Blocks.FUN_BODY_BLOCK_INPUT);
+  };
+
+  funBodyBlock.init = function() {
+    this.appendDummyInput()
+      .appendTitle("Function body:");
+    this.appendValueWithType(Ray.Blocks.FUN_BODY_BLOCK_INPUT, new Ray.Types.Unknown());
+  };
+
+  return funBodyBlock;
 };
