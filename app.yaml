@@ -6,6 +6,10 @@ threadsafe: true
 
 handlers:
 # All my js and css at the moment
+- url: /favicon\.ico
+  static_files: /favicon.ico
+  upload: /favicon\.ico
+
 - url: /(.*)\.js
   static_files: \1.js
   upload: .*\.js

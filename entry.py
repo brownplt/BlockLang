@@ -8,7 +8,7 @@ from google.appengine.api import users
 import webapp2
 import jinja2
 
-DEVELOPMENT = True
+DEVELOPMENT = False # Set to True when in development and False otherwise
 TEMPLATE_DIR = 'templates'
 EDITOR_PAGE = 'editor.html'
 INDEX_PAGE = 'index.html'
@@ -18,8 +18,8 @@ JINJA_ENV = jinja2.Environment(
   extensions=['jinja2.ext.autoescape'], 
 )
 JINJA_ENV.globals['DEVELOPMENT'] = DEVELOPMENT
-JINJA_ENV.globals['COMPILED'] = False
-JINJA_ENV.globals['USE_LESS'] = True
+JINJA_ENV.globals['COMPILED'] = True
+JINJA_ENV.globals['USE_LESS'] = False
 
 def datetimeformat(value, fmt="%Y-%m-%d %H:%M:%S"):
   return value.strftime(fmt)

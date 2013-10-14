@@ -1105,3 +1105,35 @@ div.hidden_container {
 .invalid-state-message {
   color: red;
 }
+.list-heading {
+  font-weight: bold;
+}
+.program-list {
+  width: 100%;
+}
+.program-list-item {
+  clear: left;
+  display: block;
+  width: 100%;
+  list-style: none;
+  margin: 0px;
+  padding: 8px 0px 8px 4px;
+  overflow: auto;
+}
+.program-list-item > * {
+  padding-right: 10px;
+  float: left;
+}
+.program-list-item:hover {
+  background-color: white;
+}
+.program-list-item:hover.list-heading {
+  background-color: inherit;
+}
+.program-name {
+  width: 33%;
+  display: block;
+}
+.program-last-modified {
+  width: 33%;
+}
