@@ -1,0 +1,352 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /Users/spencergordon/Documents/Summer2013/summer/TODO.org
+
+
+* ----------------------------------------------------------------------------------------------------
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:28
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+
+So I am trying to set up the list of programs with a row at the bottom
+to create a new program, but in order to do
+that, I need to pass all the program names to the page initially, so
+I can reject any invalid names. 
+
+This is getting quite annoying, so I wonder if maybe it's easier to
+just set this all up by just having the page make a request to the
+API, and getting JSON back with all the program names, and using that
+instead of having to read in all these data attributes. 
+
+This would simplify interaction quite a bit.
+
+* ----------------------------------------------------------------------------------------------------
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:28
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+
+Many programs per account
+support for undefined functions
+block or notch for function body
+
+October 1st is when Bootstrap materials are frozen for release.
+
+Send Kathi todo list
+
+
+* TODO
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:28
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :ARCHIVE_TODO: TODO
+  :END:
+- [ ] I want to add a save button. I need that button to make a POST
+  request with the appropriate data.
+- [ ] Logout can just make the request, and then do the logout stuff. 
+- [ ] Loading is also kinda tricky
+
+Ok, I now have to put the source in my template, and then hook it up
+to saving
+
+Fix the weird tab sizing issue
+
+I think the problem I am having now is that I can't get an html file
+from ray/blockly, since I am serving it as a static file. I think I
+can just set application-readable to true to fix this!
+
+
+* Next items on the todo list
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:28
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+
+Make a block for function body, and make it not deletable
+
+Correctly interpret undefined values. 
+
+Logging in and logging out now works!
+
+
+* ----------
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:28
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+When I get back, try deserializing that, and set up a server around
+it to load and save stuff. 
+
+
+* ----------
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:28
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+<xml>
+  <workspace kind="main">
+    <block type="ray_substring" x="39"
+           y="65">
+      <value name="str">
+        <block type="ray_string-append">
+          <mutation
+              rest_args="2">
+          </mutation>
+        </block>
+      </value>
+    </block>
+  </workspace>
+  <user_function>
+    <user_function_specification
+        fun_id="0">
+      <name>string-last
+      </name>
+      <description>gets the last
+      character of the passed-in string
+      </description>
+      <arg name="x"
+           type="String">
+      </arg>
+      <return_type
+          type="Character">
+      </return_type>
+    </user_function_specification>
+    <workspace
+        kind="user_function" fun_id="0">
+      <block type="ray_string-ref" x="143"
+             y="36">
+        <value name="str">
+          <block
+              type="ray_function_0_arg_0">
+          </block>
+        </value>
+        <value name="k">
+          <block
+              type="ray_-">
+            <value name="x">
+              <block type="ray_string-length">
+                <value
+                    name="x">
+                  <block
+                      type="ray_function_0_arg_0">
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value
+                name="y">
+              <block type="ray_data_create_Number">
+                <title
+                    name="N">1
+                </title>
+              </block>
+            </value>
+          </block>
+        </value>
+      </block>
+      <block
+          type="example" x="215" y="240">
+        <value name="EXPR">
+          <block
+              type="ray_user_function_0">
+            <value name="P_ARG0">
+              <block
+                  type="ray_data_create_String">
+                <title name="S">Hello,
+                World!
+                </title>
+              </block>
+            </value>
+          </block>
+        </value>
+        <value
+            name="RESULT">
+          <block type="ray_data_create_Character">
+            <title
+                name="C">!
+            </title>
+          </block>
+        </value>
+      </block>
+    </workspace>
+  </user_function>
+</xml>
+
+* ----------------------------------------------------------------------------------------------------
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:28
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+Ok, so I now have deserialization sorta working
+
+Here is a sample program to deserialize:
+
+* Ideas
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:29
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+Just have holes be replaced with 'undefined', and cause dynamic errors, but no static errors.
+
+As a test, create string-last, with correct definition, and test it with "Hello, world!" --> '!'
+
+Also, create double-a-number and test it with 20 --> 40
+
+(define (string-last x) (string-ref x (- (string-length x) 1)))
+(check-expect (string-last "Hello, world!") #\!)
+
+(define (double-a-number n) (* 2 n))
+(check-expect (double-a-number 20) 40)
+
+Talk to Joe and Daniel about moving this to integrate with the Cap'n Teach storage mechanism
+
+Go with the undefined proposal
+
+
+Also, respond to Emmanuel/update the todo list with his items. 
+
+Ask Shriram what he means by everything can be undone.
+
+Also, what about the fact that you can have an example in a function definition tab that doesn't actually test the function in question? Should it be reset when the function changes?
+
+Conversly, you can have an example in function A's tab that uses function B. When should it be reset? 
+
+Maybe I should just make the function blocks in the examples not removable, so that you can't run into the first problem.
+
+----------------------------------------------------------------------------------------------------
+
+FIGURE OUT WHAT THE SCHEDULE IS!!!!!!!!!
+
+RESPOND TO EMMANUEL'S PREVIOUS EMAIL
+
+EMPTY doesn't typecheck correctly, because there is no function value associated with it. I have to fix this.
+Actually the problem isn't in typechecking. The problem is that when
+we go to generate code for it, we dispatch on the presenct of a value_
+field, which it does have even though it is not a  function. We need
+to have some global, like Globals.Class that we can dispatch against,
+and have that field remain an implementation detail. Or we can do
+this in a more object-oriented way, and have each object provide its
+own generation. Also the way my blocks are constructed is worryingly
+ad-hoc. There should be a more principled way to go about. Maybe some
+interface they could all implement. 
+
+Also, I gotta pull the latest code, and see what I'm missing.
+
+Next thing is to fix 'empty', and to disable run button.
+Then consider what to do about examples that use other functions, and whether I should make it impossible to remove function application in example.
+Have a tooltip that explains what went wrong over the area of the example, when we have a failure.
+
+Also, the fact that the run button is disabling and enabling in
+response to events, and not by polling solves the problem of
+potentially being able to run invalid code. Given that, it's okay
+that the tab status indicator takes some time to update. 
+
+----------------------------------------------------------------------------------------------------
+
+- [X] Fix 'empty'
+- [X] Disable run button at the appropriate times
+- [X] Set a tooltip indicating that you can go to the tab for more
+  information
+- [ ] Add explanatory tooltip over failing examples. 
+- [ ] Clean up this document, and figure out where I am exactly.
+
+
+* Things to work on in the near future
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:29
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+- Double-clicking / handling evaluation when definitions are
+  unfinished, when values are undefined
+- Tooltip with explanation over failing(/passing) examples
+- [X] Making the results box better, perhaps have it show a results block
+  when successfully executing, and just turn red with an error
+  message otherwise. 
+- Getting vertical layouts to work fully
+- [X] Changing the type names to the unabbreviated versions!
+
+
+* Get double clicking to evaluate working
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:29
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+
+In order to do this, I have to figure out first where
+block.onMouseDown is called, so I can know what I'm going to have to intercept.
+
+
+* Send Kathi email telling her to test on iPad
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:29
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+
+- [ ] Make all blocks global, and just have them show up or not, depending on what Blockly is requesting it.
+
+I just switched to generating a category tree, and now I am running into problems when generating the toolbox from that, so I should have the category tree handle that itself.
+
+I now correctly generate the xml, but I can't look things up. The problem is Ray.Shared.lookupInBlockDirectory, which has a key as an argument which is incorrect. 
+
+I am changing sync trees to not go through XML, because that is dumb. 
+
+That should solve problems.
+
+I have to solve the problem with undefined values not being correctly
+handled. That is a very high priority, since that will have a large
+effect on making the system less brittle, as lots of attempts to
+evaluate when everything is not perfect currently run into errors,
+when they shouldn't necessarily. Though maybe that's just the result
+of me failing to understand the check all and evaluate button
+sufficiently.
+
+Have the result block window resize to match the block size, or at
+least figure out a way to work that into the page better. 
+
+Ok, curent idea is to work on serialization.
+
+
+* More TODO
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2013-10-27 Sun 15:29
+  :ARCHIVE_FILE: ~/Documents/Summer2013/summer/TODO.org
+  :ARCHIVE_CATEGORY: TODO
+  :END:
+
+- [ ] Get multiple result blocks to stack / OR have results evaluate
+  alongside blocks
+- [ ] Account for changes in title values when resetting example
+  block colors
+
+Prioritize UI features over deep integration, I don't need to be able
+to turn arbitrary Racket code into Block code for the moment.
+
+Next objective: make it possible to load from xml the entire state
+of the application
+
+- [ ] Make functions that can take in and return lists
+- [ ] Paste at cursor
+- [ ] Figure out numeric equality
+- [ ] Why is simply evaluating true not working! FIXED
+
+New problem discovered! When I go to delete a function, the current
+tab is still polling that function, and so it could poll after
+deletion has started, in which case deletion will throw errors
+because some fields are null.
+
+New problem discovered. Signatures blocks are incorrectly spaced, the
+text overlaps them. 
+

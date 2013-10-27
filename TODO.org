@@ -1,432 +1,201 @@
-* Completed Tasks [39/39]
-- [X] Switch from "consumes char" to "consumes", and same for "produces"
-  and other types.
-- [X] Get the function name to be above the function arguments.
-- [X] Re-order blocks to match likely use.
-- [X] Put 'and' and 'or' in 'booleans'.
-- [X] Make function names black
-- [X] Switch '*' for '×'
-- [X] Refactor to have consistent naming conventions!!!
-- [X] Fix bug where disposing an expression with sub-expressions
-  throws an error during typechecking
-- [X] Remove dependency on underscore.js 
-- [X] When dragging blocks with rest arguments, the rest arguments
-  revert to unknown color, they're fine if I add or remove arguments,
-  but initially they do have this problem.
-- [X] Show the function signature inside the canvas as well, so that you
-  can drag arguments from the signature into the function body.
-- [X] Add blocks for test cases 
-- [X] Get rid of 'all' drawer
-- [X] Add interface element to halt computation
-- [X] Fixed bug where char would throw error
-- [X] Fixed bug where opening/closing signature Would cause text highlight
-- [X] Make it possible to rename function arguments.
-- [X] Make it possible to edit function signature, remove a function.
-- [X] Figure out how to get the workspace to fit in the available
-  space exactly.
-- [X] Main vertical scrollbar is broken.
-- [X] Fix weird rendering issue with statement blocks.
-- [X] For definitions with holes, have a hole icon on the tab for that
-  definition to indicate that
-  the definition is unfinished.
-- [X] Update signature language to read more like natural language
-- [X] X to remove argument
-- [X] Fix list block, so that it typechecks correctly (basically, I
-  just have to special case this in the typechecker, and provide the
-  appropriate constraints).
-- [X] Add tooltips to funTab icon buttons
-- [X] Have tabs change color on test success/failure (don't correctly
-  handle unfinished definitions or tests)
-- [X] Have test blocks change color on test success/failure
-- [X] Have test blocks reset color when subexpressions or function
-  definition changes
-- [X] Have run button check all tests in main workspace, but just a
-  function's tests when in that function's tab.
-- [X] Have run button disabled when viewing invalid workspace
-- [X] Have run button text and tooltip change appropriately 
-- [X] Use full name of types. num -> number, str -> string, char ->
-  character. Make this easy and configurable, so I can change this globally
-- [X] Rename 'forms' to 'constructs' or 'control'
-- [X] Make function names unique
-- [X] Fixed bug in firefox caused by calling getBBox on hidden svg element
-- [X] Fixed race condition
-- [X] Fixed signature text translation bug
-- [X] Fixed hidden horizontal scroll bar on signature
-- [X] Make everything serializable, so I can easily load from some JS
-  data structure. !! (or XML blob)
+#+STARTUP: indent
+* Completed Tasks [40/40]
+** Any priority
+*** DONE 
+Switch from "consumes char" to "consumes", and same for "produces" and other types.
+*** DONE 
+Get the function name to be above the function arguments.
+*** DONE 
+Re-order blocks to match likely use.
+*** DONE 
+Put 'and' and 'or' in 'booleans'.
+*** DONE 
+Make function names black
+*** DONE 
+Switch '*' for '×'
+*** DONE 
+Refactor to have consistent naming conventions!!!
+*** DONE 
+Fix bug where disposing an expression with sub-expressions throws an error during typechecking
+*** DONE 
+Remove dependency on underscore.js 
+*** DONE 
+When dragging blocks with rest arguments, the rest arguments revert to unknown color, they're fine if I add or remove arguments, but initially they do have this problem.
+*** DONE 
+Show the function signature inside the canvas as well, so that you can drag arguments from the signature into the function body.
+*** DONE 
+Add blocks for test cases 
+*** DONE 
+Get rid of 'all' drawer
+*** DONE 
+Add interface element to halt computation
+*** DONE 
+Fixed bug where char would throw error
+*** DONE 
+Fixed bug where opening/closing signature Would cause text highlight
+*** DONE 
+Make it possible to rename function arguments.
+*** DONE 
+Make it possible to edit function signature, remove a function.
+*** DONE 
+Figure out how to get the workspace to fit in the available space exactly.
+*** DONE 
+Main vertical scrollbar is broken.
+*** DONE 
+Fix weird rendering issue with statement blocks.
+*** DONE 
+For definitions with holes, have a hole icon on the tab for that definition to indicate that the definition is unfinished.
+*** DONE 
+Update signature language to read more like natural language
+*** DONE 
+X to remove argument
+*** DONE 
+Fix list block, so that it typechecks correctly (basically, I just have to special case this in the typechecker, and provide the appropriate constraints).
+*** DONE 
+Add tooltips to funTab icon buttons
+*** DONE 
+Have tabs change color on test success/failure (don't correctly handle unfinished definitions or tests)
+*** DONE 
+Have test blocks change color on test success/failure
+*** DONE 
+Have test blocks reset color when subexpressions or function definition changes
+*** DONE 
+Have run button check all tests in main workspace, but just a function's tests when in that function's tab.
+*** DONE 
+Have run button disabled when viewing invalid workspace
+*** DONE 
+Have run button text and tooltip change appropriately 
+*** DONE 
+Use full name of types. num -> number, str -> string, char -> character. Make this easy and configurable, so I can change this globally
+*** DONE 
+Rename 'forms' to 'constructs' or 'control'
+*** DONE 
+Make function names unique
+*** DONE 
+Fixed bug in firefox caused by calling getBBox on hidden svg element
+*** DONE 
+Fixed race condition
+*** DONE 
+Fixed signature text translation bug
+*** DONE 
+Fixed hidden horizontal scroll bar on signature
+*** DONE 
+Make everything serializable, so I can easily load from some JS data structure. !! (or XML blob)
 
 * Remaining Tasks
-** High Priority [1/19]
-- [ ] Double clicking is like using a repl, and is immediate evaluation,
-  while running a program is the formal version which triggers tests to
-  be run. (Even if you don't use something, all the tests should be
-  run)
-  I currently have the UI in place for double clicking, but haven't
-  hooked it up to evaluation.
-- [ ] Have failed tests change color to red upon failure, and
-  successful ones to turn green upon success, and then have a tooltip
-  that explains what went wrong that is active over the whole area of
-  the test block. Have a tab change color as well if there are
-  failing tests in the tab.
-  I have everything here but the tooltip on the test block with an
-  explanation of what went wrong.
-- [ ] Have unfinished definitions work gracefully  
-- [ ] When you change a function and that causes type error, make the
-  block that doesn't fit turn red or something, and then also have the
-  workspaces which use that block turn red as well
-- [ ] Add in image atomic type. !!
-- [ ] Add support for world-programming, via big-bang primitives. !!
-- [ ] Test adding so many functions that the tab bar is longer than
-  the screen width 
-- [ ] Get function body displayable in pop-up alongside function
-  usage !!
-- [ ] Make it possible to define a value by right-clicking, saying
-  "Name a value" (Not inside functions) !!
-- [ ] Hook up to WeScheme !!
-  I have accounts working, and need to add the interface elements for
-  listing programs. 
-- [ ] Make failed attempts to connect react more violently to that
-  failure. Maybe have block to which you can't connect get repelled!
-- [ ] Make drop targets for blocks larger, so that it's easier to connect
-  them.
-- [ ] Default type of argument should be blank.
-- [ ] Test it on iPad !!
-- [ ] Make signature easier to open when closed
-- [ ] Move example block to next line, and add the word "For" in front
-  so it reads "For example..."
-- [ ] Pull latest version of Blockly
-- [ ] Provide support for undoing any action !!
+** High Priority [0/18]
+*** TODO [#A] 
+Double clicking is like using a repl, and is immediate evaluation, while running a program is the formal version which triggers tests to be run. (Even if you don't use something, all the tests should be run) I currently have the UI in place for double clicking, but haven't hooked it up to evaluation.
+*** TODO [#A]
+Have failed tests change color to red upon failure, and successful ones to turn green upon success, and then have a tooltip that explains what went wrong that is active over the whole area of the test block. Have a tab change color as well if there are failing tests in the tab. I have everything here but the tooltip on the test block with an explanation of what went wrong.
+*** TODO [#A]
+Have unfinished definitions work gracefully  
+*** TODO [#B]
+When you change a function and that causes type error, make the block that doesn't fit turn red or something, and then also have the workspaces which use that block turn red as well
+*** TODO [#A]
+Add in image atomic type. !!
+*** TODO [#B]
+Add support for world-programming, via big-bang primitives. !!
+*** TODO [#A]
+Test adding so many functions that the tab bar is longer than the screen width 
+*** TODO [#A]
+Get function body displayable in pop-up alongside function usage !!
+*** TODO [#A]
+Make it possible to define a value by right-clicking, saying "Name a value" (Not inside functions) !!
+*** TODO [#C]
+Hook up to WeScheme !! I have accounts working, and need to add the interface elements for listing programs. 
+*** TODO [#A]
+Make failed attempts to connect react more violently to that failure. Maybe have block to which you can't connect get repelled!
+*** TODO [#A]
+Make drop targets for blocks larger, so that it's easier to connect them.
+*** TODO [#A]
+Default type of argument should be blank.
+*** TODO [#A]
+Test it on iPad !!
+*** TODO [#A]
+Make signature easier to open when closed
+*** TODO [#B]
+Move example block to next line, and add the word "For" in front so it reads "For example..."
+*** TODO [#C]
+Pull latest version of Blockly
+*** TODO [#A]
+Provide support for undoing any action !!
 
-** Low Priority
-- [ ] Switch to rounded rectangles. Merge this with notch shape
-- [ ] Change unknown color to rainbow gradient.
-- [ ] Move the button to open function editing dialog to the signature
-- [ ] Make it possible to define a value by right-clicking, saying
-  "Name a value" (Inside functions)
+** Low Priority [0/38]
+*** TODO
+Switch to rounded rectangles. Merge this with notch shape
+*** TODO
+Change unknown color to rainbow gradient.
+*** TODO
+Move the button to open function editing dialog to the signature
+*** TODO
+Make it possible to define a value by right-clicking, saying "Name a value" (Inside functions)
+*** TODO
+Every time there is a bug, set it up to send me an email.
+*** TODO
+Inside function definition dialog, you should be able to drag a name and type into the signature to add an argument.
+*** TODO
+Have flyout automatically refresh when I switch tabs, so that I get most up to date set of blocks.
+*** TODO
+Disable copying of argument blocks from one function to another. (Actually just allow, and throw error if you use an undefined variable)
+*** TODO
+See about having function body not just floating in space. (Don't worry about this, just throw an error if they try to run and there are multiple expressions that could be the body)
+*** TODO
+Build up support for vertical layouts, and convert 'if' and 'cond' to use vertical layouts.
+*** TODO
+Remove dependency on jQuery. Not necessarily worth the hassle, it's also only used in testing.
+*** TODO
+Start getting compiled mode to work.
+*** TODO
+Color toolbar items, according to type.
+*** TODO
+Figure out why drawers get confused sometimes. 
+*** TODO
+Rename 'unknown' to 'misc'. 
+*** TODO
+In funtion creation dialog, arguments names should be colored according to their type. Same with function name. 
+*** TODO
+Ordering for evaluation of multiple expressions in main workspace.
+*** TODO
+Figure out how to handle unfinished function definitions
+*** TODO
+Make pasting happen at cursor, not just at location of copy
+*** TODO
+Use DragLists to handle re-ordering arguments
+*** TODO
+Put 'example' block in forms
+*** TODO
+Figure out interface for removing/changing values
+*** TODO
+Require at least one argument for functions
+*** TODO
+Make purpose statement area much larger (input -> textarea)
+*** TODO
+Have individual items in the function definition dialog turn green when valid, and red otherwise, with localized error messages
+*** TODO
+Unify tooltips to have consistent styling
+*** TODO
+Unify tooltips to also use the same mechanism everywhere (not the case currently), so that I could switch to a message bar if desired
+*** TODO
+Provide some sort of feedback when you run tests, and there are none
+*** TODO
+Have results be shown as blocks
+*** TODO
+Figure out how to serialize everything
+*** TODO
+Add a 'list' category
+*** TODO
+See if we need 'unknown' after that
+*** TODO
+Add support for evaluating expressions within the body (have students provide values for the arguments / or just disallow this)
+*** TODO
+Have the signature return when you let go of the block you are holding
+*** TODO
+Have the signature not part of the canvas, so you can't drag things onto it.
+*** TODO
+Give name and purpose textfield/area in funDefDialog each a full line
+*** TODO
+Precede each line in FunDefDialog with label in bold. ("Name:", "Purpose:", "Domain:", "Range:")
+*** TODO
+Fix number validation for blocks
 
-- [ ] Every time there is a bug, set it up to send me an email.
-- [ ] Inside function definition dialog, you should be able to drag a name
-  and type into the signature to add an argument.
-- [ ] Have flyout automatically refresh when I switch tabs, so that I get
-  most up to date set of blocks.
-- [ ] Disable copying of argument blocks from one function to
-  another. *** Actually just allow, and throw error if you use an
-  undefined variable
-- [ ] See about having function body not just floating in
-  space. (Don't worry about this, just throw an error if they try to
-  run and there are multiple expressions that could be the body)
-- [ ] Build up support for vertical layouts, and convert 'if' and
-  'cond' to use vertical layouts.
-- [ ] Remove dependency on jQuery. Not necessarily worth the hassle,
-  it's also only used in testing.
-- [ ] Start getting compiled mode to work.
-- [ ] Color toolbar items, according to type.
-- [ ] Figure out why drawers get confused sometimes. 
-- [ ] Rename 'unknown' to 'misc'. 
-- [ ] In funtion creation dialog, arguments names should be colored
-  according to their type. Same with function name. 
-- [ ] Ordering for evaluation of multiple expressions in main workspace.
-- [ ] Figure out how to handle unfinished function definitions
-- [ ] Make pasting happen at cursor, not just at location of copy
-- [ ] Use DragLists to handle re-ordering arguments
-- [ ] Put 'example' block in forms
-- [ ] Figure out interface for removing/changing values
-- [ ] Require at least one argument for functions
-- [ ] Make purpose statement area much larger (input -> textarea)
-- [ ] Have individual items in the function definition dialog turn green when valid, 
-  and red otherwise, with localized error messages
-- [ ] Unify tooltips to have consistent styling
-- [ ] Unify tooltips to also use the same mechanism everywhere (not
-  the case currently), so that I could switch to a message bar if
-  desired
-- [ ] Provide some sort of feedback when you run tests, and there are
-  none
-- [ ] Have results be shown as blocks
-- [ ] Figure out how to serialize everything
-- [ ] Add a 'list' category
-- [ ] See if we need 'unknown' after that
-- [ ] Add support for evaluating expressions within the body (have
-  students provide values for the arguments / or just disallow this)
-- [ ] Have the signature return when you let go of the block you are
-  holding
-- [ ] Have the signature not part of the canvas, so you can't drag
-  things onto it.
-- [ ] Give name and purpose textfield/area in funDefDialog each a full
-  line
-- [ ] Precede each line in FunDefDialog with label in bold. ("Name:",
-  "Purpose:", "Domain:", "Range:")
-- [ ] Fix number validation for blocks
-* Ideas
-Just have holes be replaced with 'undefined', and cause dynamic errors, but no static errors.
-
-As a test, create string-last, with correct definition, and test it with "Hello, world!" --> '!'
-
-Also, create double-a-number and test it with 20 --> 40
-
-(define (string-last x) (string-ref x (- (string-length x) 1)))
-(check-expect (string-last "Hello, world!") #\!)
-
-(define (double-a-number n) (* 2 n))
-(check-expect (double-a-number 20) 40)
-
-Talk to Joe and Daniel about moving this to integrate with the Cap'n Teach storage mechanism
-
-Go with the undefined proposal
-
-
-Also, respond to Emmanuel/update the todo list with his items. 
-
-Ask Shriram what he means by everything can be undone.
-
-Also, what about the fact that you can have an example in a function definition tab that doesn't actually test the function in question? Should it be reset when the function changes?
-
-Conversly, you can have an example in function A's tab that uses function B. When should it be reset? 
-
-Maybe I should just make the function blocks in the examples not removable, so that you can't run into the first problem.
-
-----------------------------------------------------------------------------------------------------
-
-FIGURE OUT WHAT THE SCHEDULE IS!!!!!!!!!
-
-RESPOND TO EMMANUEL'S PREVIOUS EMAIL
-
-EMPTY doesn't typecheck correctly, because there is no function value associated with it. I have to fix this.
-Actually the problem isn't in typechecking. The problem is that when
-we go to generate code for it, we dispatch on the presenct of a value_
-field, which it does have even though it is not a  function. We need
-to have some global, like Globals.Class that we can dispatch against,
-and have that field remain an implementation detail. Or we can do
-this in a more object-oriented way, and have each object provide its
-own generation. Also the way my blocks are constructed is worryingly
-ad-hoc. There should be a more principled way to go about. Maybe some
-interface they could all implement. 
-
-Also, I gotta pull the latest code, and see what I'm missing.
-
-Next thing is to fix 'empty', and to disable run button.
-Then consider what to do about examples that use other functions, and whether I should make it impossible to remove function application in example.
-Have a tooltip that explains what went wrong over the area of the example, when we have a failure.
-
-Also, the fact that the run button is disabling and enabling in
-response to events, and not by polling solves the problem of
-potentially being able to run invalid code. Given that, it's okay
-that the tab status indicator takes some time to update. 
-
-----------------------------------------------------------------------------------------------------
-
-- [X] Fix 'empty'
-- [X] Disable run button at the appropriate times
-- [X] Set a tooltip indicating that you can go to the tab for more
-  information
-- [ ] Add explanatory tooltip over failing examples. 
-- [ ] Clean up this document, and figure out where I am exactly.
-
-* Things to work on in the near future
-- Double-clicking / handling evaluation when definitions are
-  unfinished, when values are undefined
-- Tooltip with explanation over failing(/passing) examples
-- [X] Making the results box better, perhaps have it show a results block
-  when successfully executing, and just turn red with an error
-  message otherwise. 
-- Getting vertical layouts to work fully
-- [X] Changing the type names to the unabbreviated versions!
-
-* Get double clicking to evaluate working
-
-In order to do this, I have to figure out first where
-block.onMouseDown is called, so I can know what I'm going to have to intercept.
-
-* Send Kathi email telling her to test on iPad
-
-- [ ] Make all blocks global, and just have them show up or not, depending on what Blockly is requesting it.
-
-I just switched to generating a category tree, and now I am running into problems when generating the toolbox from that, so I should have the category tree handle that itself.
-
-I now correctly generate the xml, but I can't look things up. The problem is Ray.Shared.lookupInBlockDirectory, which has a key as an argument which is incorrect. 
-
-I am changing sync trees to not go through XML, because that is dumb. 
-
-That should solve problems.
-
-I have to solve the problem with undefined values not being correctly
-handled. That is a very high priority, since that will have a large
-effect on making the system less brittle, as lots of attempts to
-evaluate when everything is not perfect currently run into errors,
-when they shouldn't necessarily. Though maybe that's just the result
-of me failing to understand the check all and evaluate button
-sufficiently.
-
-Have the result block window resize to match the block size, or at
-least figure out a way to work that into the page better. 
-
-Ok, curent idea is to work on serialization.
-
-* More TODO
-
-- [ ] Get multiple result blocks to stack / OR have results evaluate
-  alongside blocks
-- [ ] Account for changes in title values when resetting example
-  block colors
-
-Prioritize UI features over deep integration, I don't need to be able
-to turn arbitrary Racket code into Block code for the moment.
-
-Next objective: make it possible to load from xml the entire state
-of the application
-
-- [ ] Make functions that can take in and return lists
-- [ ] Paste at cursor
-- [ ] Figure out numeric equality
-- [ ] Why is simply evaluating true not working! FIXED
-
-New problem discovered! When I go to delete a function, the current
-tab is still polling that function, and so it could poll after
-deletion has started, in which case deletion will throw errors
-because some fields are null.
-
-New problem discovered. Signatures blocks are incorrectly spaced, the
-text overlaps them. 
-
-* ----------------------------------------------------------------------------------------------------
-Ok, so I now have deserialization sorta working
-
-Here is a sample program to deserialize:
-* ----------
-<xml>
-  <workspace kind="main">
-    <block type="ray_substring" x="39"
-           y="65">
-      <value name="str">
-        <block type="ray_string-append">
-          <mutation
-              rest_args="2">
-          </mutation>
-        </block>
-      </value>
-    </block>
-  </workspace>
-  <user_function>
-    <user_function_specification
-        fun_id="0">
-      <name>string-last
-      </name>
-      <description>gets the last
-      character of the passed-in string
-      </description>
-      <arg name="x"
-           type="String">
-      </arg>
-      <return_type
-          type="Character">
-      </return_type>
-    </user_function_specification>
-    <workspace
-        kind="user_function" fun_id="0">
-      <block type="ray_string-ref" x="143"
-             y="36">
-        <value name="str">
-          <block
-              type="ray_function_0_arg_0">
-          </block>
-        </value>
-        <value name="k">
-          <block
-              type="ray_-">
-            <value name="x">
-              <block type="ray_string-length">
-                <value
-                    name="x">
-                  <block
-                      type="ray_function_0_arg_0">
-                  </block>
-                </value>
-              </block>
-            </value>
-            <value
-                name="y">
-              <block type="ray_data_create_Number">
-                <title
-                    name="N">1
-                </title>
-              </block>
-            </value>
-          </block>
-        </value>
-      </block>
-      <block
-          type="example" x="215" y="240">
-        <value name="EXPR">
-          <block
-              type="ray_user_function_0">
-            <value name="P_ARG0">
-              <block
-                  type="ray_data_create_String">
-                <title name="S">Hello,
-                World!
-                </title>
-              </block>
-            </value>
-          </block>
-        </value>
-        <value
-            name="RESULT">
-          <block type="ray_data_create_Character">
-            <title
-                name="C">!
-            </title>
-          </block>
-        </value>
-      </block>
-    </workspace>
-  </user_function>
-</xml>
-* ----------
-When I get back, try deserializing that, and set up a server around
-it to load and save stuff. 
-
-* Next items on the todo list
-
-Make a block for function body, and make it not deletable
-
-Correctly interpret undefined values. 
-
-Logging in and logging out now works!
-
-* TODO
-- [ ] I want to add a save button. I need that button to make a POST
-  request with the appropriate data.
-- [ ] Logout can just make the request, and then do the logout stuff. 
-- [ ] Loading is also kinda tricky
-
-Ok, I now have to put the source in my template, and then hook it up
-to saving
-
-Fix the weird tab sizing issue
-
-I think the problem I am having now is that I can't get an html file
-from ray/blockly, since I am serving it as a static file. I think I
-can just set application-readable to true to fix this!
-
-* ----------------------------------------------------------------------------------------------------
-
-Many programs per account
-support for undefined functions
-block or notch for function body
-
-October 1st is when Bootstrap materials are frozen for release.
-
-Send Kathi todo list
-
-* ----------------------------------------------------------------------------------------------------
-
-So I am trying to set up the list of programs with a row at the bottom
-to create a new program, but in order to do
-that, I need to pass all the program names to the page initially, so
-I can reject any invalid names. 
-
-This is getting quite annoying, so I wonder if maybe it's easier to
-just set this all up by just having the page make a request to the
-API, and getting JSON back with all the program names, and using that
-instead of having to read in all these data attributes. 
-
-This would simplify interaction quite a bit.
